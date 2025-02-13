@@ -11,7 +11,8 @@ services:
       - ./yarn.lock:/app/yarn.lock
     # depends_on:
     #   - mongodb
-    # environment:
+    environment:
+      YARN_CACHE_FOLDER: .cache
       # MONGODB_URI: "mongodb://mongodb:27017/zoo"
     # command: yarn ls
 

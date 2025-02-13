@@ -6,6 +6,7 @@ helm
 
 .git
 .gitignore
+.cache
 
 *.log
 npm-debug.log*
