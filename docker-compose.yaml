@@ -1,3 +1,4 @@
+version: "3.8"
 services:
   backend:
     build:
@@ -9,20 +10,23 @@ services:
     volumes:
       - ./packages/backend:/app
       - ./yarn.lock:/app/yarn.lock
-    # depends_on:
-    #   - mongodb
+    depends_on:
+      - mongodb
     environment:
       YARN_CACHE_FOLDER: .cache
-      # MONGODB_URI: "mongodb://mongodb:27017/zoo"
-    # command: yarn ls
+      MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT}/${MONGO_DATABASE}?authSource=admin"
 
-  # mongodb:
-  #   image: mongo:6.0
-  #   container_name: zoo-mongo-dev
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - mongo_data:/data/db
+  mongodb:
+    image: mongo:6.0
+    container_name: zoo-mongo-dev
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASS}
+    ports:
+      - "${MONGO_PORT_HOST}:${MONGO_PORT}"
+    volumes:
+      - mongo_data:/data/db
 
-# volumes:
-#   mongo_data:
+volumes:
+  mongo_data:
