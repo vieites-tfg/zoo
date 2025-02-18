@@ -1,40 +1,27 @@
-import express, { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import express from 'express';
+import bodyParser from 'body-parser';
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import animalsRouter from './routes/animals.routes';
 
 const app = express();
-app.use(express.json());
+app.use(bodyParser.json());
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello from the Zoo Backend!');
-});
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Zoo Animals API',
+      version: '1.0.0',
+      description: 'API to manage animals from a zoo',
+    },
+  },
+  apis: ['./src/routes/*.ts'],
+};
 
-const maxAttempts = 5; // Maximum number of connection attempts
-const retryInterval = 2000; // Wait time between retries in milliseconds (2 seconds)
-let attempts = 0;
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-const mongoDBURI = process.env.MONGODB_URI || "mongodb://mongodb:27017/zoo"
-
-function connectWithRetry() {
-  mongoose.connect(mongoDBURI, {
-    serverSelectionTimeoutMS: 5000 // Maximum time to select a server
-  })
-    .then(() => {
-      console.log('Successfully connected to MongoDB');
-    })
-    .catch(err => {
-      attempts++;
-      console.error(`Error connecting to MongoDB (attempt ${attempts} of ${maxAttempts}):`, err);
-      
-      if (attempts < maxAttempts) {
-        console.log(`Retrying in ${retryInterval / 1000} seconds...`);
-        setTimeout(connectWithRetry, retryInterval);
-      } else {
-        console.error('Maximum connection attempts reached. Aborting connection.');
-        process.exit(1); // Exit the process on critical failure
-      }
-    });
-}
-
-connectWithRetry();
+app.use('/animals', animalsRouter);
 
 export default app;
