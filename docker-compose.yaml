@@ -8,12 +8,28 @@ services:
       - "3000:3000"
     volumes:
       - ./packages/backend:/app
-      - ./yarn.lock:/app/yarn.lock
     depends_on:
       - mongodb
     environment:
+      NODE_ENV: development
       YARN_CACHE_FOLDER: .cache
       MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT}/${MONGO_DATABASE}?authSource=admin"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./packages/frontend/Dockerfile
+    container_name: zoo-frontend-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./packages/frontend:/app
+      - /app/node_modules/
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: development
+      YARN_CACHE_FOLDER: .cache
 
   mongodb:
     image: mongo:6.0
