@@ -1,7 +1,8 @@
 set allow-duplicate-recipes
 
 alias d := down
-alias da := down_all
+alias dv := down_vol
+alias dva := down_vol_all
 alias re := rebuild
 
 _default:
@@ -10,7 +11,10 @@ _default:
 down:
   docker compose down
 
-down_all:
+down_vol:
+  docker compose down -v
+
+down_vol_all:
   docker compose down -v --rmi "all"
 
 rebuild:
