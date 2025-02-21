@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import AnimalTable from './components/AnimalTable.vue'
-import Animal from '@/types/Animal'
+import Animal from './types/Animal'
 
 const animals = ref<Animal[]>([])
 
