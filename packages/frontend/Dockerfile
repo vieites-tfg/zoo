@@ -4,11 +4,11 @@ WORKDIR /app
 
 ENV PATH=/app/node_modules/.bin:$PATH
 
-COPY ./packages/frontend/package.json ./yarn.lock ./
+COPY ./package.json ./yarn.lock ./
 
 RUN yarn install --frozen-lockfile
 
-COPY ./packages/frontend .
+COPY . .
 
 EXPOSE 5173
 

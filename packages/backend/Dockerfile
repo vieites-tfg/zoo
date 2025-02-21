@@ -1,14 +1,14 @@
-FROM node:18-slim
+FROM nod7:18-slim
 
 WORKDIR /app
 
 ENV PATH=/app/node_modules/.bin:$PATH
 
-COPY ./packages/backend/package.json ./yarn.lock ./
+COPY ./package.json ./yarn.lock ./
 
 RUN yarn install --frozen-lockfile
 
-COPY ./packages/backend .
+COPY . .
 
 EXPOSE 3000
 
