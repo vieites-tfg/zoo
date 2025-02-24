@@ -33,7 +33,7 @@ onMounted(() => {
 
 <template>
   <div class="w-4/5 mx-auto p-6">
-    <h1 class="text-xl font-bold mb-4">Animal List</h1>
+    <h1 class="font-title text-4xl font-bold mb-4 flex justify-center">Zoo</h1>
     <AnimalTable :animals="animals" />
   </div>
 </template>

@@ -1,13 +1,13 @@
 <template>
   <div class="p-4">
     <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+      <thead>
         <tr>
           <th
             v-for="column in columns"
             :key="column.field"
             scope="col"
-            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+            class="font-head px-2 py-2 text-left text-xs font-semibold text-black uppercase tracking-wide cursor-pointer"
             @click="sortBy(column.field)"
           >
             {{ column.field }}
@@ -17,7 +17,7 @@
           </th>
         </tr>
       </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
+      <tbody class="font-body text-4xl bg-white">
         <tr
           v-for="animal in sortedAnimals"
           :key="animal._id"
@@ -26,7 +26,7 @@
           <td
             v-for="column in columns"
             :key="column.field"
-            class="px-4 py-2 text-sm text-gray-700"
+            class="px-2 py-1 text-sm text-gray-700 border border-black"
           >
             {{ animal[column.field] }}
           </td>
@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import Animal from '@/types/Animal'
+import Animal from './types/Animal'
 
 const props = defineProps<{
   animals: Animal[]
