@@ -56,9 +56,7 @@ const columns: Column[] = [
   { field: 'notes' },
 ];
 
-const emit = defineEmits<{
-  (e: 'selectionChanged'): void;
-}>();
+const emit = defineEmits(['selectionChanged']);
 
 // Select animals
 

@@ -16,9 +16,7 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits<{
-  (e: 'click'): void;
-}>();
+const emit = defineEmits(['click'])
 </script>
 
 <style scoped>

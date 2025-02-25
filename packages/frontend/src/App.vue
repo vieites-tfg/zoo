@@ -3,10 +3,15 @@
     <Title />
     <ActionButtons
       :isDeleteEnabled="isDeleteEnabled"
+      @openNewAnimal="openNewAnimalModal"
     />
     <AnimalTable
       :animals="animals"
       @selectionChanged="updateSelection"
+    />
+    <NewAnimalModal 
+    :openModal="openModal"
+    @closeNewAnimal="closeNewAnimalModal"
     />
   </div>
 </template>
@@ -16,13 +21,23 @@ import { ref, onMounted } from 'vue'
 import Title from './components/Title.vue'
 import ActionButtons from './components/ActionButtons.vue'
 import AnimalTable from './components/AnimalTable.vue'
+import NewAnimalModal from './components/NewAnimalModal.vue'
 import Animal from './types/Animal'
 
 const animals = ref<Animal[]>([])
 const isDeleteEnabled = ref(false)
+const openModal = ref(false)
 
 const updateSelection = (selectedCount: number) => {
   isDeleteEnabled.value = selectedCount > 0
+};
+
+const openNewAnimalModal = () => {
+  openModal.value = true
+};
+
+const closeNewAnimalModal = () => {
+  openModal.value = false
 };
 
 onMounted(() => {

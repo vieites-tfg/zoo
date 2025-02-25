@@ -8,10 +8,5 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits<{
-  (e: 'click'): void;
-}>();
+const emit = defineEmits(['click'])
 </script>
-
-<style scoped>
-</style>

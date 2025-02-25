@@ -1,21 +1,35 @@
 <template>
   <div class="flex justify-start pl-4">
-    <NewButton @click="handleNew" />
-    <DeleteButton @click="handleDelete" :disabled="!props.isDeleteEnabled" class="ml-2" />
+    <Button @click="handleNew" :info="greenButton" />
+    <Button @click="handleDelete" :info="redButton" class="ml-2" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import NewButton from './NewButton.vue';
-import DeleteButton from './DeleteButton.vue';
+import { ref, computed } from 'vue'
+import Button from './GenericButton.vue';
 
 const props = defineProps<{
   isDeleteEnabled: bool
 }>()
 
+const emit = defineEmits(['openNewAnimal'])
+
+const greenButton: Button = {
+  text: "New",
+  color: "green"
+}
+
+const redButton = computed(() => {
+  return {
+    text: "Delete",
+    color: "red",
+    disabled: !props.isDeleteEnabled
+  }
+})
+
 const handleNew = () => {
-  console.log("Botón + New presionado");
+  emit('openNewAnimal')
 };
 
 const handleDelete = () => {
