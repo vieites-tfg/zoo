@@ -1,9 +1,29 @@
+<template>
+  <div class="w-4/5 mx-auto p-6 pt-[25vh]">
+    <Title />
+    <ActionButtons
+      :isDeleteEnabled="isDeleteEnabled"
+    />
+    <AnimalTable
+      :animals="animals"
+      @selectionChanged="updateSelection"
+    />
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import Title from './components/Title.vue'
+import ActionButtons from './components/ActionButtons.vue'
 import AnimalTable from './components/AnimalTable.vue'
 import Animal from './types/Animal'
 
 const animals = ref<Animal[]>([])
+const isDeleteEnabled = ref(false)
+
+const updateSelection = (selectedCount: number) => {
+  isDeleteEnabled.value = selectedCount > 0
+};
 
 onMounted(() => {
   animals.value = [
@@ -15,7 +35,8 @@ onMounted(() => {
       genre: 'Female',
       diet: 'Herbivore',
       condition: 'Healthy',
-      notes: 'Very social, interacts well with visitors.'
+      notes: 'Very social, interacts well with visitors.',
+      selected: false
     },
     {
       _id: '2',
@@ -25,18 +46,9 @@ onMounted(() => {
       genre: 'Male',
       diet: 'Carnivore',
       condition: 'Injured paw',
-      notes: 'Under special care due to paw injury.'
+      notes: 'Under special care due to paw injury.',
+      selected: false
     }
   ]
 })
 </script>
-
-<template>
-  <div class="w-4/5 mx-auto p-6">
-    <h1 class="font-title text-4xl font-bold mb-4 flex justify-center">Zoo</h1>
-    <AnimalTable :animals="animals" />
-  </div>
-</template>
-
-<style scoped>
-</style>
