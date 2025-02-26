@@ -41,11 +41,28 @@ const closeNewAnimalModal = () => {
   openModal.value = false
 };
 
+function formatDate(date: string): string {
+  const d = new Date(date)
+
+  return d.toLocaleDateString(undefined, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
+}
+
 async function loadAnimals() {
   try {
     const allAnimals = await getAllAnimals()
-    console.log('Animals:', allAnimals)
-    animals.value = allAnimals
+
+    const formattedAnimals = allAnimals.map((a) => {
+      return {
+        ...a,
+        birthday: formatDate(a.birthday),
+      }
+    })
+
+    animals.value = formattedAnimals
   } catch (error) {
     console.error('Could not load the animals:', error)
   }
