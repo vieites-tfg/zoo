@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <table class="min-w-full divide-y divide-gray-200">
+    <table class="min-w-full">
       <thead>
         <tr>
           <th class="px-4 py-2">
