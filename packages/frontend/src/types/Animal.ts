@@ -7,5 +7,5 @@ export interface Animal {
   diet: string
   condition: string
   notes: string
-  selected: string
+  selected?: string
 }

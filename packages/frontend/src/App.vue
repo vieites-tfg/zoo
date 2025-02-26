@@ -23,6 +23,7 @@ import ActionButtons from './components/ActionButtons.vue'
 import AnimalTable from './components/AnimalTable.vue'
 import NewAnimalModal from './components/NewAnimalModal.vue'
 import Animal from './types/Animal'
+import { getAllAnimals } from './api/animals';
 
 const animals = ref<Animal[]>([])
 const isDeleteEnabled = ref(false)
@@ -40,30 +41,17 @@ const closeNewAnimalModal = () => {
   openModal.value = false
 };
 
+async function loadAnimals() {
+  try {
+    const allAnimals = await getAllAnimals()
+    console.log('Animals:', allAnimals)
+    animals.value = allAnimals
+  } catch (error) {
+    console.error('Could not load the animals:', error)
+  }
+}
+
 onMounted(() => {
-  animals.value = [
-    {
-      _id: '1',
-      name: 'Bella',
-      species: 'Giraffe',
-      birthday: '2020-01-15',
-      genre: 'Female',
-      diet: 'Herbivore',
-      condition: 'Healthy',
-      notes: 'Very social, interacts well with visitors.',
-      selected: false
-    },
-    {
-      _id: '2',
-      name: 'Rocky',
-      species: 'Lion',
-      birthday: '2018-06-10',
-      genre: 'Male',
-      diet: 'Carnivore',
-      condition: 'Injured paw',
-      notes: 'Under special care due to paw injury.',
-      selected: false
-    }
-  ]
+  loadAnimals()
 })
 </script>

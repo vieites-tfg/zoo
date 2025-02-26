@@ -4,7 +4,7 @@
       <div class="bg-white w-2/5 p-6 rounded shadow-lg relative">
         <h2 class="text-xl font-title font-bold mb-4 text-center">New animal</h2>
 
-        <form @submit.prevent="handleAdd">
+        <form class="grid grid-cols-2 gap-4" @submit.prevent="handleAdd">
           <div class="mb-2">
             <label class="block font-semibold" for="name">Name</label>
             <input id="name" v-model="formData.name" type="text"
@@ -41,13 +41,13 @@
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
-          <div class="mb-2">
+          <div class="mb-2 col-span-2">
             <label class="block font-semibold" for="notes">Notes</label>
             <textarea id="notes" v-model="formData.notes"
-              class="w-full border border-gray-300 rounded px-2 py-1"></textarea>
+              class="w-full border border-gray-300 rounded px-2 py-1 min-h-8 max-h-56"></textarea>
           </div>
 
-          <div class="flex justify-end space-x-2 mt-4">
+          <div class="col-start-2 flex justify-end space-x-2 mt-4">
             <Button :info="clearButton" @click="clearForm" />
             <Button :info="addButton" @click="handleAdd" />
           </div>
