@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { Types } from 'mongoose';
 import { AnimalService } from '../services/animal.service';
 import Joi from 'joi';
 
@@ -75,6 +76,11 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
  */
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      res.status(404).json({ error: 'Animal not found' });
+      return;
+    }
+
     const animal = await AnimalService.getAnimalById(req.params.id);
     if (!animal) {
       res.status(404).json({ error: 'Animal not found' });
@@ -190,6 +196,11 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
  */
 router.put('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      res.status(404).json({ error: 'Animal not found' });
+      return;
+    }
+
     const { error } = updateAnimalSchema.validate(req.body);
     if (error) {
       res.status(400).json({ error: error.details[0].message });
