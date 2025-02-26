@@ -8,21 +8,34 @@
               <input type="checkbox" :checked="allSelected" @change="toggleAll" />
             </div>
           </th>
-          <th v-for="column in columns" :key="column.field" scope="col"
-            class="font-head px-2 py-2 text-left text-xs font-semibold text-black uppercase tracking-wide cursor-pointer"
-            @click="sortBy(column.field)">
+          <th>
+            <!-- Empty header for editing -->
+          </th>
+          <th v-for="column in columns" :key="column.field" scope="col" @click="sortBy(column.field)" :class="[
+            'font-head px-2 py-2 text-left text-xs font-semibold text-black uppercase tracking-wide',
+            column.field !== 'notes' ? 'cursor-pointer' : ''
+          ]">
             {{ column.field }}
-            <span v-if="sortKey === column.field">
+            <span v-if="sortKey === column.field && sortKey !== 'notes'">
               {{ sortOrder === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
         </tr>
       </thead>
       <tbody class="font-body text-4xl bg-white">
-        <tr v-for="(animal, index) in sortedAnimals" :key="animal._id" class="hover:bg-gray-100">
+        <tr v-for="animal in sortedAnimals" :key="animal._id" class="hover:bg-gray-100">
           <td>
             <div class="flex justify-center items-center">
-              <input type="checkbox" :checked="animal.selected" @change="toggleRow(index)" />
+              <input type="checkbox" :checked="animal.selected" @change="toggleRow(animal)" />
+            </div>
+          </td>
+          <td class="px-2 py-1">
+            <div class="flex justify-left items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="size-5 text-gray-700">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+              </svg>
             </div>
           </td>
           <td v-for="column in columns" :key="column.field" class="px-2 py-1 text-sm text-gray-700 border border-black">
@@ -74,8 +87,8 @@ const toggleAll = () => {
   emit('selectionChanged', allSelected.value ? 1 : 0)
 };
 
-const toggleRow = (index: number) => {
-  props.animals[index].selected = !props.animals[index].selected
+const toggleRow = (animal: Animal) => {
+  animal.selected = !animal.selected
   emit('selectionChanged', props.animals.filter((a) => a.selected).length)
 };
 
@@ -95,6 +108,10 @@ function sortBy(column: keyof Animal) {
 
 const sortedAnimals = computed(() => {
   if (!sortKey.value) {
+    return props.animals
+  }
+
+  if (sortKey.value === 'notes') {
     return props.animals
   }
 
