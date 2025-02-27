@@ -13,7 +13,7 @@ const props = defineProps<{
   isDeleteEnabled: bool
 }>()
 
-const emit = defineEmits(['openNewAnimal'])
+const emit = defineEmits(['newAnimal'])
 
 const greenButton: Button = {
   text: "New",
@@ -29,7 +29,7 @@ const redButton = computed(() => {
 })
 
 const handleNew = () => {
-  emit('openNewAnimal')
+  emit('newAnimal')
 };
 
 const handleDelete = () => {

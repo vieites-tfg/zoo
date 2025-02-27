@@ -14,8 +14,6 @@ const props = defineProps<{
   info: Button
 }>()
 
-console.log(props.info.color)
-
 const bgColorClass = computed(() => {
   if (props.info.color === 'green') {
     return 'border-green-500 text-green-500 hover:bg-green-500 hover:text-white'

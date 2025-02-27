@@ -2,54 +2,53 @@
   <div>
     <div v-if="openModal" class="fixed inset-0 flex items-center justify-center bg-gray-100/50 bg-opacity-50 z-50">
       <div class="bg-white w-2/5 p-6 rounded shadow-lg relative">
-        <h2 class="text-xl font-title font-bold mb-4 text-center">New animal</h2>
+        <h2 class="text-xl font-title font-bold mb-4 text-center">{{ info.title }}</h2>
 
         <form class="grid grid-cols-2 gap-4" @submit.prevent="handleAdd">
           <div class="mb-2">
             <label class="block font-semibold" for="name">Name</label>
-            <input id="name" v-model="formData.name" type="text"
+            <input id="name" v-model="info.data.name" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="species">Species</label>
-            <input id="species" v-model="formData.species" type="text"
+            <input id="species" v-model="info.data.species" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="birthday">Birthday</label>
-            <input id="birthday" v-model="formData.birthday" type="date"
+            <input id="birthday" v-model="formattedBirthday" type="date"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="genre">Genre</label>
-            <input id="genre" v-model="formData.genre" type="text"
+            <input id="genre" v-model="info.data.genre" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="diet">Diet</label>
-            <input id="diet" v-model="formData.diet" type="text"
+            <input id="diet" v-model="info.data.diet" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="condition">Condition</label>
-            <input id="condition" v-model="formData.condition" type="text"
+            <input id="condition" v-model="info.data.condition" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2 col-span-2">
             <label class="block font-semibold" for="notes">Notes</label>
-            <textarea id="notes" v-model="formData.notes"
+            <textarea id="notes" v-model="info.data.notes"
               class="w-full border border-gray-300 rounded px-2 py-1 min-h-8 max-h-56"></textarea>
           </div>
 
           <div class="col-start-2 flex justify-end space-x-2 mt-4">
-            <Button :info="clearButton" @click="clearForm" />
-            <Button :info="addButton" @click="handleAdd" />
+            <slot/>
           </div>
         </form>
 
@@ -66,52 +65,21 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
-import Button from './GenericButton.vue'
+import IAnimalModal from '../types/AnimalModal'
 
 const props = defineProps<{
-  openModal: boolean
+  openModal: boolean,
+  info: IAnimalModal,
 }>()
 
-const emit = defineEmits(['closeNewAnimal'])
-
-const clearButton: Button = {
-  text: 'Clear'
-}
-
-const addButton: Button = {
-  text: 'Add',
-  color: 'green',
-  type: 'submit'
-}
-
-const formData = reactive({
-  name: '',
-  species: '',
-  birthday: '',
-  genre: '',
-  diet: '',
-  condition: '',
-  notes: ''
+const formattedBirthday = computed(() => {
+  const [day, month, year] = props.info.data.birthday.split('/');
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 })
 
+const emit = defineEmits(['closeAnimalModal'])
+
 function closeModal() {
-  emit('closeNewAnimal')
-}
-
-function clearForm() {
-  formData.name = ''
-  formData.species = ''
-  formData.birthday = ''
-  formData.genre = ''
-  formData.diet = ''
-  formData.condition = ''
-  formData.notes = ''
-}
-
-function handleAdd() {
-  console.log('Datos del formulario:', { ...formData })
-
-  closeModal()
-  clearForm()
+  emit('closeAnimalModal')
 }
 </script>

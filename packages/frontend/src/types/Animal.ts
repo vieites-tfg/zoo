@@ -1,5 +1,5 @@
-export interface Animal {
-  _id: string
+export interface IAnimal {
+  _id?: string
   name: string
   species: string
   birthday: string
