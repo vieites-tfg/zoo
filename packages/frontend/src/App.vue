@@ -3,11 +3,7 @@
     <Title />
     <ActionButtons :isDeleteEnabled="isDeleteEnabled" @newAnimal="newAnimal" />
     <AnimalTable :animals="animals" @selectionChanged="updateSelection" @editAnimal="editAnimal" />
-    <AnimalModal 
-      :openModal="openModal"
-      :info="animalModalData"
-      @closeAnimalModal="closeAnimalModal"
-    >
+    <AnimalModal :openModal="openModal" :info="animalModalData" @closeAnimalModal="closeAnimalModal" >
       <template v-if="animalModalData.action === 'Create'">
         <NewAnimalButtons @clearForm="clearForm" @createNewAnimal="createNewAnimal"/>
       </template>
@@ -74,7 +70,6 @@ const createNewAnimal = (animal: IAnimal) => {
 
 const clearForm = () => {
   animalModalData.value.data = { ...cleanedForm }
-  console.log(animalModalData.value.data)
 }
 
 const newAnimal = () => {
