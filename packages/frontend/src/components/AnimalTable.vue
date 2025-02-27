@@ -46,7 +46,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import IAnimal from './types/Animal'
+import IAnimal from '../types/Animal'
+import { toISODate } from '../utils/date'
 
 const props = defineProps<{
   animals: IAnimal[]
@@ -125,11 +126,12 @@ const sortedAnimals = computed(() => {
     }
 
     if (sortKey.value === 'birthday') {
-      const dateA = new Date(valA);
-      const dateB = new Date(valB);
+      const dateA = toISODate(valA)
+      const dateB = toISODate(valB)
+
       return sortOrder.value === 'asc'
-        ? dateA.getTime() - dateB.getTime()
-        : dateB.getTime() - dateA.getTime();
+        ? dateA - dateB
+        : dateB - dateA
     }
 
     const comparison = valA.toString().localeCompare(valB.toString())
@@ -138,5 +140,3 @@ const sortedAnimals = computed(() => {
   return sorted
 })
 </script>
-
-<style scoped></style>

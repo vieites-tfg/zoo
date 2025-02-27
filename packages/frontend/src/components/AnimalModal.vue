@@ -66,6 +66,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import IAnimalModal from '../types/AnimalModal'
+import { toISODate } from '../utils/date'
 
 const props = defineProps<{
   openModal: boolean,
@@ -74,8 +75,10 @@ const props = defineProps<{
 
 const formattedBirthday = computed(() => {
   if (props.info.data.birthday === '') return ''
-  const [day, month, year] = props.info.data.birthday.split('/');
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
+  const date = toISODate(props.info.data.birthday)
+  console.log(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 })
 
 const emit = defineEmits(['closeAnimalModal'])
