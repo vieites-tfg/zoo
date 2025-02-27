@@ -19,7 +19,7 @@
 
           <div class="mb-2">
             <label class="block font-semibold" for="birthday">Birthday</label>
-            <input id="birthday" v-model="formattedBirthday" type="date"
+            <input id="birthday" v-model="info.data.birthday" type="date"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
@@ -48,7 +48,7 @@
           </div>
 
           <div class="col-start-2 flex justify-end space-x-2 mt-4">
-            <slot/>
+            <slot />
           </div>
         </form>
 
@@ -66,20 +66,11 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import IAnimalModal from '../types/AnimalModal'
-import { toISODate } from '../utils/date'
 
 const props = defineProps<{
   openModal: boolean,
   info: IAnimalModal,
 }>()
-
-const formattedBirthday = computed(() => {
-  if (props.info.data.birthday === '') return ''
-
-  const date = toISODate(props.info.data.birthday)
-  console.log(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-})
 
 const emit = defineEmits(['closeAnimalModal'])
 

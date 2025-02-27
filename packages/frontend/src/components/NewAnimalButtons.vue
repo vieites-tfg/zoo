@@ -1,6 +1,6 @@
 <template>
   <Button @click="$emit('clearForm')" :info="clearButton" />
-  <Button @click="$emit('createNewAnimal', animal)" :info="addButton" class="ml-2" />
+  <Button @click="$emit('createNewAnimal')" :info="addButton" class="ml-2" />
 </template>
 
 <script setup lang="ts">
@@ -10,7 +10,7 @@ import IAnimal from '../types/Animal';
 
 const emit = defineEmits<{
   (e: 'clearForm'): void
-  (e: 'createNewAnimal', animal: IAnimal): void
+  (e: 'createNewAnimal'): void
 }>()
 
 const clearButton: Button = {

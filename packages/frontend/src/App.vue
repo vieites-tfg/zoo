@@ -3,25 +3,16 @@
     <Title />
     <ActionButtons :isDeleteEnabled="isDeleteEnabled" @newAnimal="newAnimal" />
     <AnimalTable :animals="animals" @selectionChanged="updateSelection" @editAnimal="editAnimal" />
-    <AnimalModal :openModal="openModal" :info="animalModalData" @closeAnimalModal="closeAnimalModal" >
-      <template v-if="animalModalData.action === 'Create'">
-        <NewAnimalButtons @clearForm="clearForm" @createNewAnimal="createNewAnimal"/>
-      </template>
-      <template v-else>
-        <UpdateAnimalButtons/>
-      </template>
-    </AnimalModal>
+    <Modals :openModal="openModal" :animalModalData="animalModalData" @closeAnimalModal="closeAnimalModal"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import Title from './components/Title.vue'
+import Modals from './components/Modals.vue'
 import ActionButtons from './components/ActionButtons.vue'
-import NewAnimalButtons from './components/NewAnimalButtons.vue'
-import UpdateAnimalButtons from './components/UpdateAnimalButtons.vue'
 import AnimalTable from './components/AnimalTable.vue'
-import AnimalModal from './components/AnimalModal.vue'
 import IAnimal from './types/Animal'
 import IAnimalModal from './types/AnimalModal'
 import { getAllAnimals } from './api/animals';
@@ -41,44 +32,20 @@ const updateButton: Button = {
   type: 'submit'
 }
 
-const cleanedForm: IAnimal = {
-  name: '',
-  species: '',
-  birthday: '',
-  genre: '',
-  diet: '',
-  condition: '',
-  notes: ''
-}
-
 const updateSelection = (selectedCount: number) => {
   isDeleteEnabled.value = selectedCount > 0
-};
-
-const openAnimalModal = () => {
-  console.log(animalModalData.value)
-  openModal.value = true
 };
 
 const closeAnimalModal = () => {
   openModal.value = false
 };
 
-const createNewAnimal = (animal: IAnimal) => {
-  console.log(`Creating the animal: ${animal}`)
-}
-
-const clearForm = () => {
-  animalModalData.value.data = { ...cleanedForm }
-}
-
 const newAnimal = () => {
   animalModalData.value = {
     action: 'Create',
-    title: "New animal",
-    data: { ...cleanedForm }
+    title: "New animal"
   }
-  openAnimalModal()
+  openModal.value = true
 }
 
 const editAnimal = (animal: IAnimal) => {
@@ -87,7 +54,7 @@ const editAnimal = (animal: IAnimal) => {
     title: "Update animal",
     data: animal
   }
-  openAnimalModal()
+  openModal.value = true
 }
 
 const formatDate = (date: string): string => {
@@ -95,7 +62,7 @@ const formatDate = (date: string): string => {
   const year = d.getFullYear();
   const month = ("0" + (d.getMonth() + 1)).slice(-2);
   const day = ("0" + d.getDate()).slice(-2);
-  return `${day}/${month}/${year}`;
+  return `${year}-${month}-${day}`;
 }
 
 async function loadAnimals() {
