@@ -9,6 +9,18 @@ alias l := logs
 _default:
   just -l
 
+update_yarn:
+  rm yarn.lock || true
+  rm -rf node_modules || true
+  rm -rf packages/**/node_modules || true
+  rm packages/frontend/yarn.lock || true
+  rm packages/backend/yarn.lock || true
+  yarn install
+  cp yarn.lock packages/backend
+  cp yarn.lock packages/frontend
+  rm yarn.lock
+  rm -rf node_modules
+
 down:
   docker compose down
 
