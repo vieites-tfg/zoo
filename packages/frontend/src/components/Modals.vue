@@ -1,16 +1,23 @@
 <template>
-  <AnimalModal :openModal="openModal" :info="currentData" @closeAnimalModal="$emit('closeAnimalModal')">
+  <AnimalModal
+    :openModal="openModal"
+    :info="currentData"
+    :clear="clearModal"
+    :provideFormData="provideFormData"
+    @cleared="clearedModal"
+    @providingFormData="providingFormData"
+    @closeAnimalModal="$emit('closeAnimalModal')">
     <template v-if="currentData && currentData.action === 'Create'">
       <NewAnimalButtons @clearForm="clearForm" @createNewAnimal="createNewAnimal" />
     </template>
     <template v-else>
-      <UpdateAnimalButtons />
+      <UpdateAnimalButtons @resetForm="resetForm" @updateAnimal="updateAnimal" />
     </template>
   </AnimalModal>
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps } from 'vue'
+import { ref, computed, defineProps } from 'vue'
 import IAnimalModal from '../types/AnimalModal'
 import AnimalModal from './AnimalModal.vue'
 import NewAnimalButtons from './NewAnimalButtons.vue'
@@ -23,12 +30,7 @@ const props = defineProps<{
 
 const emits = defineEmits(['closeAnimalModal'])
 
-const currentData = computed<IAnimalModal>(() => {
-  props.animalModalData.data = !props.animalModalData.data ? { ...cleanedForm } : props.animalModalData.data
-  return props.animalModalData
-})
-
-const cleanedForm: IAnimal = {
+const clearedForm: IAnimal = {
   name: '',
   species: '',
   birthday: '',
@@ -38,13 +40,43 @@ const cleanedForm: IAnimal = {
   notes: ''
 }
 
+const clearModal = ref<boolean>(false)
+const provideFormData = ref<boolean>(false)
+
+const initialData = ref<IAnimalModal>(!props.animalModalData.data ? { ...clearedForm } : props.animalModalData.data)
+
+const currentData = computed<IAnimalModal>(() => {
+  props.animalModalData.data = !props.animalModalData.data ? { ...clearedForm } : props.animalModalData.data
+  return { ...props.animalModalData }
+})
+
 // Functions
 
-const clearForm = () => {
-  currentData.value.data = { ...cleanedForm }
+const providingFormData = (animal: IAnimal) => {
+  provideFormData.value = false
+  console.log({action: props.animalModalData.action})
+  console.log({initial: currentData.value})
+  console.log(animal)
+  emits('closeAnimalModal')
 }
 
-const createNewAnimal = (animal: IAnimal) => {
-  console.log(currentData.value.data)
+const clearedModal = () => {
+  clearModal.value = false
+}
+
+const clearForm = () => {
+  clearModal.value = true
+}
+
+const resetForm = () => {
+  currentData.value.data = { ...clearedForm }
+}
+
+const createNewAnimal = () => {
+  provideFormData.value = true
+}
+
+const updateAnimal = () => {
+  provideFormData.value = true
 }
 </script>

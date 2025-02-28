@@ -1,6 +1,6 @@
 <template>
   <Button @click="$emit('resetForm')" :info="resetButton" />
-  <Button @click="$emit('updateAnimal', animal)" :info="updateButton" class="ml-2" />
+  <Button @click="$emit('updateAnimal')" :info="updateButton" class="ml-2" />
 </template>
 
 <script setup lang="ts">
@@ -10,7 +10,7 @@ import IAnimal from '../types/Animal';
 
 const emit = defineEmits<{
   (e: 'resetForm'): void
-  (e: 'updateAnimal', animal: IAnimal): void
+  (e: 'updateAnimal'): void
 }>()
 
 const resetButton: Button = {

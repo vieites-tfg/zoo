@@ -7,43 +7,43 @@
         <form class="grid grid-cols-2 gap-4" @submit.prevent="handleAdd">
           <div class="mb-2">
             <label class="block font-semibold" for="name">Name</label>
-            <input id="name" v-model="info.data.name" type="text"
+            <input id="name" v-model="formData.name" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="species">Species</label>
-            <input id="species" v-model="info.data.species" type="text"
+            <input id="species" v-model="formData.species" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="birthday">Birthday</label>
-            <input id="birthday" v-model="info.data.birthday" type="date"
+            <input id="birthday" v-model="formData.birthday" type="date"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="genre">Genre</label>
-            <input id="genre" v-model="info.data.genre" type="text"
+            <input id="genre" v-model="formData.genre" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="diet">Diet</label>
-            <input id="diet" v-model="info.data.diet" type="text"
+            <input id="diet" v-model="formData.diet" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2">
             <label class="block font-semibold" for="condition">Condition</label>
-            <input id="condition" v-model="info.data.condition" type="text"
+            <input id="condition" v-model="formData.condition" type="text"
               class="w-full border border-gray-300 rounded px-2 py-1" />
           </div>
 
           <div class="mb-2 col-span-2">
             <label class="block font-semibold" for="notes">Notes</label>
-            <textarea id="notes" v-model="info.data.notes"
+            <textarea id="notes" v-model="formData.notes"
               class="w-full border border-gray-300 rounded px-2 py-1 min-h-8 max-h-56"></textarea>
           </div>
 
@@ -65,16 +65,51 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
+import IAnimal from '../types/Animal'
 import IAnimalModal from '../types/AnimalModal'
 
 const props = defineProps<{
+  clear: boolean,
   openModal: boolean,
+  provideFormData: boolean,
   info: IAnimalModal,
 }>()
 
-const emit = defineEmits(['closeAnimalModal'])
+const emit = defineEmits<{
+  (e: 'closeAnimalModal'): void
+  (e: 'cleared'): void
+  (e: 'providingFormData', animal: IAnimal): void
+}>()
 
-function closeModal() {
+const clearedForm: IAnimal = {
+  name: '',
+  species: '',
+  birthday: '',
+  genre: '',
+  diet: '',
+  condition: '',
+  notes: ''
+}
+
+const formData = computed({
+  get() {
+    if (props.provideFormData) {
+      emit('providingFormData', { ...formData })
+
+      return { ...formData }
+    }
+
+    if (props.clear) {
+      emit('cleared')
+
+      return { ...clearedForm }
+    }
+
+    return { ...props.info.data }
+  }
+})
+
+const closeModal = () => {
   emit('closeAnimalModal')
 }
 </script>
