@@ -64,12 +64,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, watch } from 'vue'
 import IAnimal from '../types/Animal'
 import IAnimalModal from '../types/AnimalModal'
 
 const props = defineProps<{
   clear: boolean,
+  reset: boolean,
   openModal: boolean,
   provideFormData: boolean,
   info: IAnimalModal,
@@ -78,10 +79,11 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'closeAnimalModal'): void
   (e: 'cleared'): void
+  (e: 'reseted'): void
   (e: 'providingFormData', animal: IAnimal): void
 }>()
 
-const clearedForm: IAnimal = {
+const emptyForm: IAnimal = {
   name: '',
   species: '',
   birthday: '',
@@ -91,23 +93,49 @@ const clearedForm: IAnimal = {
   notes: ''
 }
 
-const formData = computed({
-  get() {
-    if (props.provideFormData) {
-      emit('providingFormData', { ...formData })
+const formData = ref<IAnimal>({ ...props.info.data })
 
-      return { ...formData }
+watch(
+  () => props.provideFormData,
+  (newVal) => {
+    if (newVal) {
+      emit('providingFormData', { ...formData.value })
     }
-
-    if (props.clear) {
-      emit('cleared')
-
-      return { ...clearedForm }
-    }
-
-    return { ...props.info.data }
   }
-})
+)
+
+watch(
+  () => props.openModal,
+  (opened) => {
+    if (opened) {
+      formData.value = { ...props.info.data }
+    }
+  }
+)
+
+watch(
+  () => props.clear,
+  (newVal) => {
+    if (newVal) {
+      formData.value = { ...emptyForm }
+      emit('cleared')
+    }
+  }
+)
+
+watch(
+  () => props.reset,
+  (newVal) => {
+    if (newVal) {
+      formData.value = { ...props.info.data }
+      emit('reseted')
+    }
+  }
+)
+
+function handleAdd() {
+  console.log('Submitted formData:', formData.value)
+}
 
 const closeModal = () => {
   emit('closeAnimalModal')

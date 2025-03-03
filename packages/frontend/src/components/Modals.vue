@@ -2,9 +2,11 @@
   <AnimalModal
     :openModal="openModal"
     :info="currentData"
-    :clear="clearModal"
+    :clear="clear"
+    :reset="reset"
     :provideFormData="provideFormData"
-    @cleared="clearedModal"
+    @cleared="clearedForm"
+    @reseted="resetedForm"
     @providingFormData="providingFormData"
     @closeAnimalModal="$emit('closeAnimalModal')">
     <template v-if="currentData && currentData.action === 'Create'">
@@ -30,7 +32,7 @@ const props = defineProps<{
 
 const emits = defineEmits(['closeAnimalModal'])
 
-const clearedForm: IAnimal = {
+const emptyForm: IAnimal = {
   name: '',
   species: '',
   birthday: '',
@@ -40,13 +42,14 @@ const clearedForm: IAnimal = {
   notes: ''
 }
 
-const clearModal = ref<boolean>(false)
+const clear = ref<boolean>(false)
+const reset = ref<boolean>(false)
 const provideFormData = ref<boolean>(false)
 
-const initialData = ref<IAnimalModal>(!props.animalModalData.data ? { ...clearedForm } : props.animalModalData.data)
+const initialData = ref<IAnimalModal>(!props.animalModalData.data ? { ...emptyForm } : props.animalModalData.data)
 
 const currentData = computed<IAnimalModal>(() => {
-  props.animalModalData.data = !props.animalModalData.data ? { ...clearedForm } : props.animalModalData.data
+  props.animalModalData.data = !props.animalModalData.data ? { ...emptyForm } : props.animalModalData.data
   return { ...props.animalModalData }
 })
 
@@ -60,16 +63,20 @@ const providingFormData = (animal: IAnimal) => {
   emits('closeAnimalModal')
 }
 
-const clearedModal = () => {
-  clearModal.value = false
+const clearedForm = () => {
+  clear.value = false
 }
 
 const clearForm = () => {
-  clearModal.value = true
+  clear.value = true
 }
 
 const resetForm = () => {
-  currentData.value.data = { ...clearedForm }
+  reset.value = true
+}
+
+const resetedForm = () => {
+  reset.value = false
 }
 
 const createNewAnimal = () => {
