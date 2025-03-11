@@ -16,7 +16,10 @@
     "@tailwindcss/vite": "^4.0.7",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
+<<<<<<< HEAD
     "cypress": "^14.1.0",
+=======
+>>>>>>> 7910fd9 (Feature/bootstrap frontend (#3))
     "tailwindcss": "^4.0.7",
     "typescript": "~5.7.2",
     "vite": "^6.1.0",
