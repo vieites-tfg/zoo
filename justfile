@@ -43,6 +43,7 @@ init:
 dev:
   docker compose up -d
 
+[working-directory: './packages/frontend']
 e2e:
-  cd ./packages/frontend
-  docker run --rm -it -v $PWD:/e2e -w /e2e --entrypoint=cypress cypress/included:14.1.0 run --browser chrome
+  if [[ "$(docker images -f reference=cypress | wc -l | xargs)" != "2" ]]; then docker build -f Dockerfile.cypress -t cypress .; fi
+  docker run --rm -it -v $PWD:/e2e -w /e2e --entrypoint=npx cypress cypress run
