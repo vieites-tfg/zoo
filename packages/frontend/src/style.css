@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* Class based dark mode */
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-title: "Atma", "sans-serif";
+  --font-head: "Montserrat", "sans-serif";
+  --font-body: "Montserrat Alternates", "sans-serif";
+}
