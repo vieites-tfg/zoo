@@ -42,3 +42,6 @@ init:
 
 dev:
   docker compose up -d
+
+e2e:
+  docker run --rm -it -v $PWD:/e2e -w /e2e --entrypoint=cypress cypress/included:14.1.0 run --browser chrome
