@@ -46,4 +46,4 @@ dev:
 [working-directory: './packages/frontend']
 e2e:
   if [[ "$(docker images -f reference=cypress | wc -l | xargs)" != "2" ]]; then docker build -f Dockerfile.cypress -t cypress .; fi
-  docker run --rm -it -v $PWD:/e2e -w /e2e --entrypoint=npx cypress cypress run
+  docker run --rm --network zoo_default -it -v $PWD:/e2e -w /e2e --entrypoint=npx cypress cypress run
