@@ -5,6 +5,7 @@ alias dv := down_vol
 alias dva := down_vol_all
 alias re := rebuild
 alias l := logs
+alias tb := test_backend
 
 _default:
   just -l
@@ -42,3 +43,8 @@ init:
 
 dev:
   docker compose up -d
+
+[working-directory: 'packages/backend']
+test_backend:
+  docker run --rm -v "$(pwd)":/app -w /app node:18-slim sh -c "yarn install && yarn test"
+
