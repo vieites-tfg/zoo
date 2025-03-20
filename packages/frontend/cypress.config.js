@@ -1,7 +1,8 @@
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
+  video: true,
   e2e: {
-    baseUrl: 'http://host.docker.internal:5173',
+    baseUrl: 'http://frontend:5173',
   },
 })
