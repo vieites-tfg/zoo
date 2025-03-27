@@ -1,17 +1,19 @@
 <template>
-  <Button @click="$emit('resetForm')" :info="resetButton" />
-  <Button @click="$emit('updateAnimal')" :info="updateButton" class="ml-2" />
+  <Button
+    :info="resetButton"
+    @click="$emit('resetForm')"
+  />
+  <Button
+    :info="updateButton"
+    class="ml-2"
+    @click="$emit('updateAnimal')"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import Button from './GenericButton.vue';
-import IAnimal from '../types/Animal';
 
-const emit = defineEmits<{
-  (e: 'resetForm'): void
-  (e: 'updateAnimal'): void
-}>()
+defineEmits([ 'resetForm', 'updateAnimal' ])
 
 const resetButton: Button = {
   text: 'Reset'

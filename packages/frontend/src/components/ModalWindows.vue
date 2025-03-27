@@ -1,19 +1,26 @@
 <template>
   <AnimalModal
-    :openModal="openModal"
+    :open-modal="openModal"
     :info="currentData"
     :clear="clear"
     :reset="reset"
-    :provideFormData="provideFormData"
+    :provide-form-data="provideFormData"
     @cleared="clearedForm"
     @reseted="resetedForm"
-    @providingFormData="providingFormData"
-    @closeAnimalModal="$emit('closeAnimalModal')">
+    @providing-form-data="providingFormData"
+    @close-animal-modal="$emit('closeAnimalModal')"
+  >
     <template v-if="currentData && currentData.action === 'Create'">
-      <NewAnimalButtons @clearForm="clearForm" @createNewAnimal="createNewAnimal" />
+      <NewAnimalButtons
+        @clear-form="clearForm"
+        @create-new-animal="createNewAnimal"
+      />
     </template>
     <template v-else>
-      <UpdateAnimalButtons @resetForm="resetForm" @updateAnimal="updateAnimal" />
+      <UpdateAnimalButtons
+        @reset-form="resetForm"
+        @update-animal="updateAnimal"
+      />
     </template>
   </AnimalModal>
 </template>
@@ -46,12 +53,10 @@ const clear = ref<boolean>(false)
 const reset = ref<boolean>(false)
 const provideFormData = ref<boolean>(false)
 
-const initialData = ref<IAnimalModal>(!props.animalModalData.data ? { ...emptyForm } : props.animalModalData.data)
-
-const currentData = computed<IAnimalModal>(() => {
-  props.animalModalData.data = !props.animalModalData.data ? { ...emptyForm } : props.animalModalData.data
-  return { ...props.animalModalData }
-})
+const currentData = computed<IAnimalModal>(() => ({
+  ...props.animalModalData,
+  data: props.animalModalData.data || { ...emptyForm }
+}));
 
 // Functions
 
