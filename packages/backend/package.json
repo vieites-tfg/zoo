@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.ts",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "lint": "eslint --ext .ts src"
   },
   "dependencies": {
     "@types/swagger-ui-express": "^4.1.7",
@@ -18,14 +19,17 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.23.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^22.13.2",
     "@types/swagger-jsdoc": "^6.0.4",
+    "eslint": "^9.23.0",
     "nodemon": "^3.1.9",
     "swagger-jsdoc": "^6.2.8",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.28.0"
   }
 }
