@@ -189,9 +189,9 @@
     mongoose "*"
 
 "@types/node@*", "@types/node@^22.13.2":
-  version "22.13.10"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.13.10.tgz#df9ea358c5ed991266becc3109dc2dc9125d77e4"
-  integrity sha512-I6LPUvlRH+O6VRUqYOcMudhaIdUVWfsjnZavnsraHvpBwaEyMN29ry+0UVJhImYL16xsscu0aske3yA+uPOWfw==
+  version "22.13.14"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.13.14.tgz#70d84ec91013dcd2ba2de35532a5a14c2b4cc912"
+  integrity sha512-Zs/Ollc1SJ8nKUAgc7ivOEdIBM8JAKgrqqUYi2J997JuKO7/tpQC+WCetQ1sypiKCQWHdvdg9wBNpUPEWZae7w==
   dependencies:
     undici-types "~6.20.0"
 
@@ -833,23 +833,23 @@ mongodb-connection-string-url@^3.0.0:
     "@types/whatwg-url" "^11.0.2"
     whatwg-url "^14.1.0 || ^13.0.0"
 
-mongodb@~6.14.0:
-  version "6.14.2"
-  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-6.14.2.tgz#56533105e62ce795cd10a205a6374ecd8d58ad49"
-  integrity sha512-kMEHNo0F3P6QKDq17zcDuPeaywK/YaJVCEQRzPF3TOM/Bl9MFg64YE5Tu7ifj37qZJMhwU1tl2Ioivws5gRG5Q==
+mongodb@~6.15.0:
+  version "6.15.0"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-6.15.0.tgz#4303ce0f7d5e5750749b1cb318dc7a115778f92e"
+  integrity sha512-ifBhQ0rRzHDzqp9jAQP6OwHSH7dbYIQjD3SbJs9YYk9AikKEettW/9s/tbSFDTpXcRbF+u1aLrhHxDFaYtZpFQ==
   dependencies:
     "@mongodb-js/saslprep" "^1.1.9"
     bson "^6.10.3"
     mongodb-connection-string-url "^3.0.0"
 
 mongoose@*, mongoose@^8.10.0:
-  version "8.12.1"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-8.12.1.tgz#20fdc9a6cff72b323e438c6b4492cd4d4e1dd989"
-  integrity sha512-UW22y8QFVYmrb36hm8cGncfn4ARc/XsYWQwRTaj0gxtQk1rDuhzDO1eBantS+hTTatfAIS96LlRCJrcNHvW5+Q==
+  version "8.13.0"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-8.13.0.tgz#31fc1e4efe986f250e86260b32d2b04a39031cc2"
+  integrity sha512-e/iYV1mPeOkg+SWAMHzt3t42/EZyER3OB1H2pjP9C3vQ+Qb5DMeV9Kb+YCUycKgScA3fbwL7dKG4EpinGlg21g==
   dependencies:
     bson "^6.10.3"
     kareem "2.6.3"
-    mongodb "~6.14.0"
+    mongodb "~6.15.0"
     mpath "0.9.0"
     mquery "5.0.0"
     ms "2.1.3"
@@ -1134,9 +1134,9 @@ swagger-parser@^10.0.3:
     "@apidevtools/swagger-parser" "10.0.3"
 
 swagger-ui-dist@>=5.0.0:
-  version "5.20.1"
-  resolved "https://registry.yarnpkg.com/swagger-ui-dist/-/swagger-ui-dist-5.20.1.tgz#9aa6012cd537a9d3feac2d9e814d97bb36459824"
-  integrity sha512-qBPCis2w8nP4US7SvUxdJD3OwKcqiWeZmjN2VWhq2v+ESZEXOP/7n4DeiOiiZcGYTKMHAHUUrroHaTsjUWTEGw==
+  version "5.20.2"
+  resolved "https://registry.yarnpkg.com/swagger-ui-dist/-/swagger-ui-dist-5.20.2.tgz#d90e5cf986ca9aa2d3b28221f6b684045b93669d"
+  integrity sha512-zP2biZvCt6R1IAz/iGcjeEViHez7UPHUFfMFyF6jcTKS1ZIP2cgr+KSZEMhBnpIcFfDrZxkD8v56taL5A8phuA==
   dependencies:
     "@scarf/scarf" "=1.4.0"
 
@@ -1229,9 +1229,9 @@ v8-compile-cache-lib@^3.0.1:
   integrity sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==
 
 validator@^13.7.0:
-  version "13.12.0"
-  resolved "https://registry.yarnpkg.com/validator/-/validator-13.12.0.tgz#7d78e76ba85504da3fee4fd1922b385914d4b35f"
-  integrity sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg==
+  version "13.15.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-13.15.0.tgz#2dc7ce057e7513a55585109eec29b2c8e8c1aefd"
+  integrity sha512-36B2ryl4+oL5QxZ3AzD0t5SsMNGvTtQHpjgFO5tbNxfXbMFkY822ktCDe1MnlqV3301QQI9SLHDNJokDI+Z9pA==
 
 vary@^1, vary@~1.1.2:
   version "1.1.2"

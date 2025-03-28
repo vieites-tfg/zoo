@@ -29,6 +29,7 @@ down_vol:
 
 down_vol_all:
   docker compose down -v --rmi "all"
+  docker rmi cypress || true
 
 rebuild:
   docker compose build --no-cache
