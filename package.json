@@ -4,13 +4,10 @@
   "workspaces": {
     "packages": [
       "packages/*"
-    ],
-    "nohoist": [
-      "**/backend",
-      "**/backend/**",
-      "**/frontend",
-      "**/frontend/**"
     ]
+  },
+  "scripts": {
+    "lint": "lerna run lint"
   },
   "dependencies": {
     "yarn": "^1.22.22"

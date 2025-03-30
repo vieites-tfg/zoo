@@ -1,8 +1,12 @@
 <template>
-  <button :type="info.type || 'button'" @click="$emit('click')" :class="[
-    'border-2 font-semibold px-4 py-2 rounded transition',
-    info.disabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100',
-    bgColorClass]">
+  <button
+    :type="info.type || 'button'"
+    :class="[
+      'border-2 font-semibold px-4 py-2 rounded transition',
+      info.disabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100',
+      bgColorClass]"
+    @click="$emit('click')"
+  >
     <span>{{ info.text }}</span>
   </button>
 </template>
@@ -24,5 +28,5 @@ const bgColorClass = computed(() => {
   return 'border-black text-black hover:bg-black hover:text-white'
 })
 
-const emit = defineEmits(['click'])
+defineEmits(['click'])
 </script>
