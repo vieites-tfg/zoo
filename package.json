@@ -4,6 +4,12 @@
   "workspaces": {
     "packages": [
       "packages/*"
+    ],
+    "nohoist": [
+      "**/backend",
+      "**/backend/**",
+      "**/frontend",
+      "**/frontend/**"
     ]
   },
   "scripts": {

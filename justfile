@@ -59,3 +59,6 @@ e2e:
 [working-directory: 'packages/backend']
 test_backend:
   docker run --rm -v "$(pwd)":/app -w /app node:18-slim sh -c "yarn install && yarn test"
+
+lint:
+  yarn run lint
