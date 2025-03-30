@@ -48,8 +48,8 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const animals = await AnimalService.getAllAnimals();
     res.json(animals);
-  } catch (e) {
-    res.status(500).json({ error: `Error getting animals: ${e}` });
+  } catch (error) {
+    res.status(500).json({ error: 'Error getting animals' });
   }
 });
 
@@ -87,8 +87,8 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
       return;
     }
     res.json(animal);
-  } catch (e) {
-    res.status(500).json({ error: `Error getting the animal: ${e}` });
+  } catch (error) {
+    res.status(500).json({ error: 'Error getting the animal' });
   }
 });
 
@@ -146,8 +146,8 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
     const newAnimal = await AnimalService.createAnimal(req.body);
     res.status(201).json(newAnimal);
-  } catch (e) {
-    res.status(500).json({ error: `Error creating animal: ${e}` });
+  } catch (error) {
+    res.status(500).json({ error: 'Error creating animal' });
   }
 });
 
@@ -213,8 +213,8 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
       return;
     }
     res.json(updatedAnimal);
-  } catch (e) {
-    res.status(500).json({ error: `Error updating animal: ${e}` });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating animal' });
   }
 });
 
@@ -247,8 +247,8 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
       return;
     }
     res.json({ message: 'Animal deleted successfully' });
-  } catch (e) {
-    res.status(500).json({ error: `Error deleting animal ${e}` });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting animal' });
   }
 });
 

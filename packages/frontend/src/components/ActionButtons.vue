@@ -1,19 +1,12 @@
 <template>
   <div class="flex justify-start pl-4">
-    <Button
-      :info="greenButton"
-      @click="handleNew"
-    />
-    <Button
-      :info="redButton"
-      class="ml-2"
-      @click="handleDelete"
-    />
+    <Button @click="handleNew" :info="greenButton" />
+    <Button @click="handleDelete" :info="redButton" class="ml-2" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import Button from './GenericButton.vue';
 
 const props = defineProps<{
