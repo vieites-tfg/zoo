@@ -8,7 +8,7 @@
     "start": "node dist/index.ts",
     "dev": "nodemon src/index.ts",
     "lint": "eslint --ext .ts src",
-    "test": "jest"
+    "test": "jest --forceExit"
   },
   "dependencies": {
     "@types/swagger-ui-express": "4.1.7",

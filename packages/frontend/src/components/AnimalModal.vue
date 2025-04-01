@@ -2,7 +2,7 @@
   <div>
     <div
       v-if="openModal"
-      class="fixed inset-0 flex items-center justify-center bg-gray-100/50 bg-opacity-50 z-50"
+      class="modal fixed inset-0 flex items-center justify-center bg-gray-100/50 bg-opacity-50 z-50"
     >
       <div class="bg-white w-2/5 p-6 rounded shadow-lg relative">
         <h2 class="text-xl font-title font-bold mb-4 text-center">

@@ -6,8 +6,6 @@ helm
 
 .git
 .gitignore
-.cache
-.env
 
 *.log
 npm-debug.log*
@@ -15,5 +13,3 @@ yarn-debug.log*
 yarn-error.log*
 
 README.md
-Dockerfile*
-docker-compose*
