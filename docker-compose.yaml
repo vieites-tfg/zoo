@@ -1,33 +1,18 @@
 services:
-  backend:
-    build:
-      context: ./packages/backend
-    container_name: zoo-backend-dev
+  zoo:
+    build: .
+    container_name: zoo-dev
     ports:
       - "3000:3000"
+      - "5173:5173"
     volumes:
-      - ./packages/backend:/app
+      - .:/app
     depends_on:
       - mongodb
     environment:
       NODE_ENV: development
       YARN_CACHE_FOLDER: .cache
       MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT:-27017}/${MONGO_DATABASE}?authSource=admin"
-
-  frontend:
-    build:
-      context: ./packages/frontend
-    container_name: zoo-frontend-dev
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./packages/frontend:/app
-      - /app/node_modules/
-    depends_on:
-      - backend
-    environment:
-      NODE_ENV: development
-      YARN_CACHE_FOLDER: .cache
 
   mongodb:
     image: mongo:7.0

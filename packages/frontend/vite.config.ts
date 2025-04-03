@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   server: {
-    allowedHosts: [ "frontend" ],
+    allowedHosts: [ "zoo" ],
   },
   plugins: [
     vue(),

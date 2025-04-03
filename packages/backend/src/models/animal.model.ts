@@ -24,6 +24,7 @@ const animalSchema = new Schema(
   },
   {
     timestamps: true,
+    antoIndex: false,
   }
 );
 

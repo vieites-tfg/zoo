@@ -3,6 +3,6 @@ import { defineConfig } from 'cypress'
 export default defineConfig({
   video: true,
   e2e: {
-    baseUrl: 'http://frontend:5173',
+    baseUrl: 'http://zoo:5173',
   },
 })

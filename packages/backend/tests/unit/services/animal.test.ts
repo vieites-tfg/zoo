@@ -1,10 +1,15 @@
 import { Animal } from '../../../src/models/animal.model';
 import { AnimalService } from '../../../src/services/animal.service';
 import { IAnimal } from '../../../src/models/animal.model';
+import mongoose from 'mongoose';
 
 describe('AnimalService Unit Tests', () => {
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  afterAll(async () => {
+    await mongoose.disconnect();
   });
 
   describe('getAllAnimals', () => {

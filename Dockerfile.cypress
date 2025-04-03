@@ -1,0 +1,9 @@
+FROM cypress/browsers
+
+COPY . /e2e
+
+WORKDIR /e2e
+
+RUN npx cypress install
+
+RUN yarn add lerna@8.2.1 -W

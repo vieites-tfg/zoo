@@ -14,11 +14,12 @@ Esta es la estructura general del monorepo. Se muestran únicamente los elemento
 │   └── frontend/
 │       └── Dockerfile
 ├── mongo-init/
-├── docker-compose.yaml
 ├── example.env
 ├── lerna.json
 ├── package.json
-└── yarn.lock
+├── yarn.lock
+├── docker-compose.yaml
+└── Dockerfile
 ```
 
 ## Funcionalidades
@@ -42,10 +43,10 @@ A continuación se indica el software junto con las versiones utilizadas para el
 | **Software** | **Version** | **Docs** |
 |---|---|---|
 | Git | 2.48.1 | https://git-scm.com/ |
-| Node | 23.7.0 | https://nodejs.org/en |
-| Yarn | 1.22.22 | https://yarnpkg.com/ |
-| npm | 10.9.2 | https://www.npmjs.com/ |
 | Docker | v27.5.1 (con `compose` habilitado) | https://www.docker.com/ |
+| Node (opcional) | 23.7.0 | https://nodejs.org/en |
+| Yarn (opcional) | 1.22.22 | https://yarnpkg.com/ |
+| npm (opcional) | 10.9.2 | https://www.npmjs.com/ |
 | Lerna (opcional) | v8.1.9 | https://lerna.js.org/ |
 | Just  (opcional) | v1.39.0 | https://github.com/casey/just |
 
@@ -53,6 +54,10 @@ A continuación se indica el software junto con las versiones utilizadas para el
 ### Variables de entorno
 
 Es necesario configurar el archivo `.env`. Para ello, se proporciona un `example.env` de ejemplo, el cual hay que renombrar a `.env`.
+
+```bash
+mv example.env .env
+```
 
 ```env
 MONGO_DATABASE=<database_name>  # required
@@ -94,6 +99,28 @@ just dev
 > Con `just` puedes ejecutar los pasos anteriores de manera concatenada mediante el comando `just init dev`.
 
 4. Accede a la página web en [http://localhost:5173](http://localhost:5173)
+
+### Más posibilidades
+
+- Ejecuta el linter:
+
+```bash
+just lint
+```
+
+- Comprueba que se pasan los tests, tanto del backend como del frontend:
+
+```bash
+just test
+```
+
+- O cualquiera de los paquetes por separado:
+
+```bash
+just test_backend # just tb
+# o
+just test_frontend # just tf
+```
 
 ### Para probar la API
 
