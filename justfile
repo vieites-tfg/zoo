@@ -64,7 +64,7 @@ lint:
   @just _run "yarn" "lint"
 
 build_image package version:
-  docker build -t ghcr.io/vieites-tfg/zoo-{{package}}:{{version}} -f ./packages/{{package}}/Dockerfile .
+  docker build --target {{package}} -t ghcr.io/vieites-tfg/zoo-{{package}}:{{version}} .
 
 push package version:
   docker push ghcr.io/vieites-tfg/zoo-{{package}}:{{version}}
