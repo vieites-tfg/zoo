@@ -1,5 +1,3 @@
-set allow-duplicate-recipes
-
 alias d := down
 alias dv := down_vol
 alias dva := down_vol_all
@@ -7,6 +5,7 @@ alias re := rebuild
 alias l := logs
 alias tb := test_backend
 alias tf := test_frontend
+alias bi := build_image
 
 _default:
   just -l
@@ -63,3 +62,9 @@ test:
 
 lint:
   @just _run "yarn" "lint"
+
+build_image package version:
+  docker build -t ghcr.io/vieites-tfg/zoo-{{package}}:{{version}} -f ./packages/{{package}}/Dockerfile .
+
+push package version:
+  docker push ghcr.io/vieites-tfg/zoo-{{package}}:{{version}}

@@ -1,0 +1,29 @@
+services:
+  zooback:
+    build:
+      context: .
+      dockerfile: ./packages/backend/Dockerfile
+    container_name: zoo-prod-back
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    environment:
+      YARN_CACHE_FOLDER: .cache
+      MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT:-27017}/${MONGO_DATABASE}?authSource=admin"
+
+  mongodb:
+    image: mongo:7.0
+    container_name: zoo-mongo-prod
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASS}
+    ports:
+      - "${MONGO_PORT_HOST:-27017}:${MONGO_PORT:-27017}"
+    volumes:
+      - ./mongo-init/:/docker-entrypoint-initdb.d/
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

@@ -1,15 +1,43 @@
-FROM node:18-slim
+FROM node:20-alpine AS builder
+
+LABEL "org.opencontainers.image.source"="https://github.com/vieites-tfg/zoo"
 
 WORKDIR /app
 
-ENV PATH=/app/node_modules/.bin:$PATH
+COPY yarn.lock package.json ./
 
-COPY ./package.json ./yarn.lock ./
+COPY packages/backend/package.json ./packages/backend/
+
+COPY ./packages/backend/tsconfig.json ./packages/backend/
 
 RUN yarn install --frozen-lockfile
 
-COPY . .
+COPY packages/backend/src ./packages/backend/src
 
-EXPOSE 3000
+WORKDIR /app/packages/backend
 
-CMD ["yarn", "dev"]
+RUN yarn build
+
+FROM node:20-alpine AS production
+
+LABEL org.opencontainers.image.source="https://github.com/vieites-tfg/zoo"
+
+LABEL org.opencontainers.image.description="Backend image for zoo app"
+
+WORKDIR /app
+
+ARG PORT=3000
+
+ENV PORT=${PORT}
+
+EXPOSE ${PORT}
+
+COPY yarn.lock package.json ./
+
+COPY packages/backend/package.json ./packages/backend/
+
+RUN yarn install --frozen-lockfile --production && yarn cache clean
+
+COPY --from=builder /app/packages/backend/dist ./dist
+
+CMD ["node", "dist/index.js"]
