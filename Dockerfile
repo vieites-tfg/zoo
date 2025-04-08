@@ -36,8 +36,6 @@ WORKDIR /app
 
 RUN lerna run --scope frontend build 
 
-RUN ncc build ./packages/frontend/dist/main.js -o compiled-frontend.js
-
 #
 # Backend
 #
@@ -60,20 +58,12 @@ CMD ["node", "index.js"]
 #
 # Frontend
 #
-FROM node:20-slim AS frontend
+FROM nginx:alpine AS frontend
 
-WORKDIR /app
+WORKDIR /usr/share/nginx/html
 
-COPY --from=frontend-build /app/compiled-frontend.js .
+COPY --from=frontend-build /app/packages/frontend/dist .
 
-COPY --from=frontend-build /app/packages/frontend/package.json .
+EXPOSE 80
 
-COPY --from=frontend-build /app/packages/frontend/dist ./dist
-
-RUN yarn install --production
-
-ENV NODE_ENV=production
-
-EXPOSE 5173
-
-CMD ["node", "compiled-frontend.js"]
+CMD ["nginx", "-g", "daemon off;"]
