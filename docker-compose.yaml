@@ -1,22 +1,30 @@
 services:
-  zoo:
-    build: .
-    container_name: zoo-dev
+  zoo-frontend:
+    image: ghcr.io/vieites-tfg/zoo-frontend
+    container_name: zoo-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - zoo-backend
+    environment:
+      NODE_ENV: production
+      YARN_CACHE_FOLDER: .cache
+
+  zoo-backend:
+    image: ghcr.io/vieites-tfg/zoo-backend
+    container_name: zoo-backend
     ports:
       - "3000:3000"
-      - "5173:5173"
-    volumes:
-      - .:/app
     depends_on:
       - mongodb
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       YARN_CACHE_FOLDER: .cache
       MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT:-27017}/${MONGO_DATABASE}?authSource=admin"
 
   mongodb:
     image: mongo:7.0
-    container_name: zoo-mongo-dev
+    container_name: zoo-mongo
     environment:
       - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT}

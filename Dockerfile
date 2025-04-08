@@ -5,7 +5,6 @@ FROM node:20 AS base
 
 WORKDIR /app
 
-# Copy root package files and install Lerna
 COPY package.json lerna.json yarn.lock* ./
 
 COPY packages packages/
