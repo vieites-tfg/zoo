@@ -38,7 +38,7 @@ RUN lerna run --scope frontend build
 #
 # Backend
 #
-FROM node:20-slim AS backend
+FROM node:20-alpine AS backend
 
 WORKDIR /app
 
