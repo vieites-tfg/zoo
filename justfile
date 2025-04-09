@@ -1,40 +1,28 @@
-set allow-duplicate-recipes
-
-alias d := down
 alias dv := down_vol
-alias dva := down_vol_all
-alias re := rebuild
 alias l := logs
 alias tb := test_backend
 alias tf := test_frontend
+alias b := build_image
+alias p := push_image
+alias bp := build_and_push
 
 _default:
   just -l
 
-down:
-  docker compose down
-
 down_vol:
   docker compose down -v
-
-down_vol_all:
-  docker compose down -v --rmi "all"
-  docker rmi cypress || true
-
-rebuild:
-  docker compose build --no-cache
 
 logs service:
   docker compose logs {{service}} -f
 
 _run entrypoint command:
   #!/usr/bin/env bash
-  if [[ "$(docker images -f reference=zoo-zoo | wc -l | xargs)" != "2" ]]
+  if [[ "$(docker images -f reference=zoo-base | wc -l | xargs)" != "2" ]]
   then
-    docker build -t zoo-zoo .
+    docker build --target base -t zoo-base .
   fi
 
-  docker run --rm -w /app -v $PWD:/app --entrypoint={{entrypoint}} zoo-zoo {{command}}
+  docker run --rm -w /app -v $PWD:/app --entrypoint={{entrypoint}} zoo-base {{command}}
 
 init:
   @just _run "yarn" "install"
@@ -63,3 +51,15 @@ test:
 
 lint:
   @just _run "yarn" "lint"
+
+build_image package version:
+  docker build --target {{package}} -t ghcr.io/vieites-tfg/zoo-{{package}}:{{version}} .
+  docker tag ghcr.io/vieites-tfg/zoo-{{package}}:{{version}} ghcr.io/vieites-tfg/zoo-{{package}}:latest
+
+push_image package version:
+  docker push ghcr.io/vieites-tfg/zoo-{{package}}:{{version}}
+  docker push ghcr.io/vieites-tfg/zoo-{{package}}:latest
+
+build_and_push package version:
+  just build_image {{package}} {{version}}
+  just push_image {{package}} {{version}}

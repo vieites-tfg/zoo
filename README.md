@@ -43,12 +43,12 @@ A continuación se indica el software junto con las versiones utilizadas para el
 | **Software** | **Version** | **Docs** |
 |---|---|---|
 | Git | 2.48.1 | https://git-scm.com/ |
+| Just | v1.39.0 | https://github.com/casey/just |
 | Docker | v27.5.1 (con `compose` habilitado) | https://www.docker.com/ |
 | Node (opcional) | 23.7.0 | https://nodejs.org/en |
 | Yarn (opcional) | 1.22.22 | https://yarnpkg.com/ |
 | npm (opcional) | 10.9.2 | https://www.npmjs.com/ |
 | Lerna (opcional) | v8.1.9 | https://lerna.js.org/ |
-| Just  (opcional) | v1.39.0 | https://github.com/casey/just |
 
 
 ### Variables de entorno
@@ -79,19 +79,15 @@ git clone https://github.com/vieites-tfg/zoo ~/zoo
 cd ~/zoo
 ```
 
-2. Instala todos los paquetes necesarios.
+2. Instala todos los paquetes necesarios. **Este paso se debe realizar antes de cualquier otra opción**.
 
 ```bash
-make init
-# o usando "just"
 just init
 ```
 
 3. Inicia los contenedores en modo desarrollo.
 
 ```bash
-make dev
-# o usando "just"
 just dev
 ```
 
@@ -108,7 +104,7 @@ just dev
 just lint
 ```
 
-- Comprueba que se pasan los tests, tanto del backend como del frontend:
+- Comprueba que se pasan los tests, tanto del backend como del frontend. **Es necesario haber lanzado la aplicación con `just dev`** para que los tests funcionen correctamente:
 
 ```bash
 just test
@@ -120,6 +116,24 @@ just test
 just test_backend # just tb
 # o
 just test_frontend # just tf
+```
+
+- Construye las imágenes de los paquetes (frontend o backend). La versión de la imagen que se construya se tomará como "latest":
+
+```bash
+just build_image <package> <version> # just b <package> <version>
+```
+
+- Sube las imágenes al registry de GitHub:
+
+```bash
+just push_image <package> <version> # just p <package> <version>
+```
+
+- O las dos acciones anteriores al mismo tiempo:
+
+```bash
+just build_and_push <package> <version> # just bp <package> <version>
 ```
 
 ### Para probar la API
