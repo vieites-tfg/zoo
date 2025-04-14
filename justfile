@@ -5,6 +5,7 @@ alias tf := test_frontend
 alias b := build_image
 alias p := push_image
 alias bp := build_and_push
+alias pp := push_package
 
 _default:
   just -l
@@ -63,3 +64,6 @@ push_image package version:
 build_and_push package version:
   just build_image {{package}} {{version}}
   just push_image {{package}} {{version}}
+
+push_package package:
+  docker run --rm -it -w /app -v $PWD:/app -e CR_PAT=$CR_PAT --entrypoint=yarn zoo-base publish --access restricted ./packages/{{package}}
