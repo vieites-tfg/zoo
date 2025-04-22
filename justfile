@@ -2,10 +2,12 @@ alias dv := down_vol
 alias l := logs
 alias tb := test_backend
 alias tf := test_frontend
-alias b := image_build
-alias p := image_push
-alias bp := build_and_push
-alias pp := push_package
+alias ib := image_build
+alias ip := image_push
+alias ibp := image_build_push
+alias pr := pkg_remote
+alias pl := pkg_local
+alias prl := pkg_remote_local
 
 _default:
   just -l
@@ -61,14 +63,14 @@ image_build package:
 image_push package:
   ./image.sh push {{package}}
 
-build_and_push package version:
-  just build_image {{package}} {{version}}
-  just push_image {{package}} {{version}}
+image_build_push package:
+  ./image.sh all {{package}}
 
-push_package package:
-  @just _build_zoo_base
-  @just _run "yarn" "publish --access restricted ./packages/{{package}}"
+pkg_remote package:
+  ./push_package.sh remote {{package}}
 
-push_packages:
-  @just push_package frontend
-  @just push_package backend
+pkg_local package:
+  ./push_package.sh local {{package}}
+
+pkg_remote_local package:
+  ./push_package.sh all {{package}}

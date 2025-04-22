@@ -21,9 +21,11 @@ PACKAGE:
   frontend	do the <ACTION> for the image of the 'frontend' package
   all		do the <ACTION> for all the images
 EOF
+
+exitt
 }
 
-exit () {
+exitt () {
 	kill -SIGUSR1 "$PID"
 }
 
@@ -63,7 +65,6 @@ main () {
 	if [[ "$#" != 2 ]]
 	then
 		usage
-		exit 1
 	fi
 
 	case "$2" in
@@ -93,8 +94,6 @@ main () {
 			usage
 			;;
 	esac
-
-
 }
 
 main "$@"
