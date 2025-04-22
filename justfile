@@ -2,8 +2,8 @@ alias dv := down_vol
 alias l := logs
 alias tb := test_backend
 alias tf := test_frontend
-alias b := build_image
-alias p := push_image
+alias b := image_build
+alias p := image_push
 alias bp := build_and_push
 alias pp := push_package
 
@@ -16,14 +16,16 @@ down_vol:
 logs service:
   docker compose logs {{service}} -f
 
-_run entrypoint command:
+_build_zoo_base:
   #!/usr/bin/env bash
   if [[ "$(docker images -f reference=zoo-base | wc -l | xargs)" != "2" ]]
   then
     docker build --target base -t zoo-base .
   fi
 
-  docker run --rm -w /app -v $PWD:/app --entrypoint={{entrypoint}} zoo-base {{command}}
+_run entrypoint command:
+  @just _build_zoo_base
+  docker run --rm -w /app -v $PWD:/app -e CR_PAT=$CR_PAT --entrypoint={{entrypoint}} zoo-base {{command}}
 
 init:
   @just _run "yarn" "install"
@@ -53,17 +55,20 @@ test:
 lint:
   @just _run "yarn" "lint"
 
-build_image package version:
-  docker build --target {{package}} -t ghcr.io/vieites-tfg/zoo-{{package}}:{{version}} .
-  docker tag ghcr.io/vieites-tfg/zoo-{{package}}:{{version}} ghcr.io/vieites-tfg/zoo-{{package}}:latest
+image_build package:
+  ./image.sh build {{package}}
 
-push_image package version:
-  docker push ghcr.io/vieites-tfg/zoo-{{package}}:{{version}}
-  docker push ghcr.io/vieites-tfg/zoo-{{package}}:latest
+image_push package:
+  ./image.sh push {{package}}
 
 build_and_push package version:
   just build_image {{package}} {{version}}
   just push_image {{package}} {{version}}
 
 push_package package:
-  docker run --rm -it -w /app -v $PWD:/app -e CR_PAT=$CR_PAT --entrypoint=yarn zoo-base publish --access restricted ./packages/{{package}}
+  @just _build_zoo_base
+  @just _run "yarn" "publish --access restricted ./packages/{{package}}"
+
+push_packages:
+  @just push_package frontend
+  @just push_package backend
