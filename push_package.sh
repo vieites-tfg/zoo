@@ -67,9 +67,11 @@ main () {
 		usage
 	fi
 
+	local package=""
+
 	case "$2" in
 		backend | frontend)
-			package="$1"
+			package="$2"
 			;;
 		all)
 			package="$PACKAGES"
