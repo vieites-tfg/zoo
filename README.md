@@ -98,6 +98,9 @@ just dev
 
 ### Más posibilidades
 
+> [!important]
+> Siempre es necesario haber realizado un `just init` previamente a la ejecución de cualquier otro comando.
+
 - Ejecuta el linter:
 
 ```bash
@@ -121,20 +124,52 @@ just test_frontend # just tf
 - Construye las imágenes de los paquetes (frontend o backend). La versión de la imagen que se construya se tomará como "latest":
 
 ```bash
-just build_image <package> <version> # just b <package> <version>
+just image_build <package> # just ib <package>
 ```
+
+> [!note]
+> Tanto en el anterior comando como en los que se muestan a continuación, los posibles valores para `<package>` son:
+> - `backend`: Únicamente el paquete del backend.
+> - `frontend`: Únicamente el paquete del frontend.
+> - `all`: Tanto el backend como el frontend.
+>
+> **No es posible** ejecutar un comando como el siguiente ejemplo: `just ib backend frontend`. Es necesario hacer `just ib all`.
 
 - Sube las imágenes al registry de GitHub:
 
 ```bash
-just push_image <package> <version> # just p <package> <version>
+just image_push <package> # just ip <package>
 ```
+
+> [!note]
+> Para realizar las operaciones de subir elementos al repositorio remoto, es necesario tener un token válido almacenado en la variable de entorno `CR_PAT`.
 
 - O las dos acciones anteriores al mismo tiempo:
 
 ```bash
-just build_and_push <package> <version> # just bp <package> <version>
+just image_build_push <package> # just ibp <package>
 ```
+
+- Se pueden subir al *registry* remoto los paquetes npm con el siguiente comando:
+
+```bash
+just pkg_remote <package> # just pr <package>
+```
+
+- En el caso de querer almacenar los paquetes npm y no tener un token de autenticación, estos se pueden guardar de manera local. Se creará un archivo comprimido para cada uno de los paquetes que se quiera guardar y se almacenará en la raíz del repositorio, en el directorio `local_packages/`. Solo hay que ejecutar el siguiente comando:
+
+```bash
+just pkg_local <package> # just pl <package>
+```
+
+- En caso de querer realizar tanto el almacenamiento remoto como local, se ejecutaría lo siguiente:
+
+```bash
+just pkg_remote_local <package> # just prl <package>
+```
+
+> [!note]
+> Los comandos anteriores para subir tanto las imágenes de Docker como los paquetes npm, utilizan los scripts `image.sh` y `push_package.sh`, respectivamente.
 
 ### Para probar la API
 
