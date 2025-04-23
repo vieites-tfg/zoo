@@ -22,7 +22,7 @@ FROM base AS backend-build
 
 WORKDIR /app
 
-RUN lerna run --scope backend build 
+RUN lerna run --scope @vieites-tfg/zoo-backend build 
 
 RUN ncc build ./packages/backend/dist/index.js -o compiled-backend.js
 
@@ -33,7 +33,7 @@ FROM base AS frontend-build
 
 WORKDIR /app
 
-RUN lerna run --scope frontend build 
+RUN lerna run --scope @vieites-tfg/zoo-frontend build 
 
 #
 # Backend
