@@ -65,6 +65,7 @@ MONGO_PORT=<container_port>     # optional (default: 27017)
 MONGO_PORT_HOST=<host_port>     # optional (default: 27017)
 MONGO_ROOT=<root_name>          # required
 MONGO_ROOT_PASS=<root_password> # required
+CR_PAT=""                       # optional (para push de elementos de manera remota)
 ```
 
 ## Cómo probarlo
@@ -142,7 +143,7 @@ just image_push <package> # just ip <package>
 ```
 
 > [!note]
-> Para realizar las operaciones de subir elementos al repositorio remoto, es necesario tener un token válido almacenado en la variable de entorno `CR_PAT`.
+> Para realizar las operaciones de subir elementos al repositorio remoto, es necesario tener un token válido almacenado en la variable de entorno `CR_PAT`. En el caso de no tenerlo, es obligatorio tenerla creada con un valor vacío (`export CR_PAT=""`)
 
 - O las dos acciones anteriores al mismo tiempo:
 
