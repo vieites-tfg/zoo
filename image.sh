@@ -29,15 +29,20 @@ exitt () {
 	kill -SIGUSR1 "$PID"
 }
 
+# 1:	the package
+get_version () {
+	cd packages/"$1"
+	local version=$(node -p "require('./package.json').version")
+	cd - &>/dev/null
+
+	echo "$version"
+}
+
 # 1:	a list of valid packages
 push_image () {
 	for p in $1
 	do
-		# Get version.
-		cd packages/"$p"
-		local version=$(node -p "require('./package.json').version")
-
-		cd -
+		local version=$(get_version "$p")
 
 		# Push.
 		docker push ghcr.io/vieites-tfg/zoo-"$p":"$version"
@@ -49,11 +54,7 @@ push_image () {
 build_image () {
 	for p in $1
 	do
-		# Get version.
-		cd packages/"$p"
-		local version=$(node -p "require('./package.json').version")
-	
-		cd -
+		local version=$(get_version "$p")
 
 		# Build.
 		docker build --target "$p" -t ghcr.io/vieites-tfg/zoo-"$p":"$version" .

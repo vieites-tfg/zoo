@@ -27,7 +27,7 @@ _build_zoo_base:
 
 _run entrypoint command:
   @just _build_zoo_base
-  docker run --rm -w /app -v $PWD:/app -e CR_PAT=$CR_PAT --entrypoint={{entrypoint}} zoo-base {{command}}
+  docker run --rm -w /app -v $PWD:/app --env-file .env --entrypoint={{entrypoint}} zoo-base {{command}}
 
 init:
   @just _run "yarn" "install"
