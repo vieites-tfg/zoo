@@ -31,19 +31,11 @@ exitt () {
 	kill -SIGUSR1 "$PID"
 }
 
-build_base () {
-	if [[ "$(docker images -f reference=zoo-base | wc -l | xargs)" != "2" ]]
-	then
-		docker build --target base -t zoo-base .
-	fi
-}
-
 # 1:	a list of valid packages
 to_remote () {
 	for p in $1
 	do
-		docker run --rm -w /app -v $PWD:/app -e CR_PAT=$CR_PAT --entrypoint=yarn \
-		zoo-base publish --access restricted ./packages/"$p"
+		just _run "yarn" "publish --access restricted ./packages/$p"
 	done
 }
 
@@ -83,7 +75,7 @@ main () {
 
 	case "$1" in
 		remote | local | all)
-			build_base
+			just _build_zoo_base
 			;;
 		*)
 			usage
