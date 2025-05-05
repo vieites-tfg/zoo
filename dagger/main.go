@@ -4,6 +4,7 @@ import (
 	"context"
 	"dagger/dagger/internal/dagger"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -111,6 +112,23 @@ func (m *Dagger) Launch(
 	return front, nil
 }
 
+func (m *Dagger) Lint(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+	sec *dagger.Secret,
+) (string, error) {
+	ctr, err := m.Init(ctx, src, sec)
+	if err != nil {
+		return "", err
+	}
+
+	return ctr.WithMountedDirectory("/app", src).
+		WithWorkdir("/app").
+		WithExec([]string{"yarn", "lint"}).
+		Stdout(ctx)
+}
+
 func makeSecrets(ctx context.Context, vars map[string]string) error {
 	secrets = make(Secrets)
 	client := dagger.Connect()
@@ -201,6 +219,11 @@ func parseEnvFile(content string) map[string]string {
 			value = strings.Trim(value, "\"'")
 			envVars[key] = value
 		}
+	}
+
+	dct := os.Getenv("DAGGER_CLOUD_TOKEN")
+	if dct != "" {
+		envVars["DAGGER_CLOUD_TOKEN"] = dct
 	}
 
 	return envVars
