@@ -1,0 +1,16 @@
+set allow-duplicate-recipes
+
+src := "--src .."
+src_pat := "--src .. --sec env://CR_PAT"
+
+_defalt:
+  just -l
+
+base:
+  dagger call base {{src}}
+
+init:
+  dagger call init {{src_pat}}
+
+launch:
+  dagger call launch {{src_pat}}
