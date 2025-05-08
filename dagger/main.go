@@ -95,7 +95,8 @@ func (m *Dagger) Backend(
 		From("ghcr.io/vieites-tfg/zoo-backend").
 		WithExposedPort(3000).
 		WithEnvVariable("NODE_ENV", "production").
-		WithEnvVariable("YARN_CACHE_FOLDER", ".cache").
+		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
+		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
 		WithSecretVariable("MONGODB_URI", secrets["MONGODB_URI"]).
 		AsService().
 		WithHostname("zoo-bakend")
@@ -124,7 +125,8 @@ func (m *Dagger) Frontend(
 		From("ghcr.io/vieites-tfg/zoo-frontend").
 		WithExposedPort(80).
 		WithEnvVariable("NODE_ENV", "production").
-		WithEnvVariable("YARN_CACHE_FOLDER", ".cache").
+		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
+		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
 		AsService().
 		WithHostname("zoo-frontend")
 
