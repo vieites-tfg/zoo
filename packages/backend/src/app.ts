@@ -8,8 +8,14 @@ import animalsRouter from './routes/animals.routes';
 const app = express();
 app.use(bodyParser.json());
 app.use(cors({
-  origin: "http://localhost:5173"
-}))
+  origin: (origin, callback) => {
+    if (!origin || origin.startsWith('http://localhost') || origin.startsWith('https://localhost')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
 
 const swaggerOptions = {
   definition: {
