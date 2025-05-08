@@ -13,10 +13,9 @@ type Dagger struct{}
 
 var secrets Secrets
 
-// Base builds the image from the Dockerfile
+// Builds the base image from the Dockerfile.
 func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) *dagger.Container {
-	return src.
-		DockerBuild(dagger.DirectoryDockerBuildOpts{Target: "base"}).
+	return src.DockerBuild(dagger.DirectoryDockerBuildOpts{Target: "base"}).
 		WithMountedDirectory("/app", src).
 		WithWorkdir("/app")
 }
@@ -48,6 +47,7 @@ func (m *Dagger) Init(
 	return ctr, nil
 }
 
+// Returns the backend service.
 func (m *Dagger) LaunchBackend(
 	ctx context.Context,
 	// +defaultPath="/"
@@ -99,6 +99,7 @@ func (m *Dagger) LaunchBackend(
 	return svc, nil
 }
 
+// Returns the frontend service.
 func (m *Dagger) LaunchFrontend(
 	ctx context.Context,
 	// +defaultPath="/"
@@ -136,6 +137,22 @@ func (m *Dagger) Lint(
 	return ctr.WithMountedDirectory("/app", src).
 		WithWorkdir("/app").
 		WithExec([]string{"yarn", "lint"}).
+		Stdout(ctx)
+}
+
+func (m *Dagger) TestBackend(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+	sec *dagger.Secret,
+) (string, error) {
+	ctr, err := m.Init(ctx, src, sec)
+	if err != nil {
+		return "", err
+	}
+
+	return ctr.
+		WithExec([]string{"lerna", "run", "test", "--scope", "@vieites-tfg/zoo-backend"}).
 		Stdout(ctx)
 }
 
