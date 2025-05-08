@@ -15,8 +15,10 @@ var secrets Secrets
 
 // Base builds the image from the Dockerfile
 func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) *dagger.Container {
-	return src.DockerBuild().
-		Build(src, dagger.ContainerBuildOpts{Target: "base"})
+	return src.
+		DockerBuild(dagger.DirectoryDockerBuildOpts{Target: "base"}).
+		WithMountedDirectory("/app", src).
+		WithWorkdir("/app")
 }
 
 // Init configures the content with the .env environment variables
@@ -46,15 +48,13 @@ func (m *Dagger) Init(
 	return ctr, nil
 }
 
-func (m *Dagger) LaunchBack(
+func (m *Dagger) LaunchBackend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
-	// +defaultPath="/mongo-init"
-	mongoInit *dagger.Directory,
 	sec *dagger.Secret,
 ) (*dagger.Service, error) {
-	_, err := m.Init(ctx, src, sec)
+	ctr, err := m.Init(ctx, src, sec)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +64,7 @@ func (m *Dagger) LaunchBack(
 		return nil, err
 	}
 
+	mongoInit := ctr.Directory("/app/mongo-init")
 	mongo := dag.
 		Container().
 		From("mongo:7.0").
@@ -75,6 +76,11 @@ func (m *Dagger) LaunchBack(
 		AsService().
 		WithHostname("mongodb")
 
+	_, err = mongo.Start(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	back := dag.
 		Container().
 		From("ghcr.io/vieites-tfg/zoo-backend").
@@ -82,14 +88,18 @@ func (m *Dagger) LaunchBack(
 		WithEnvVariable("NODE_ENV", "production").
 		WithEnvVariable("YARN_CACHE_FOLDER", ".cache").
 		WithSecretVariable("MONGODB_URI", secrets["MONGODB_URI"]).
-		WithServiceBinding("mongo", mongo).
 		AsService().
 		WithHostname("zoo-bakend")
 
-	return back, nil
+	svc, err := back.Start(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return svc, nil
 }
 
-func (m *Dagger) Launch(
+func (m *Dagger) LaunchFrontend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
