@@ -156,6 +156,35 @@ func (m *Dagger) TestBackend(
 		Stdout(ctx)
 }
 
+func (m *Dagger) Cypress(ctx context.Context, src *dagger.Directory) *dagger.Container {
+	return dag.
+		Container().
+		From("cypress/browsers").
+		WithMountedDirectory("/e2e", src).
+		WithWorkdir("/e2e").
+		WithExec([]string{"npx", "cypress", "install"}).
+		WithExec([]string{"yarn", "add", "lerna@8.2.1", "-W"})
+}
+
+func (m *Dagger) TestFrontend(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+	sec *dagger.Secret,
+	front *dagger.Service,
+) (string, error) {
+	_, err := m.Init(ctx, src, sec)
+	if err != nil {
+		return "", err
+	}
+
+	return m.Cypress(ctx, src).
+		WithServiceBinding("zoo-frontend", front).
+		Terminal().
+		WithExec([]string{"yarn", "run", "e2e"}).
+		Stdout(ctx)
+}
+
 func makeSecrets(ctx context.Context, vars map[string]string) error {
 	secrets = make(Secrets)
 	client := dagger.Connect()
