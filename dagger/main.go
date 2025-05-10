@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"dagger/dagger/internal/dagger"
+	"fmt"
+	"slices"
 )
 
-type Dagger struct{
+type Dagger struct {
 	// +optional
 	Sec *dagger.Secret
 }
@@ -23,9 +25,19 @@ func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) (*dagger.Conta
 		m.Sec = dagger.Connect().SetSecret("secrets", contents)
 	}
 
-	return src.DockerBuild(dagger.DirectoryDockerBuildOpts{Target: "base"}).
-		WithMountedDirectory("/app", src).
-		WithWorkdir("/app"), nil
+	ctr := dag.
+		Container().
+		From("node:20").
+		WithWorkdir("/app").
+		WithFile("package.json", src.File("package.json")).
+		WithFile("lerna.json", src.File("lerna.json")).
+		WithFile("yarn.lock", src.File("yarn.lock")).
+		WithDirectory("packages", src.Directory("packages")).
+		WithExec([]string{"yarn", "install"}).
+		WithExec([]string{"yarn", "global", "add", "lerna@8.2.1"}).
+		WithExec([]string{"yarn", "global", "add", "@vercel/ncc"})
+
+	return ctr, nil
 }
 
 // Init configures the content with the .env environment variables
@@ -57,13 +69,13 @@ func (m *Dagger) Init(
 	return ctr, nil
 }
 
-// Returns the backend service with the Mongo database.
+// Returns the backend container as a service with the Mongo database.
 func (m *Dagger) Backend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
 ) (*dagger.Service, error) {
-	ctr, err := m.Init(ctx, src)
+	_, err := m.Init(ctx, src)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +85,7 @@ func (m *Dagger) Backend(
 		return nil, err
 	}
 
-	mongoInit := ctr.Directory("/app/mongo-init")
+	mongoInit := src.Directory("mongo-init")
 	mongo := dag.
 		Container().
 		From("mongo:7.0").
@@ -90,14 +102,26 @@ func (m *Dagger) Backend(
 		return nil, err
 	}
 
+	build, err := m.BackendBuild(ctx, src)
+	if err != nil {
+		return nil, err
+	}
+
+	compiled := build.File("/app/dist/index.js")
+	pkgJson := build.File("/app/packages/backend/package.json")
+
 	back := dag.
-		Container().
-		From("ghcr.io/vieites-tfg/zoo-backend").
+		Container().From("node:20-alpine").
 		WithExposedPort(3000).
 		WithEnvVariable("NODE_ENV", "production").
 		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
 		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
 		WithSecretVariable("MONGODB_URI", secrets["MONGODB_URI"]).
+		WithWorkdir("/app").
+		WithFile("/app/package.json", pkgJson).
+		WithFile("/app/index.js", compiled).
+		WithExec([]string{"yarn", "install", "--production"}).
+		WithEntrypoint([]string{"node", "index.js"}).
 		AsService().
 		WithHostname("zoo-bakend")
 
@@ -109,28 +133,55 @@ func (m *Dagger) Backend(
 	return svc, nil
 }
 
-// Returns the frontend service.
+// Returns the backend container.
+func (m *Dagger) BackendBuild(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+) (*dagger.Container, error) {
+	base, err := m.Init(ctx, src)
+	if err != nil {
+		return nil, err
+	}
+
+	build := base.
+		WithWorkdir("/app").
+		WithExec([]string{"lerna", "run", "--scope", "@vieites-tfg/zoo-backend", "build"}).
+		WithExec([]string{"ncc", "build", "./packages/backend/dist/index.js", "-o", "./dist"})
+
+	return build, nil
+}
+
+// Returns the frontend container.
+func (m *Dagger) FrontendBuild(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+) (*dagger.Container, error) {
+	base, err := m.Init(ctx, src)
+	if err != nil {
+		return nil, err
+	}
+
+	front := base.
+		WithWorkdir("/app").
+		WithExec([]string{"lerna", "run", "--scope", "@vieites-tfg/zoo-frontend", "build"})
+
+	return front, nil
+}
+
+// Returns the frontend container as a service.
 func (m *Dagger) Frontend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
 ) (*dagger.Service, error) {
-	_, err := m.Init(ctx, src)
+	front, err := m.FrontendBuild(ctx, src)
 	if err != nil {
 		return nil, err
 	}
 
-	front := dag.
-		Container().
-		From("ghcr.io/vieites-tfg/zoo-frontend").
-		WithExposedPort(80).
-		WithEnvVariable("NODE_ENV", "production").
-		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
-		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
-		AsService().
-		WithHostname("zoo-frontend")
-
-	return front, nil
+	return front.AsService().WithHostname("zoo-frontend"), nil
 }
 
 func (m *Dagger) Lint(
@@ -192,4 +243,41 @@ func (m *Dagger) TestFrontend(
 		WithServiceBinding("zoo-frontend", front).
 		WithExec([]string{"yarn", "run", "e2e"}).
 		Stdout(ctx)
+}
+
+// Builds the package Docker image indicated and returns its container.
+// package is optional can be one of: ["backend", "frontend"].
+// If package is empty, both will be built.
+func (m *Dagger) BuildImage(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+	// +default="all"
+	pkg string,
+) ([]*dagger.Container, error) {
+	pkgs := []string{"backend", "frontend"}
+	if slices.Contains(pkgs, pkg) {
+		pkgs = []string{pkg}
+	} else if pkg != "all" {
+		return nil, fmt.Errorf("Not a valid option: '%s' is not one of ['backend', 'frontend'].", pkg)
+	}
+
+	var (
+		containers []*dagger.Container
+		ctr        *dagger.Container
+		err        error
+	)
+	for _, p := range pkgs {
+		if p == "backend" {
+			ctr, err = m.BackendBuild(ctx, src)
+		} else if p == "frontend" {
+			ctr, err = m.FrontendBuild(ctx, src)
+		}
+		if err != nil {
+			return nil, err
+		}
+		containers = append(containers, ctr)
+	}
+
+	return containers, nil
 }
