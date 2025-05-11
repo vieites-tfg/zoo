@@ -3,38 +3,21 @@ package main
 import (
 	"context"
 	"dagger/dagger/internal/dagger"
-	"fmt"
-	"strings"
 )
 
 type Dagger struct {
-	// +optional
-	Sec *dagger.Secret
+	SecEnv  *dagger.Secret
+	secrets secrets
 }
 
-type Package string
-
-const (
-	backend  Package = "backend"
-	frontend Package = "frontend"
-	all      Package = "all"
-)
-
-var pkgs = []Package{backend, frontend}
-
-var secrets Secrets
+func New(secEnv *dagger.Secret) *Dagger {
+	return &Dagger{
+		SecEnv: secEnv,
+	}
+}
 
 // Builds the base image from the Dockerfile.
 func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) (*dagger.Container, error) {
-	if m.Sec != (&dagger.Secret{}) {
-		contents, err := src.File(".env").Contents(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		m.Sec = dagger.Connect().SetSecret("secrets", contents)
-	}
-
 	ctr := dag.
 		Container().
 		From("node:20").
@@ -61,13 +44,13 @@ func (m *Dagger) Init(
 		return nil, err
 	}
 
-	content, err := m.Sec.Plaintext(ctx)
+	content, err := m.SecEnv.Plaintext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	vars := ParseEnvFile(content)
-	err = MakeSecrets(ctx, vars)
+	m.secrets, err = MakeSecrets(ctx, vars)
 	if err != nil {
 		return nil, err
 	}
@@ -75,318 +58,50 @@ func (m *Dagger) Init(
 	return ctr, nil
 }
 
-// Returns the backend container in build stage.
-func (m *Dagger) BackendBuild(
-	ctx context.Context,
-	// +defaultPath="/"
-	src *dagger.Directory,
-) (*dagger.Container, error) {
-	base, err := m.Base(ctx, src)
-	if err != nil {
-		return nil, err
-	}
-
-	build := base.
-		WithWorkdir("/app").
-		WithExec([]string{"lerna", "run", "--scope", "@vieites-tfg/zoo-backend", "build"}).
-		WithExec([]string{"ncc", "build", "./packages/backend/dist/index.js", "-o", "./dist"})
-
-	return build, nil
-}
-
-// Returns the backend container ready to run.
-func (m *Dagger) BackendCtr(
-	ctx context.Context,
-	// +defaultPath="/"
-	src *dagger.Directory,
-) (*dagger.Container, error) {
-	build, err := m.BackendBuild(ctx, src)
-	if err != nil {
-		return nil, err
-	}
-
-	compiled := build.File("/app/dist/index.js")
-	pkgJson := build.File("/app/packages/backend/package.json")
-
-	back := dag.
-		Container().From("node:20-alpine").
-		WithExposedPort(3000).
-		WithEnvVariable("NODE_ENV", "production").
-		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
-		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
-		WithWorkdir("/app").
-		WithFile("/app/package.json", pkgJson).
-		WithFile("/app/index.js", compiled).
-		WithExec([]string{"yarn", "install", "--production"}).
-		WithEntrypoint([]string{"node", "index.js"})
-
-	return back, nil
-}
-
-// Returns the backend container as a service with the Mongo database.
 func (m *Dagger) Backend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
-) (*dagger.Service, error) {
-	_, err := m.Init(ctx, src)
+) (*Backend, error) {
+	base, err := m.Init(ctx, src)
 	if err != nil {
 		return nil, err
 	}
 
-	mongoPort, err := GetMongoPort(ctx)
-	if err != nil {
-		return nil, err
+	keys := []string{"MONGO_PORT", "MONGO_DATABASE", "MONGO_ROOT", "MONGO_ROOT_PASS", "CR_PAT"}
+	values := []*dagger.Secret{
+		m.secrets["MONGO_PORT"],
+		m.secrets["MONGO_DATABASE"],
+		m.secrets["MONGO_ROOT"],
+		m.secrets["MONGO_ROOT_PASS"],
+		m.secrets["CR_PAT"],
 	}
 
-	mongoInit := src.Directory("mongo-init")
-	mongo := dag.
-		Container().
-		From("mongo:7.0").
-		WithSecretVariable("MONGO_INITDB_DATABASE", secrets["MONGO_DATABASE"]).
-		WithSecretVariable("MONGO_INITDB_ROOT_USERNAME", secrets["MONGO_ROOT"]).
-		WithSecretVariable("MONGO_INITDB_ROOT_PASSWORD", secrets["MONGO_ROOT_PASS"]).
-		WithExposedPort(mongoPort).
-		WithMountedDirectory("/docker-entrypoint-initdb.d", mongoInit).
-		AsService().
-		WithHostname("mongodb")
-
-	_, err = mongo.Start(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	ctr, err := m.BackendCtr(ctx, src)
-	if err != nil {
-		return nil, err
-	}
-
-	back := ctr.
-		WithSecretVariable("MONGODB_URI", secrets["MONGODB_URI"]).
-		AsService().WithHostname("zoo-bakend")
-
-	svc, err := back.Start(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return svc, nil
+	return &Backend{
+		Name:      "backend",
+		Base:      base,
+		SecKeys:   keys,
+		SecValues: values,
+	}, nil
 }
 
-// Returns the frontend container.
-func (m *Dagger) FrontendBuild(
-	ctx context.Context,
-	// +defaultPath="/"
-	src *dagger.Directory,
-) (*dagger.Container, error) {
-	base, err := m.Base(ctx, src)
-	if err != nil {
-		return nil, err
-	}
-
-	front := base.
-		WithWorkdir("/app").
-		WithExec([]string{"lerna", "run", "--scope", "@vieites-tfg/zoo-frontend", "build"})
-
-	return front, nil
-}
-
-func (m *Dagger) FrontendCtr(
-	ctx context.Context,
-	// +defaultPath="/"
-	src *dagger.Directory,
-) (*dagger.Container, error) {
-	build, err := m.FrontendBuild(ctx, src)
-	if err != nil {
-		return nil, err
-	}
-
-	dist := build.Directory("/app/packages/frontend/dist")
-
-	ctr := dag.
-		Container().
-		From("nginx:alpine").
-		WithWorkdir("/usr/share/nginx/html").
-		WithDirectory(".", dist).
-		WithExposedPort(80).
-		WithEntrypoint([]string{"nginx", "-g", "daemon off;"})
-
-	return ctr, nil
-}
-
-// Returns the frontend container as a service.
 func (m *Dagger) Frontend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
-) (*dagger.Service, error) {
-	front, err := m.FrontendBuild(ctx, src)
+) (*Frontend, error) {
+	base, err := m.Init(ctx, src)
 	if err != nil {
 		return nil, err
 	}
 
-	return front.AsService().WithHostname("zoo-frontend"), nil
-}
+	keys := []string{"CR_PAT"}
+	values := []*dagger.Secret{m.secrets["CR_PAT"]}
 
-func (m *Dagger) Lint(
-	ctx context.Context,
-	// +defaultPath="/"
-	src *dagger.Directory,
-) (string, error) {
-	ctr, err := m.Init(ctx, src)
-	if err != nil {
-		return "", err
-	}
-
-	return ctr.WithMountedDirectory("/app", src).
-		WithWorkdir("/app").
-		WithExec([]string{"yarn", "lint"}).
-		Stdout(ctx)
-}
-
-// Run the tests for the backend.
-func (m *Dagger) TestBackend(
-	ctx context.Context,
-	// +defaultPath="/"
-	src *dagger.Directory,
-) (string, error) {
-	ctr, err := m.Init(ctx, src)
-	if err != nil {
-		return "", err
-	}
-
-	return ctr.
-		WithExec([]string{"lerna", "run", "test", "--scope", "@vieites-tfg/zoo-backend"}).
-		Stdout(ctx)
-}
-
-// Returns the Cypress container used to run the e2e tests for the frontend.
-func (m *Dagger) Cypress(src *dagger.Directory) *dagger.Container {
-	return dag.
-		Container().
-		From("cypress/browsers").
-		WithMountedDirectory("/e2e", src).
-		WithWorkdir("/e2e").
-		WithExec([]string{"npx", "cypress", "install"}).
-		WithExec([]string{"yarn", "add", "lerna@8.2.1", "-W"})
-}
-
-// Run the tests for the frontend.
-func (m *Dagger) TestFrontend(
-	ctx context.Context,
-	// +defaultPath="/"
-	src *dagger.Directory,
-	front *dagger.Service,
-) (string, error) {
-	_, err := m.Init(ctx, src)
-	if err != nil {
-		return "", err
-	}
-
-	return m.Cypress(src).
-		WithServiceBinding("zoo-frontend", front).
-		WithExec([]string{"yarn", "run", "e2e"}).
-		Stdout(ctx)
-}
-
-// Pushes the package Docker image indicated to the GitHub registry.
-// package is optional can be one of: ["backend", "frontend"].
-// If package is empty, both will be built.
-func (m *Dagger) PublishImage(
-	ctx context.Context,
-	// +defaultPath="/"
-	src *dagger.Directory,
-	pkg Package,
-) ([]string, error) {
-	var err error
-
-	_, err = m.Init(ctx, src)
-	if err != nil {
-		return []string{}, err
-	}
-
-	var ctr *dagger.Container
-
-	containers := make(map[Package]*dagger.Container)
-	tags := make(map[Package][]string) 
-
-	var once bool
-	if pkg != all {
-		once = true
-	}
-
-	for _, p := range pkgs {
-		if once {
-			p = pkg
-		}
-		switch p {
-		case backend:
-			ctr, err = m.BackendCtr(ctx, src)
-		case frontend:
-			ctr, err = m.FrontendCtr(ctx, src)
-		}
-
-		if err != nil {
-			return nil, err
-		}
-		containers[p] = ctr
-
-		version, err := m.GetVersion(ctx, src, p)
-		if err != nil {
-			return nil, err
-		}
-		tags[p] = []string{"latest", strings.TrimSpace(version)}
-
-		if once {
-			break
-		}
-	}
-
-	var out []string
-	for p, ctr := range containers {
-		for _, t := range tags[p] {
-			imageRef, err := ctr.WithRegistryAuth("ghcr.io", "vieitesss", secrets["CR_PAT"]).
-				Publish(ctx, fmt.Sprintf("ghcr.io/vieites-tfg/zoo-%s:%s", string(p), t))
-			if err != nil {
-				return out, err
-			}
-			out = append(out, imageRef)
-		}
-	}
-
-	return out, nil
-}
-
-func (m *Dagger) GetVersion(
-	ctx context.Context,
-	// +defaultPath="/"
-	src *dagger.Directory,
-	pkg Package,
-) (string, error) {
-	ctr, err := m.Base(ctx, src)
-	if err != nil {
-		return "", err
-	}
-
-	if pkg != all {
-		return getVersion(ctx, ctr, pkg)
-	}
-
-	out := strings.Builder{}
-	for _, p := range pkgs {
-		version, err := getVersion(ctx, ctr, p)
-		if err != nil {
-			return "", fmt.Errorf("Error with %v: %s", p, err)
-		}
-		out.WriteString(fmt.Sprintf("%v -> %s\n", p, version))
-	}
-
-	return out.String(), nil
-}
-
-func getVersion(ctx context.Context, ctr *dagger.Container, pkg Package) (string, error) {
-	return ctr.
-		WithWorkdir(fmt.Sprintf("/app/packages/%s", pkg)).
-		WithExec([]string{"node", "-p", "require('./package.json').version"}).
-		Stdout(ctx)
+	return &Frontend{
+		Name:      "frontend",
+		Base:      base,
+		SecKeys:   keys,
+		SecValues: values,
+	}, nil
 }
