@@ -108,9 +108,16 @@ func PublishPkg(
 	pkg string,
 	pat *dagger.Secret,
 ) (string, error) {
+	content, err := config.Contents(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	content = fmt.Sprintf("//npm.pkg.github.com/:_authToken=${CR_PAT}\n%s", content)
+
 	return base.
 		WithSecretVariable("CR_PAT", pat).
-		WithFile("/app/.npmrc", config).
+		WithNewFile("/app/.npmrc", content).
 		WithExec([]string{"yarn", "publish", "--access", "restricted", fmt.Sprintf("/app/packages/%s", pkg), "--non-interactive"}).
 		Stdout(ctx)
 }
