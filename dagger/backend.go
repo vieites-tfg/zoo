@@ -4,15 +4,13 @@ import (
 	"context"
 	"dagger/dagger/internal/dagger"
 	"fmt"
-	"slices"
 	"strconv"
 )
 
 type Backend struct {
-	Name      string
-	Base      *dagger.Container
-	SecKeys   []string
-	SecValues []*dagger.Secret
+	Name    string
+	Base    *dagger.Container
+	Secrets SecMap
 }
 
 func (m *Backend) Build(ctx context.Context) *dagger.Container {
@@ -51,7 +49,7 @@ func (m *Backend) Service(
 	// +defaultPath="/"
 	src *dagger.Directory,
 ) (*dagger.Service, error) {
-	mongoPort, err := getMongoPort(ctx, m.SecValues[slices.Index(m.SecKeys, "MONGO_PORT")])
+	mongoPort, err := getMongoPort(ctx, m.Secrets.Get("MONGO_PORT"))
 	if err != nil {
 		return nil, err
 	}
@@ -60,9 +58,9 @@ func (m *Backend) Service(
 	mongo := dagger.Connect().
 		Container().
 		From("mongo:7.0").
-		WithSecretVariable("MONGO_INITDB_DATABASE", m.SecValues[slices.Index(m.SecKeys, "MONGO_DATABASE")]).
-		WithSecretVariable("MONGO_INITDB_ROOT_USERNAME", m.SecValues[slices.Index(m.SecKeys, "MONGO_ROOT")]).
-		WithSecretVariable("MONGO_INITDB_ROOT_PASSWORD", m.SecValues[slices.Index(m.SecKeys, "MONGO_ROOT_PASS")]).
+		WithSecretVariable("MONGO_INITDB_DATABASE", m.Secrets.Get("MONGO_DATABASE")).
+		WithSecretVariable("MONGO_INITDB_ROOT_USERNAME", m.Secrets.Get("MONGO_ROOT")).
+		WithSecretVariable("MONGO_INITDB_ROOT_PASSWORD", m.Secrets.Get("MONGO_ROOT_PASS")).
 		WithExposedPort(mongoPort).
 		WithMountedDirectory("/docker-entrypoint-initdb.d", mongoInit).
 		AsService().
@@ -73,7 +71,7 @@ func (m *Backend) Service(
 		return nil, err
 	}
 
-	mongoUri, err := createMongoUri(ctx, m.SecKeys, m.SecValues)
+	mongoUri, err := createMongoUri(ctx, m.Secrets)
 
 	back := m.Ctr(ctx).
 		WithSecretVariable("MONGODB_URI", mongoUri).
@@ -94,14 +92,11 @@ func (m *Backend) Test(ctx context.Context) (string, error) {
 }
 
 func (m *Backend) Lint(ctx context.Context) (string, error) {
-	return m.Base.
-		WithWorkdir(fmt.Sprintf("/app/packages/%s", m.Name)).
-		WithExec([]string{"yarn", "lint"}).
-		Stdout(ctx)
+	return Lint(ctx, m.Base, m.Name)
 }
 
 func (m *Backend) PublishImage(ctx context.Context) ([]string, error) {
-	return PublishImage(ctx, m.Base, m.Ctr(ctx), m.Name, m.SecValues[slices.Index(m.SecKeys, "CR_PAT")])
+	return PublishImage(ctx, m.Base, m.Ctr(ctx), m.Name, m.Secrets.Get("CR_PAT"))
 }
 
 func getMongoPort(ctx context.Context, port *dagger.Secret) (int, error) {
@@ -118,11 +113,7 @@ func getMongoPort(ctx context.Context, port *dagger.Secret) (int, error) {
 	return mongo_port, nil
 }
 
-func createMongoUri(
-	ctx context.Context,
-	secKeys []string,
-	secValues []*dagger.Secret,
-) (*dagger.Secret, error) {
+func createMongoUri(ctx context.Context, secrets SecMap) (*dagger.Secret, error) {
 	var (
 		err       error
 		root      string
@@ -131,22 +122,22 @@ func createMongoUri(
 		db        string
 	)
 
-	root, err = secValues[slices.Index(secKeys, "MONGO_ROOT")].Plaintext(ctx)
+	root, err = secrets.Get("MONGO_ROOT").Plaintext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	rootPass, err = secValues[slices.Index(secKeys, "MONGO_ROOT_PASS")].Plaintext(ctx)
+	rootPass, err = secrets.Get("MONGO_ROOT_PASS").Plaintext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	mongoPort, err = secValues[slices.Index(secKeys, "MONGO_PORT")].Plaintext(ctx)
+	mongoPort, err = secrets.Get("MONGO_PORT").Plaintext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	db, err = secValues[slices.Index(secKeys, "MONGO_DATABASE")].Plaintext(ctx)
+	db, err = secrets.Get("MONGO_DATABASE").Plaintext(ctx)
 	if err != nil {
 		return nil, err
 	}

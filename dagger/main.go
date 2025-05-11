@@ -78,10 +78,9 @@ func (m *Dagger) Backend(
 	}
 
 	return &Backend{
-		Name:      "backend",
-		Base:      base,
-		SecKeys:   keys,
-		SecValues: values,
+		Name:    "backend",
+		Base:    base,
+		Secrets: SecMap{Keys: keys, Values: values},
 	}, nil
 }
 
@@ -99,9 +98,8 @@ func (m *Dagger) Frontend(
 	values := []*dagger.Secret{m.secrets["CR_PAT"]}
 
 	return &Frontend{
-		Name:      "frontend",
-		Base:      base,
-		SecKeys:   keys,
-		SecValues: values,
+		Name:    "frontend",
+		Base:    base,
+		Secrets: SecMap{Keys: keys, Values: values},
 	}, nil
 }

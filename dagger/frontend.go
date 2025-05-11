@@ -3,15 +3,12 @@ package main
 import (
 	"context"
 	"dagger/dagger/internal/dagger"
-	"fmt"
-	"slices"
 )
 
 type Frontend struct {
 	Name      string
 	Base      *dagger.Container
-	SecKeys   []string
-	SecValues []*dagger.Secret
+	Secrets   SecMap
 }
 
 func (m *Frontend) Build(ctx context.Context) *dagger.Container {
@@ -43,10 +40,7 @@ func (m *Frontend) Service(ctx context.Context) *dagger.Service {
 }
 
 func (m *Frontend) Lint(ctx context.Context) (string, error) {
-	return m.Base.
-		WithWorkdir(fmt.Sprintf("/app/packages/%s", m.Name)).
-		WithExec([]string{"yarn", "lint"}).
-		Stdout(ctx)
+	return Lint(ctx, m.Base, m.Name)
 }
 
 // Run the tests for the frontend.
@@ -63,7 +57,7 @@ func (m *Frontend) Test(
 }
 
 func (m *Frontend) PublishImage(ctx context.Context) ([]string, error) {
-	return PublishImage(ctx, m.Base, m.Ctr(ctx), m.Name, m.SecValues[slices.Index(m.SecKeys, "CR_PAT")])
+	return PublishImage(ctx, m.Base, m.Ctr(ctx), m.Name, m.Secrets.Get("CR_PAT"))
 }
 
 func Cypress(src *dagger.Directory) *dagger.Container {

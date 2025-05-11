@@ -4,6 +4,7 @@ import (
 	"context"
 	"dagger/dagger/internal/dagger"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -89,4 +90,11 @@ func PublishImage(
 	}
 
 	return out, nil
+}
+
+func Lint(ctx context.Context, base *dagger.Container, pkg string) (string, error) {
+	return base.
+		WithWorkdir(fmt.Sprintf("/app/packages/%s", pkg)).
+		WithExec([]string{"yarn", "lint"}).
+		Stdout(ctx)
 }
