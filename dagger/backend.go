@@ -113,6 +113,14 @@ func getMongoPort(ctx context.Context, port *dagger.Secret) (int, error) {
 	return mongo_port, nil
 }
 
+func (m *Backend) PublishPkg(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+) (string, error) {
+	return PublishPkg(ctx, m.Base, src.File(".npmrc"), m.Name, m.Secrets.Get("CR_PAT"))
+}
+
 func createMongoUri(ctx context.Context, secrets SecMap) (*dagger.Secret, error) {
 	var (
 		err       error

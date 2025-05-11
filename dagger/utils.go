@@ -10,8 +10,10 @@ import (
 
 type secrets map[string]*dagger.Secret
 
-func MakeSecrets(ctx context.Context, vars map[string]string) (secrets, error) {
+func MakeSecrets(ctx context.Context, envContent string) (secrets, error) {
 	secrets := make(secrets)
+
+	vars := parseEnvFile(envContent)
 	client := dagger.Connect()
 	for key, value := range vars {
 		secrets[key] = client.SetSecret(key, value)
@@ -26,7 +28,7 @@ func MakeSecrets(ctx context.Context, vars map[string]string) (secrets, error) {
 }
 
 // parseEnvFile process the content of the .env and returns a variables map
-func ParseEnvFile(content string) map[string]string {
+func parseEnvFile(content string) map[string]string {
 	envVars := make(map[string]string)
 	lines := strings.Split(content, "\n")
 	for _, line := range lines {
@@ -96,5 +98,19 @@ func Lint(ctx context.Context, base *dagger.Container, pkg string) (string, erro
 	return base.
 		WithWorkdir(fmt.Sprintf("/app/packages/%s", pkg)).
 		WithExec([]string{"yarn", "lint"}).
+		Stdout(ctx)
+}
+
+func PublishPkg(
+	ctx context.Context,
+	base *dagger.Container,
+	config *dagger.File,
+	pkg string,
+	pat *dagger.Secret,
+) (string, error) {
+	return base.
+		WithSecretVariable("CR_PAT", pat).
+		WithFile("/app/.npmrc", config).
+		WithExec([]string{"yarn", "publish", "--access", "restricted", fmt.Sprintf("/app/packages/%s", pkg), "--non-interactive"}).
 		Stdout(ctx)
 }

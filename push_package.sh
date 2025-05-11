@@ -33,6 +33,7 @@ exitt () {
 
 # 1:	a list of valid packages
 to_remote () {
+	yarn config set "npm.pkg.github.com/:_authToken" "${CR_PAT}" &> /dev/null && echo "[INFO] Auth token set!" || echo "[ERROR] Could not set the auth token" && exitt
 	for p in $1
 	do
 		just _run "yarn" "publish --access restricted ./packages/$p"
@@ -58,6 +59,13 @@ main () {
 	then
 		usage
 	fi
+
+	if [[ -z "${CR_PAT}" ]]
+	then
+		echo "You have to save your access token for your registry into CR_PAT env variable."
+		exitt
+	fi
+
 
 	local package=""
 

@@ -49,8 +49,7 @@ func (m *Dagger) Init(
 		return nil, err
 	}
 
-	vars := ParseEnvFile(content)
-	m.secrets, err = MakeSecrets(ctx, vars)
+	m.secrets, err = MakeSecrets(ctx, content)
 	if err != nil {
 		return nil, err
 	}

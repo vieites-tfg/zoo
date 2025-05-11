@@ -60,6 +60,14 @@ func (m *Frontend) PublishImage(ctx context.Context) ([]string, error) {
 	return PublishImage(ctx, m.Base, m.Ctr(ctx), m.Name, m.Secrets.Get("CR_PAT"))
 }
 
+func (m *Frontend) PublishPkg(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+) (string, error) {
+	return PublishPkg(ctx, m.Base, src.File(".npmrc"), m.Name, m.Secrets.Get("CR_PAT"))
+}
+
 func Cypress(src *dagger.Directory) *dagger.Container {
 	return dagger.Connect().
 		Container().
