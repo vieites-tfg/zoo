@@ -142,7 +142,7 @@ func (m *Backend) PublishPkg(
 		return "", err
 	}
 
-	return PublishPkg(ctx, m.Base, src.File(".npmrc"), m.Name, m.Secrets.Get("CR_PAT"))
+	return PublishPkg(ctx, m.Base, m.Name, m.Secrets.Get("CR_PAT"))
 }
 
 func createMongoUri(ctx context.Context, secrets SecMap) (*dagger.Secret, error) {

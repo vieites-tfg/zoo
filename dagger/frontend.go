@@ -106,7 +106,7 @@ func (m *Frontend) PublishPkg(
 		return "", err
 	}
 
-	return PublishPkg(ctx, m.Base, src.File(".npmrc"), m.Name, m.Secrets.Get("CR_PAT"))
+	return PublishPkg(ctx, m.Base, m.Name, m.Secrets.Get("CR_PAT"))
 }
 
 func Cypress(src *dagger.Directory) *dagger.Container {
