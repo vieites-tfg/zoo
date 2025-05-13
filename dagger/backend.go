@@ -8,11 +8,17 @@ import (
 )
 
 type Backend struct {
-	Name    string
-	Base    *dagger.Container
+	// The name of the package.
+	Name string
+
+	// The base container from which the functions will be run.
+	Base *dagger.Container
+
+	// The secrets needed to launch the package.
 	Secrets SecMap
 }
 
+// Builds the backend package, generating only one executable file and returns the container.
 func (m *Backend) Build(ctx context.Context) *dagger.Container {
 	build := m.Base.
 		WithWorkdir("/app").
@@ -22,6 +28,7 @@ func (m *Backend) Build(ctx context.Context) *dagger.Container {
 	return build
 }
 
+// Based on the build stage, gets the executable file and creates a ready to run container. Since it needs a Mongo database, it does not work by itself as a service.
 func (m *Backend) Ctr(ctx context.Context) *dagger.Container {
 	build := m.Build(ctx)
 
@@ -44,6 +51,7 @@ func (m *Backend) Ctr(ctx context.Context) *dagger.Container {
 	return back
 }
 
+// Creates a Mongo database and, based on the ready-to-run container, binds it to the backend using the environment variable. It returns the backend service with the 3000 port exported.
 func (m *Backend) Service(
 	ctx context.Context,
 	// +defaultPath="/"
@@ -85,16 +93,19 @@ func (m *Backend) Service(
 	return svc, nil
 }
 
+// Run the test for the package.
 func (m *Backend) Test(ctx context.Context) (string, error) {
 	return m.Base.
 		WithExec([]string{"lerna", "run", "test", "--scope", "@vieites-tfg/zoo-backend"}).
 		Stdout(ctx)
 }
 
+// Runs the linter for the package.
 func (m *Backend) Lint(ctx context.Context) (string, error) {
 	return Lint(ctx, m.Base, m.Name)
 }
 
+// Publish the Docker image of the package with the "latest" and the npm package (inside the 'package.json') versions.
 func (m *Backend) PublishImage(ctx context.Context) ([]string, error) {
 	return PublishImage(ctx, m.Base, m.Ctr(ctx), m.Name, m.Secrets.Get("CR_PAT"))
 }
@@ -113,11 +124,24 @@ func getMongoPort(ctx context.Context, port *dagger.Secret) (int, error) {
 	return mongo_port, nil
 }
 
+// Publish the npm package.
 func (m *Backend) PublishPkg(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
 ) (string, error) {
+	var err error
+
+	_, err = m.Lint(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = m.Test(ctx)
+	if err != nil {
+		return "", err
+	}
+
 	return PublishPkg(ctx, m.Base, src.File(".npmrc"), m.Name, m.Secrets.Get("CR_PAT"))
 }
 
