@@ -33,11 +33,15 @@ exitt () {
 
 # 1:	a list of valid packages
 to_remote () {
-	yarn config set "npm.pkg.github.com/:_authToken" "${CR_PAT}" &> /dev/null && echo "[INFO] Auth token set!" || echo "[ERROR] Could not set the auth token" && exitt
+	local npmrc="$ROOT"/.npmrc
+	touch "$npmrc" && echo "//npm.pkg.github.com/:_authToken=\${CR_PAT}" > "$npmrc"
+
 	for p in $1
 	do
-		just _run "yarn" "publish --access restricted ./packages/$p"
+		just _run "yarn" "yarn publish --access restricted ./packages/$p --non-interactive"
 	done
+
+	rm "$npmrc"
 }
 
 # 1:	a list of valid packages
