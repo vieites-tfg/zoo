@@ -44,6 +44,7 @@ A continuación se indica el software junto con las versiones utilizadas para el
 | Git | 2.48.1 | https://git-scm.com/ |
 | Just | v1.39.0 | https://github.com/casey/just |
 | Docker | v27.5.1 (con `compose` habilitado) | https://www.docker.com/ |
+| Dagger | latest | https://dagger.io |
 | Node (opcional) | 23.7.0 | https://nodejs.org/en |
 | Yarn (opcional) | 1.22.22 | https://yarnpkg.com/ |
 | npm (opcional) | 10.9.2 | https://www.npmjs.com/ |
@@ -69,17 +70,69 @@ CR_PAT=                         # optional (para realizar acciones con el regist
 
 ## Cómo probarlo
 
-> [!note]
-> Comprueba los [requisitos](#requisitos) si no lo has hecho ya.
+### Con Dagger
 
-1. Clona el repositorio y accede a él.
+Dagger es un software construido por los creadores de Docker. Permite ejecutar cualquier tipo de workflow de manera local utilizando contenedores, todo esto de manera programática, con cada vez más SDK para diferentes lenguajes. Es la herramienta más importante en este proyecto, ya que vamos a implementar un módulo de Dagger que permita realizar un ciclo completo de CI/CD, dando la posibilidad de levantar todo el entorno con Kubernetes, no solo con contenedores de Docker.
+
+Para probar la aplicación dummy con Dagger es necesario primeramente tener [instalado Dagger](https://docs.dagger.io/install) en su última versión.
+
+Una vez instalado, debemos movernos al directorio correspondiente al módulo de Dagger para esta aplicación:
 
 ```bash
-git clone https://github.com/vieites-tfg/zoo ~/zoo
-cd ~/zoo
+cd dagger
 ```
 
-2. Instala todos los paquetes necesarios. **Este paso se debe realizar antes de cualquier otra opción**.
+Desde aquí podemos ejecutar cualquir comando de dagger.
+
+1. Muestra las funciones disponibles:
+
+```bash
+dagger functions
+```
+
+Veremos varias opciones, de las cuales nos interesan `backend` y `frontend`. Estas funciones incluyen lar acciones disponibles para cada uno de los paquetes, que en este caso son las mismas. Podemos verlas con estos comandos:
+
+```bash
+dagger call backend --help
+dagger call frontend --help
+```
+
+2. Levantar la aplicación:
+
+Para ello debemos lanzar el backend por un lado y el frontend por otro. Primero ejecutamos el comando que levantará el backend de la aplicación.
+
+> ![note]
+> Siempre es necesario indicar el archivo .env, ya que es un requisito para lanzar la aplicación tener las variables mencionadas anteriormente definidas.
+
+Esto comando habilita la API en la URL `localhost:3000/animals`. Para saber más échale un vistazo al [apartado sobre la API](#prueba-la-api)
+
+```bash
+# Terminal 1
+dagger --sec-env file://../.env call backend service --ports 3000:3000
+```
+
+En otra terminal vamos a levantar el frontend con este comando:
+
+```bash
+# Terminal 1
+dagger --sec-env file://../.env call frontend service --ports 8080:80
+```
+
+> [!important]
+> El frontend debe levantarse siempre en el puerto 8080 para poder realizar lost test end-to-end.
+
+El comando anterior nos permite acceder a la aplicación en la URL `localhost:8080`.
+
+De esta manera **ya tenemos levantada completamente nuestra aplicación**:
+- Una base de datos MongoDB.
+- Una API conectada a la base de datos.
+- Un frontend que consume dicha API.
+
+#
+#
+# TODO: terminar documentación Dagger
+#
+#
 
 ```bash
 just init
@@ -96,7 +149,7 @@ just dev
 
 4. Accede a la página web en [http://localhost:5173](http://localhost:5173)
 
-### Más posibilidades
+#### Más posibilidades
 
 > [!important]
 > Siempre es necesario haber realizado un `just init` previamente a la ejecución de cualquier otro comando.
@@ -142,7 +195,7 @@ just image_push <package> # just ip <package>
 ```
 
 > [!note]
-> Para realizar las operaciones de subir elementos al repositorio remoto, es necesario tener un token válido `CR_PAT` del archivo `.env`. En el caso de no tenerlo, es obligatorio tenerla creada con un valor vacío en (`CR_PAT=`) el archivo `.env`.
+> Sigue las [instrucciones de GitHub](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry) para crear un PAT propio y poder así subir las imágenes de Docker al registro remoto. Este se usará también para subir los paquetes npm, como se indica más abajo.
 
 - O las dos acciones anteriores al mismo tiempo:
 
@@ -155,6 +208,9 @@ just image_build_push <package> # just ibp <package>
 ```bash
 just pkg_remote <package> # just pr <package>
 ```
+
+> [!note]
+> Para realizar las operaciones de subir elementos al repositorio remoto, es necesario tener un token válido `CR_PAT` del archivo `.env`. En el caso de no tenerlo, es obligatorio tenerla creada con un valor vacío en (`CR_PAT=`) el archivo `.env`.
 
 - En el caso de querer almacenar los paquetes npm y no tener un token de autenticación, estos se pueden guardar de manera local. Se creará un archivo comprimido para cada uno de los paquetes que se quiera guardar y se almacenará en la raíz del repositorio, en el directorio `local_packages/`. Solo hay que ejecutar el siguiente comando:
 
@@ -171,7 +227,7 @@ just pkg_remote_local <package> # just prl <package>
 > [!note]
 > Los comandos anteriores para subir tanto las imágenes de Docker como los paquetes npm, utilizan los scripts `image.sh` y `push_package.sh`, respectivamente.
 
-### Para probar la API
+### Prueba la API
 
 La API está disponible en [http://localhost:3000](http://localhost:3000). Tiene definidos los siguientes *endpoints*.
 

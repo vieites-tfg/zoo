@@ -6,7 +6,10 @@ import (
 )
 
 type Dagger struct {
+	// This is the '.env' file with the environment variables needed to launch the application.
+	// +required
 	SecEnv  *dagger.Secret
+
 	secrets secrets
 }
 
@@ -57,6 +60,7 @@ func (m *Dagger) Init(
 	return ctr, nil
 }
 
+// Functions related to the backend package.
 func (m *Dagger) Backend(
 	ctx context.Context,
 	// +defaultPath="/"
@@ -83,6 +87,7 @@ func (m *Dagger) Backend(
 	}, nil
 }
 
+// Functions related to the backend package.
 func (m *Dagger) Frontend(
 	ctx context.Context,
 	// +defaultPath="/"
