@@ -27,22 +27,13 @@ RUN lerna run --scope @vieites-tfg/zoo-backend build
 RUN ncc build ./packages/backend/dist/index.js -o compiled-backend.js
 
 #
-# Frontend build stage
-#
-FROM base AS frontend-build
-
-WORKDIR /app
-
-RUN lerna run --scope @vieites-tfg/zoo-frontend build 
-
-#
 # Backend
 #
 FROM node:20-alpine AS backend
 
 WORKDIR /app
 
-COPY --from=backend-build /app/compiled-backend.js .
+COPY --from=backend-build /app/compiled-backend.js/index.js .
 
 COPY --from=backend-build /app/packages/backend/package.json .
 
@@ -53,6 +44,15 @@ RUN yarn install --production
 EXPOSE 3000
 
 CMD ["node", "index.js"]
+
+#
+# Frontend build stage
+#
+FROM base AS frontend-build
+
+WORKDIR /app
+
+RUN lerna run --scope @vieites-tfg/zoo-frontend build 
 
 #
 # Frontend

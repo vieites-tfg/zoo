@@ -2,8 +2,9 @@ services:
   zoo-frontend:
     image: ghcr.io/vieites-tfg/zoo-frontend
     container_name: zoo-frontend
+    hostname: zoo-frontend
     ports:
-      - "5173:80"
+      - "8080:80"
     depends_on:
       - zoo-backend
     environment:
@@ -13,6 +14,7 @@ services:
   zoo-backend:
     image: ghcr.io/vieites-tfg/zoo-backend
     container_name: zoo-backend
+    hostname: zoo-backend
     ports:
       - "3000:3000"
     depends_on:
@@ -25,6 +27,7 @@ services:
   mongodb:
     image: mongo:7.0
     container_name: zoo-mongo
+    hostname: mongodb
     environment:
       - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT}

@@ -8,10 +8,10 @@
   },
   "scripts": {
     "dev": "lerna run dev",
-    "dev:backend": "lerna run --scope backend dev",
-    "dev:frontend": "lerna run --scope frontend dev",
+    "dev:backend": "lerna run dev --scope @vieites-tfg/zoo-backend",
+    "dev:frontend": "lerna run dev --scope @vieites-tfg/zoo-frontend",
     "lint": "lerna run lint",
-    "e2e": "lerna run test --scope frontend"
+    "e2e": "lerna run test --scope @vieites-tfg/zoo-frontend"
   },
   "dependencies": {
     "yarn": "^1.22.22"
