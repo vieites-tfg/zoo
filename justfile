@@ -42,10 +42,16 @@ e2e:
     docker build -f Dockerfile.cypress -t cypress .
   fi
 
-  docker run --rm -it --network zoo_default -v $PWD:/e2e -w /e2e cypress yarn run e2e
+  echo "//npm.pkg.github.com/:_authToken=\${CR_PAT}" > .npmrc
+
+  docker run --rm -it --network zoo_default \
+    -e BASE_URL="http://zoo-frontend" \
+    --env-file .env -v $PWD:/e2e -w /e2e cypress yarn run e2e
+
+  rm .npmrc
 
 test_backend:
-  @just _run "lerna" "run test --scope backend"
+  @just _run "lerna" "run test --scope @vieites-tfg/zoo-backend"
 
 test_frontend:
   just e2e

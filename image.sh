@@ -57,7 +57,7 @@ build_image () {
 		local version=$(get_version "$p")
 
 		# Build.
-		docker build --target "$p" -t ghcr.io/vieites-tfg/zoo-"$p":"$version" .
+		docker build --platform linux/amd64,linux/arm64 --target "$p" -t ghcr.io/vieites-tfg/zoo-"$p":"$version" .
 		docker tag ghcr.io/vieites-tfg/zoo-"$p":"$version" ghcr.io/vieites-tfg/zoo-"$p":latest
 	done
 }

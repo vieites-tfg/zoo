@@ -70,6 +70,13 @@ CR_PAT=                         # optional (para realizar acciones con el regist
 
 ## Cómo probarlo
 
+Primero hay que clonar el repositorio y acceder a él.
+
+```bash
+git clone https://github.com/vieites-tfg/zoo ~/zoo
+cd ~/zoo
+```
+
 ### Con Dagger
 
 Dagger es un software construido por los creadores de Docker. Permite ejecutar cualquier tipo de workflow de manera local utilizando contenedores, todo esto de manera programática, con cada vez más SDK para diferentes lenguajes. Es la herramienta más importante en este proyecto, ya que vamos a implementar un módulo de Dagger que permita realizar un ciclo completo de CI/CD, dando la posibilidad de levantar todo el entorno con Kubernetes, no solo con contenedores de Docker.
@@ -128,17 +135,46 @@ De esta manera **ya tenemos levantada completamente nuestra aplicación**:
 - Una API conectada a la base de datos.
 - Un frontend que consume dicha API.
 
-#
-#
-# TODO: terminar documentación Dagger
-#
-#
+3. Pasar test y linter.
+
+Podemos realizar esto mediante los siguientes comandos:
+
+```bash
+# Tests
+dagger --sec-env file://../.env call backend test
+dagger --sec-env file://../.env call frontend test --front tcp://localhost:8080
+# Linter
+dagger --sec-env file://../.env call backend lint
+dagger --sec-env file://../.env call frontend lint
+```
+
+> [!important]
+> Como se puede observar, para pasar los tests del frontend es necesario tener toda la aplicación levantada, tando frontend como backend, ya que se tratan de tests end-to-end. Esto es porque hay que pasar como parámetro el servicio del frontend, el cual debe estar **obligatoriamente** disponible en el puerto 8080.
+
+4. Subir imágenes de Docker y paquetes npm al registro de GitHub.
+
+Para subir las imágenes de Docker, es necesario estar logueado en el registro, tal y como se indica en la [documentación de GitHub](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry).
+
+Aquí, para el frontend, también **es necesario tener levantada toda la aplicación**, ya que se pasa el linter y se ejecutan los tests previamente a publicar la imagen de Docker o el paquete npm, por si hubiera algún error.
+
+```bash
+# Imágenes de Docker
+dagger --sec-env file://../.env call backend publish-image
+dagger --sec-env file://../.env call frontend publish-image --front tcp://localhost:8080
+# Imágenes de Docker
+dagger --sec-env file://../.env call backend publish-pkg
+dagger --sec-env file://../.env call frontend publish-pkg --front tcp://localhost:8080
+```
+
+### Con just
+
+1. Instala todos los paquetes necesarios. **Este paso se debe realizar antes de cualquier otra opción**.
 
 ```bash
 just init
 ```
 
-3. Inicia los contenedores en modo desarrollo.
+2. Inicia los contenedores en modo desarrollo.
 
 ```bash
 just dev
@@ -147,7 +183,7 @@ just dev
 > [!note]
 > Con `just` puedes ejecutar los pasos anteriores de manera concatenada mediante el comando `just init dev`.
 
-4. Accede a la página web en [http://localhost:5173](http://localhost:5173)
+3. Accede a la página web en [http://localhost:8080](http://localhost:8080)
 
 #### Más posibilidades
 
