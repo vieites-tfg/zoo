@@ -108,10 +108,10 @@ dagger call frontend --help
 
 Para ello debemos lanzar el backend por un lado y el frontend por otro. Primero ejecutamos el comando que levantará el backend de la aplicación.
 
-> ![note]
+> [!note]
 > Siempre es necesario indicar el archivo .env, ya que es un requisito para lanzar la aplicación tener las variables mencionadas anteriormente definidas.
 
-Esto comando habilita la API en la URL `localhost:3000/animals`. Para saber más échale un vistazo al [apartado sobre la API](#prueba-la-api)
+Este comando habilita la API en la URL `localhost:3000/animals`. Para saber más échale un vistazo al [apartado sobre la API](#prueba-la-api)
 
 ```bash
 # Terminal 1
@@ -121,7 +121,7 @@ dagger --sec-env file://../.env call backend service --ports 3000:3000
 En otra terminal vamos a levantar el frontend con este comando:
 
 ```bash
-# Terminal 1
+# Terminal 2
 dagger --sec-env file://../.env call frontend service --ports 8080:80
 ```
 
@@ -149,7 +149,7 @@ dagger --sec-env file://../.env call frontend lint
 ```
 
 > [!important]
-> Como se puede observar, para pasar los tests del frontend es necesario tener toda la aplicación levantada, tando frontend como backend, ya que se tratan de tests end-to-end. Esto es porque hay que pasar como parámetro el servicio del frontend, el cual debe estar **obligatoriamente** disponible en el puerto 8080.
+> Como se puede observar, para pasar los tests del frontend es necesario tener toda la aplicación levantada, tanto frontend como backend, ya que se tratan de tests end-to-end. Esto es porque hay que pasar como parámetro el servicio del frontend, el cual debe estar **obligatoriamente** disponible en el puerto 8080.
 
 4. Subir imágenes de Docker y paquetes npm al registro de GitHub.
 
@@ -188,7 +188,7 @@ just dev
 #### Más posibilidades
 
 > [!important]
-> Siempre es necesario haber realizado un `just init` previamente a la ejecución de cualquier otro comando.
+> Siempre es necesario haber realizado un `just init` previamente a la ejecución de cualquier otro comando, al menos una vez.
 
 - Ejecuta el linter:
 
