@@ -1,0 +1,18 @@
+namespaceOverride: dev
+
+frontend:
+  ingress:
+    hostTemplate: "zoo-dev.example.com"
+
+backend:
+  ingress:
+    hostTemplate: "api-zoo-dev.example.com"
+
+mongo:
+  internal:
+    enabled: true
+    rootUser: dev_root
+    rootPassword: dev_pass
+  external:
+    enabled: false
+

@@ -1,0 +1,44 @@
+frontend:
+  enabled: true
+  image:
+    repository: ghcr.io/vieites-tfg/zoo-frontend
+    tag: "0.0.0"
+  service:
+    port: 80
+  ingress:
+    enabled: true
+    hostTemplate: "zoo-{{ .Release.Namespace }}.example.com"
+
+backend:
+  enabled: true
+  image:
+    repository: ghcr.io/vieites-tfg/zoo-backend
+    tag: "{{ .Chart.AppVersion }}"
+  service:
+    port: 3000
+  ingress:
+    enabled: true
+    hostTemplate: "api-zoo-{{ .Release.Namespace }}.example.com"
+  env:
+    MONGODB_URI: ""   # se inyecta desde subchart mongo
+
+mongo:
+  internal:
+    enabled: true
+    image:
+      repository: mongo
+      tag: "7.0"
+    persistence:
+      enabled: true
+      storageClass: standard
+      size: 5Gi
+    rootUser: "{{ .Values.mongo.internal.rootUser }}"
+    rootPassword: "{{ .Values.mongo.internal.rootPassword }}"
+    service:
+      port: 27017
+  external:
+    enabled: false
+    # nombre del Secret y clave dentro del Secret que contiene la URI completa
+    secretName: ""
+    uriKey: "uri"
+

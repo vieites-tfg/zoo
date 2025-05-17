@@ -1,0 +1,6 @@
+apiVersion: v2
+name: zoo-frontend
+description: Subchart para el frontend de Zoo
+type: application
+version: 0.0.0
+appVersion: "0.0.0"

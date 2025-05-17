@@ -1,20 +1,11 @@
-alias dv := down_vol
-alias l := logs
-alias tb := test_backend
-alias tf := test_frontend
-alias ib := image_build
-alias ip := image_push
-alias ibp := image_build_push
-alias pr := pkg_remote
-alias pl := pkg_local
-alias prl := pkg_remote_local
-
 _default:
   just -l
 
+alias dv := down_vol
 down_vol:
   docker compose down -v
 
+alias l := logs
 logs service:
   docker compose logs {{service}} -f
 
@@ -50,9 +41,11 @@ e2e:
 
   rm .npmrc
 
+alias tb := test_backend
 test_backend:
   @just _run "lerna" "run test --scope @vieites-tfg/zoo-backend"
 
+alias tf := test_frontend
 test_frontend:
   just e2e
 
@@ -63,20 +56,65 @@ test:
 lint:
   @just _run "yarn" "lint"
 
+alias ib := image_build
 image_build package:
   ./image.sh build {{package}}
 
+alias ip := image_push
 image_push package:
   ./image.sh push {{package}}
 
+alias ibp := image_build_push
 image_build_push package:
   ./image.sh all {{package}}
 
+alias pr := pkg_remote
 pkg_remote package:
   ./push_package.sh remote {{package}}
 
+alias pl := pkg_local
 pkg_local package:
   ./push_package.sh local {{package}}
 
+alias prl := pkg_remote_local
 pkg_remote_local package:
   ./push_package.sh all {{package}}
+
+cluster := "zoo-cluster"
+
+cluster:
+  #!/usr/bin/env bash
+  cat <<EOF | kind create cluster --name {{cluster}} --config=-
+  kind: Cluster
+  apiVersion: kind.x-k8s.io/v1alpha4
+  nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+    - |
+      kind: InitConfiguration
+      nodeRegistration:
+        kubeletExtraArgs:
+          node-labels: "ingress-ready=true"
+    extraPortMappings:
+    - containerPort: 80
+      hostPort: 8080
+      protocol: TCP
+
+apply_ingress:
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+  kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s
+
+alias dc := delete_cluster
+delete_cluster:
+  kind delete cluster -n {{cluster}}
+
+alias ss := set_secret
+set_secret:
+  kubectl create secret docker-registry ghcr-secret \
+    --docker-server=ghcr.io \
+    --docker-username=vieites \
+    --docker-password=$CR_PAT \
+    -n dev

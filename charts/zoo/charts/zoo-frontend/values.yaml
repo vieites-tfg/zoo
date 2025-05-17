@@ -1,0 +1,18 @@
+replicaCount: 1
+image:
+  repository: ghcr.io/vieites-tfg/zoo-frontend
+  pullPolicy: IfNotPresent
+  tag: "0.0.0"  # Updated from {{ .Chart.AppVersion }} to avoid literal string
+service:
+  type: ClusterIP
+  port: 80
+ingress:
+  enabled: true
+  hostTemplate: "zoo-{{ .Release.Namespace }}.example.com"
+env:
+  NODE_ENV: production
+  YARN_CACHE_FOLDER: .cache
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

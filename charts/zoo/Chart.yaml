@@ -1,0 +1,18 @@
+apiVersion: v2
+name: zoo
+description: Umbrella chart to deploy frontend, backend and mongo
+version: 0.0.0
+appVersion: "0.0.0"
+dependencies:
+  - name: zoo-frontend
+    version: 0.0.0
+    repository: file://charts/zoo-frontend
+    condition: frontend.enabled
+  # - name: zoo-backend
+  #   version: 0.0.0
+  #   repository: file://charts/zoo-backend
+  #   condition: backend.enabled
+  # - name: zoo-mongo
+  #   version: 0.0.0
+  #   repository: file://charts/zoo-mongo
+  #   condition: mongo.internal.enabled
