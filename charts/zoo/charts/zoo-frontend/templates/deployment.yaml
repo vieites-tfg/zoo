@@ -23,11 +23,9 @@ spec:
         - name: frontend
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: NODE_ENV
-              value: {{ .Values.env.NODE_ENV | quote }}
-            - name: YARN_CACHE_FOLDER
-              value: {{ .Values.env.YARN_CACHE_FOLDER | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-{{ .Release.Name }}-config
           ports:
             - containerPort: 80
           resources:
