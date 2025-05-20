@@ -1,4 +1,0 @@
-frontend:
-  ingress:
-    enabled: true
-    hostTemplate: "zoo-dev.local"

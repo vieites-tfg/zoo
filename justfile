@@ -121,8 +121,6 @@ create_cluster:
   kubectl create namespace pre
   kubectl create namespace pro
 
-  just set_secret
-
 alias dc := delete_cluster
 delete_cluster:
   kind delete cluster -n {{cluster}}
@@ -138,4 +136,9 @@ check_hosts ns:
 launch_chart ns:
   just check_hosts {{ns}}
 
-  helm install zoo ./charts/zoo -n {{ns}}
+  helm upgrade --install zoo-{{ns}} ./charts/zoo \
+  -n {{ns}} \
+  -f charts/zoo/values.yaml \
+  -f charts/zoo/values-{{ns}}.yaml \
+  --set global.ghcrSecret.enabled=true \
+  --set global.ghcrSecret.password=$CR_PAT

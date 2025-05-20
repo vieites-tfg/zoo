@@ -1,10 +1,10 @@
-namespaceOverride: dev
-
-frontend:
+zoo-frontend:
+  image:
+    tag: "0.0.0"
   ingress:
     hostTemplate: "zoo-dev.example.com"
 
-backend:
+zoo-backend:
   ingress:
     hostTemplate: "api-zoo-dev.example.com"
 

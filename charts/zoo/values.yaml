@@ -1,4 +1,4 @@
-frontend:
+zoo-frontend:
   enabled: true
   image:
     repository: ghcr.io/vieites-tfg/zoo-frontend
@@ -7,9 +7,8 @@ frontend:
     port: 80
   ingress:
     enabled: true
-    hostTemplate: "zoo-{{ .Release.Namespace }}.example.com"
 
-backend:
+zoo-backend:
   enabled: true
   image:
     repository: ghcr.io/vieites-tfg/zoo-backend
@@ -38,7 +37,13 @@ mongo:
       port: 27017
   external:
     enabled: false
-    # nombre del Secret y clave dentro del Secret que contiene la URI completa
     secretName: ""
     uriKey: "uri"
 
+global:
+  ghcrSecret:
+    enabled: false # Set to true via command line
+    name: ghcr-secret
+    registry: ghcr.io
+    username: vieites
+    password: "" # Set via command line
