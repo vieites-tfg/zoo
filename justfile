@@ -82,7 +82,23 @@ pkg_remote_local package:
 
 cluster := "zoo-cluster"
 
-cluster:
+alias ss := set_secret
+set_secret:
+  kubectl create secret docker-registry ghcr-secret \
+    --docker-server=ghcr.io \
+    --docker-username=vieites \
+    --docker-password=$CR_PAT \
+    -n dev
+
+apply_ingress:
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+  sleep 0.5
+  kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s
+
+create_cluster:
   #!/usr/bin/env bash
   cat <<EOF | kind create cluster --name {{cluster}} --config=-
   kind: Cluster
@@ -99,22 +115,27 @@ cluster:
     - containerPort: 80
       hostPort: 8080
       protocol: TCP
+  EOF
 
-apply_ingress:
-  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-  kubectl wait --namespace ingress-nginx \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/component=controller \
-  --timeout=90s
+  kubectl create namespace dev
+  kubectl create namespace pre
+  kubectl create namespace pro
+
+  just set_secret
 
 alias dc := delete_cluster
 delete_cluster:
   kind delete cluster -n {{cluster}}
 
-alias ss := set_secret
-set_secret:
-  kubectl create secret docker-registry ghcr-secret \
-    --docker-server=ghcr.io \
-    --docker-username=vieites \
-    --docker-password=$CR_PAT \
-    -n dev
+check_hosts ns:
+  #!/usr/bin/env bash
+  host=$(grep "zoo-{{ns}}" /etc/hosts | wc -l | xargs)
+  if [[ $host == "0" ]]
+  then
+    echo "127.0.0.1 zoo-{{ns}}.example.com" | sudo tee -a /etc/hosts
+  fi
+
+launch_chart ns:
+  just check_hosts {{ns}}
+
+  helm install zoo ./charts/zoo -n {{ns}}
