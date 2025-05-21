@@ -1,27 +1,19 @@
-zoo-frontend:
-  enabled: true
-  image:
-    repository: ghcr.io/vieites-tfg/zoo-frontend
-    tag: "0.0.0"
-  service:
-    port: 80
-  ingress:
-    enabled: true
-
-zoo-backend:
-  enabled: true
-  image:
-    repository: ghcr.io/vieites-tfg/zoo-backend
-    tag: "{{ .Chart.AppVersion }}"
-  service:
-    port: 3000
-  ingress:
-    enabled: true
-    hostTemplate: "api-zoo-{{ .Release.Namespace }}.example.com"
+global:
+  replicas: 1
   env:
-    MONGODB_URI: ""   # se inyecta desde subchart mongo
+    NODE_ENV: production
+    YARN_CACHE_FOLDER: .cache
+  image:
+    repository: ghcr.io/vieites-tfg
+    pullPolicy: IfNotPresent
+  ghcrSecret:
+    enabled: false # Set to true via command line
+    name: ghcr-secret
+    registry: ghcr.io
+    username: vieites
+    password: "" # Set via command line
 
-mongo:
+zoo-mongo:
   internal:
     enabled: true
     image:
@@ -39,11 +31,3 @@ mongo:
     enabled: false
     secretName: ""
     uriKey: "uri"
-
-global:
-  ghcrSecret:
-    enabled: false # Set to true via command line
-    name: ghcr-secret
-    registry: ghcr.io
-    username: vieites
-    password: "" # Set via command line

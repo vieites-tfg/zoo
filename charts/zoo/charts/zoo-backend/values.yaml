@@ -1,0 +1,23 @@
+image:
+  name: zoo-backend
+  tag: "latest"
+service:
+  type: ClusterIP
+  port: 3000
+ingress:
+  enabled: false
+  hostTemplate: "api-zoo-{{ .Release.Namespace }}.example.com"
+mongo:
+  service:
+    name: "zoo-{{ .Release.Namespace }}-mongo-svc"
+    port: 27017
+  root:
+    user: ""
+    password: ""
+  databaseName: "{{ .Release.Name }}-mongodb"
+  uri: ""
+
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

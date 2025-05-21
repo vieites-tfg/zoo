@@ -1,3 +1,8 @@
+global:
+  # replicas: 2
+  env:
+    NODE_ENV: development
+
 zoo-frontend:
   image:
     tag: "0.0.0"
@@ -5,14 +10,18 @@ zoo-frontend:
     hostTemplate: "zoo-dev.example.com"
 
 zoo-backend:
+  image:
+    tag: "0.0.0"
+  mongo:
+    serviceName: "zoo-dev-mongo.svc"
   ingress:
+    enabled: true
     hostTemplate: "api-zoo-dev.example.com"
 
-mongo:
+zoo-mongo:
   internal:
     enabled: true
     rootUser: dev_root
     rootPassword: dev_pass
   external:
     enabled: false
-
