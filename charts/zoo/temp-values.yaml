@@ -1,5 +1,0 @@
-frontend:
-  imagePullSecret:
-    enabled: true
-    name: "ghcr-secret"
-    dockerConfigJson: '{"auths":{"ghcr.io":{"username":"vieites","password":"'"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"'","auth":"'"dmllaXRlczpnaHBfdkVJbVR2d09CeXhhUzFGRnZZU3VOaGFSR0YyUVpmMGdBUm9B"'"}}}'

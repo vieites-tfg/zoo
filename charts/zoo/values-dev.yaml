@@ -21,7 +21,5 @@ zoo-backend:
 zoo-mongo:
   internal:
     enabled: true
-    rootUser: dev_root
-    rootPassword: dev_pass
   external:
     enabled: false

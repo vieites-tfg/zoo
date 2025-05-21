@@ -1,0 +1,19 @@
+internal:
+  enabled: true
+external:
+  enabled: false
+image:
+  repository: mongo
+  tag: "7.0"
+service:
+  port: 27017
+persistence:
+  enabled: true
+  storageClass: standard
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+root:
+  user: ""     # From cmd line
+  password: "" # From cmd line
+databaseName: "mongodb-{{ .Release.Namespace }}"

@@ -12,10 +12,9 @@ mongo:
     name: "zoo-{{ .Release.Namespace }}-mongo-svc"
     port: 27017
   root:
-    user: ""
-    password: ""
-  databaseName: "{{ .Release.Name }}-mongodb"
-  uri: ""
+    user: ""     # From cmd line
+    password: "" # From cmd line
+  databaseName: "mongodb-{{ .Release.Namespace }}"
 
 resources: {}
 nodeSelector: {}

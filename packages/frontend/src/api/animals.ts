@@ -11,7 +11,8 @@ interface Animal {
 
 export async function getAllAnimals(): Promise<Animal[]> {
   try {
-    const response = await fetch('http://localhost:3000/animals');
+    let url = process.env.API_URL || "http://localhost:3000"
+    const response = await fetch(url + '/animals');
 
     if (!response.ok) {
       throw new Error(`Error in the request: ${response.status} ${response.statusText}`);

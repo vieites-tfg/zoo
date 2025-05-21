@@ -141,4 +141,16 @@ launch_chart ns:
   -f charts/zoo/values.yaml \
   -f charts/zoo/values-{{ns}}.yaml \
   --set global.ghcrSecret.enabled=true \
-  --set global.ghcrSecret.password=$CR_PAT
+  --set global.ghcrSecret.password=$CR_PAT \
+  --set zoo-backend.mongo.root.user=carer \
+  --set zoo-backend.mongo.root.password=carerpass
+
+template ns:
+  helm template zoo-{{ns}} ./charts/zoo \
+  -n {{ns}} \
+  -f charts/zoo/values.yaml \
+  -f charts/zoo/values-{{ns}}.yaml \
+  --set global.ghcrSecret.enabled=true \
+  --set global.ghcrSecret.password=$CR_PAT \
+  --set zoo-backend.mongo.root.user=carer \
+  --set zoo-backend.mongo.root.password=carerpass

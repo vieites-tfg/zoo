@@ -8,6 +8,8 @@ service:
 ingress:
   enabled: true
   hostTemplate: "zoo-{{ .Release.Namespace }}.example.com"
+backend:
+  port: 3000
 
 resources: {}
 nodeSelector: {}

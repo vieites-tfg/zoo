@@ -1,0 +1,9 @@
+apiVersion: v2
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-{{ .Release.Namespace }}-config
+  labels:
+    app.kubernetes.io/name: zoo-mongo
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  MONGO_INITDB_DATABASE: {{ printf "mongodb-%s" .Values.databaseName | quote }}

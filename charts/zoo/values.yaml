@@ -7,27 +7,8 @@ global:
     repository: ghcr.io/vieites-tfg
     pullPolicy: IfNotPresent
   ghcrSecret:
-    enabled: false # Set to true via command line
+    enabled: false
     name: ghcr-secret
     registry: ghcr.io
     username: vieites
-    password: "" # Set via command line
-
-zoo-mongo:
-  internal:
-    enabled: true
-    image:
-      repository: mongo
-      tag: "7.0"
-    persistence:
-      enabled: true
-      storageClass: standard
-      size: 5Gi
-    rootUser: "{{ .Values.mongo.internal.rootUser }}"
-    rootPassword: "{{ .Values.mongo.internal.rootPassword }}"
-    service:
-      port: 27017
-  external:
-    enabled: false
-    secretName: ""
-    uriKey: "uri"
+    password: "" # From cmd line

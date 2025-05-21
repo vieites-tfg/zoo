@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Chart.Name }}-{{ .Release.Namespace }}-config
 data:
+  API_URL: {{ printf "http://%s-backend:%d" .Release.Name (.Values.backend.port | int) | quote }}
 {{- with .Values.global.env }}
 {{- toYaml . | nindent 2 }}
 {{- end }}

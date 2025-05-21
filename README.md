@@ -115,14 +115,14 @@ Este comando habilita la API en la URL `localhost:3000/animals`. Para saber más
 
 ```bash
 # Terminal 1
-dagger --sec-env file://../.env call backend service --ports 3000:3000
+dagger --sec-env file://../.env call backend service up --ports 3000:3000
 ```
 
 En otra terminal vamos a levantar el frontend con este comando:
 
 ```bash
 # Terminal 2
-dagger --sec-env file://../.env call frontend service --ports 8080:80
+dagger --sec-env file://../.env call frontend service up --ports 8080:80
 ```
 
 > [!important]
