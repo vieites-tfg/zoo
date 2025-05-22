@@ -9,7 +9,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || origin.startsWith('http://localhost') || origin.startsWith('https://localhost')) {
+    if (!origin ||
+      origin.startsWith('http://zoo') ||
+      origin.startsWith('http://localhost') ||
+      origin.startsWith('https://localhost')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

@@ -9,12 +9,12 @@ ingress:
   hostTemplate: "api-zoo-{{ .Release.Namespace }}.example.com"
 mongo:
   service:
-    name: "zoo-{{ .Release.Namespace }}-mongo-svc"
+    name: "zoo-mongo-{{ .Release.Namespace }}-svc"
     port: 27017
   root:
     user: ""     # From cmd line
     password: "" # From cmd line
-  databaseName: "mongodb-{{ .Release.Namespace }}"
+  databaseName: "zoo"
 
 resources: {}
 nodeSelector: {}

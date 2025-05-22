@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Chart.Name }}-{{ .Release.Namespace }}-mongo
+  name: {{ .Chart.Name }}-{{ .Release.Namespace }}-statefulset
   labels:
     app.kubernetes.io/name: zoo-mongo
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -18,10 +18,16 @@ spec:
         app.kubernetes.io/name: zoo-mongo
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      volumes:
+        - name: {{ .Chart.Name }}-{{ .Release.Namespace }}-mongo-init
+          configMap:
+            name: {{ .Chart.Name }}-{{ .Release.Namespace }}-mongo-init
       containers:
         - name: mongo
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          tty: true
+          stdin: true
           ports:
             - containerPort: {{ .Values.service.port }}
           env:
@@ -43,6 +49,8 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/db
+            - name: {{ .Chart.Name }}-{{ .Release.Namespace }}-mongo-init
+              mountPath: /docker-entrypoint-initdb.d
   volumeClaimTemplates:
     - metadata:
         name: data

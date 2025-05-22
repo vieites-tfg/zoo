@@ -9,9 +9,21 @@ interface Animal {
   notes: string
 }
 
+interface AppConfig {
+  VITE_API_URL: string;
+}
+
+declare global {
+  interface Window {
+    APP_CONFIG: AppConfig;
+  }
+}
+
 export async function getAllAnimals(): Promise<Animal[]> {
   try {
-    let url = process.env.API_URL || "http://localhost:3000"
+    const apiUrlFromEnv = window.APP_CONFIG?.VITE_API_URL;
+    const url = apiUrlFromEnv || "http://localhost:3000";
+
     const response = await fetch(url + '/animals');
 
     if (!response.ok) {
@@ -22,6 +34,9 @@ export async function getAllAnimals(): Promise<Animal[]> {
     return data;
   } catch (error) {
     console.error('Error getting the animals:', error);
+    if (error instanceof Error && error.message.includes("window.APP_CONFIG is undefined")) {
+      console.error("APP_CONFIG no está definido. Asegúrate de que config.js se carga correctamente y define window.APP_CONFIG.");
+    }
     throw error;
   }
 }

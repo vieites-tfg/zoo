@@ -5,10 +5,13 @@ global:
     YARN_CACHE_FOLDER: .cache
   image:
     repository: ghcr.io/vieites-tfg
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   ghcrSecret:
     enabled: false
     name: ghcr-secret
     registry: ghcr.io
     username: vieites
     password: "" # From cmd line
+  ingress:
+    port: 8080
+

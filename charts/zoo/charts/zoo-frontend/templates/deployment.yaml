@@ -19,8 +19,17 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ .Values.global.ghcrSecret.name }}
+      volumes:
+        - name: frontend-config-volume
+          configMap:
+            name: {{ .Chart.Name }}-{{ .Release.Namespace }}-config-js
+            items:
+              - key: config.js
+                path: config.js
       containers:
         - name: frontend
+          tty: true
+          stdin: true
           image: "{{ .Values.global.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.global.image.pullPolicy }}
           envFrom:
@@ -30,4 +39,8 @@ spec:
             - containerPort: 80
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-
+          volumeMounts:
+            - name: frontend-config-volume
+              mountPath: /usr/share/nginx/html/config.js
+              subPath: config.js
+              readOnly: true

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-{{ .Release.Namespace }}-mongo-init
+data:
+  init.js: |
+    {{ .Files.Get "mongo-init/init-zoo.js" | nindent 4 }}

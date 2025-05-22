@@ -45,6 +45,8 @@ A continuación se indica el software junto con las versiones utilizadas para el
 | Just | v1.39.0 | https://github.com/casey/just |
 | Docker | v27.5.1 (con `compose` habilitado) | https://www.docker.com/ |
 | Dagger | latest | https://dagger.io |
+| Kind | 0.27.0 | https://kind.sigs.k8s.io/ |
+| Helm | v3.17.3 | https://helm.sh/docs/ |
 | Node (opcional) | 23.7.0 | https://nodejs.org/en |
 | Yarn (opcional) | 1.22.22 | https://yarnpkg.com/ |
 | npm (opcional) | 10.9.2 | https://www.npmjs.com/ |
@@ -165,6 +167,30 @@ dagger --sec-env file://../.env call frontend publish-image --front tcp://localh
 dagger --sec-env file://../.env call backend publish-pkg
 dagger --sec-env file://../.env call frontend publish-pkg --front tcp://localhost:8080
 ```
+
+### Con Kubernetes
+
+Para probarlo necesitaremos tener Kind y Helm instalados. Se proporciona más arriba los links correspondientes.
+
+Ejecutaremos los siguientes comandos:
+
+> [!important]
+> Es necesario tener un CR_PAT válido almacenado en el `.env` para ser capaces de obtener las imágenes del frontend y del backend.
+
+```bash
+just create_cluster # Crea el cluster de kind
+just apply_ingress launch_chart dev # Aplica un ingress y lanza la chart con los valores almacenados en el .env
+```
+
+Una vez ejecutados los comandos anteriores, tendremos a nuestra disposición las urls necesarias para acceder tanto al frontend como al backend.
+
+Podemor acceder a cada uno de ellos en:
+
+```bash
+http://zoo-dev.example.com:8080     # frontend
+http://api-zoo-dev.example.com:8080 # backend
+```
+
 
 ### Con just
 

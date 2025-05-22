@@ -13,7 +13,8 @@ zoo-backend:
   image:
     tag: "0.0.0"
   mongo:
-    serviceName: "zoo-dev-mongo.svc"
+    service:
+      name: "zoo-mongo-dev-svc"
   ingress:
     enabled: true
     hostTemplate: "api-zoo-dev.example.com"

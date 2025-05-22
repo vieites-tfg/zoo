@@ -13,7 +13,8 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 5Gi
+init: "mongo-init"
 root:
   user: ""     # From cmd line
   password: "" # From cmd line
-databaseName: "mongodb-{{ .Release.Namespace }}"
+databaseName: "zoo"

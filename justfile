@@ -1,3 +1,5 @@
+set dotenv-load
+
 _default:
   just -l
 
@@ -132,6 +134,11 @@ check_hosts ns:
   then
     echo "127.0.0.1 zoo-{{ns}}.example.com" | sudo tee -a /etc/hosts
   fi
+  host=$(grep "api-zoo-{{ns}}" /etc/hosts | wc -l | xargs)
+  if [[ $host == "0" ]]
+  then
+    echo "127.0.0.1 api-zoo-{{ns}}.example.com" | sudo tee -a /etc/hosts
+  fi
 
 launch_chart ns:
   just check_hosts {{ns}}
@@ -142,8 +149,10 @@ launch_chart ns:
   -f charts/zoo/values-{{ns}}.yaml \
   --set global.ghcrSecret.enabled=true \
   --set global.ghcrSecret.password=$CR_PAT \
-  --set zoo-backend.mongo.root.user=carer \
-  --set zoo-backend.mongo.root.password=carerpass
+  --set zoo-backend.mongo.root.user=$MONGO_ROOT \
+  --set zoo-backend.mongo.root.password=$MONGO_ROOT_PASS \
+  --set zoo-mongo.root.user=$MONGO_ROOT \
+  --set zoo-mongo.root.password=$MONGO_ROOT_PASS
 
 template ns:
   helm template zoo-{{ns}} ./charts/zoo \
@@ -152,5 +161,7 @@ template ns:
   -f charts/zoo/values-{{ns}}.yaml \
   --set global.ghcrSecret.enabled=true \
   --set global.ghcrSecret.password=$CR_PAT \
-  --set zoo-backend.mongo.root.user=carer \
-  --set zoo-backend.mongo.root.password=carerpass
+  --set zoo-backend.mongo.root.user=$MONGO_ROOT \
+  --set zoo-backend.mongo.root.password=$MONGO_ROOT_PASS \
+  --set zoo-mongo.root.user=$MONGO_ROOT \
+  --set zoo-mongo.root.password=$MONGO_ROOT_PASS
