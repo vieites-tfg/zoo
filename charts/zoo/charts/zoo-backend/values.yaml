@@ -5,7 +5,6 @@ service:
   type: ClusterIP
   port: 3000
 ingress:
-  enabled: false
   hostTemplate: "api-zoo-{{ .Release.Namespace }}.example.com"
 mongo:
   service:

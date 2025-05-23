@@ -7,16 +7,16 @@ zoo-frontend:
   image:
     tag: "0.0.0"
   ingress:
-    hostTemplate: "zoo-dev.example.com"
+    hostTemplate: "zoo-pre.example.com"
 
 zoo-backend:
   image:
     tag: "0.0.0"
   mongo:
     service:
-      name: "zoo-mongo-dev-svc"
+      name: "zoo-mongo-pre-svc"
   ingress:
-    hostTemplate: "api-zoo-dev.example.com"
+    hostTemplate: "api-zoo-pre.example.com"
 
 zoo-mongo:
   internal:
