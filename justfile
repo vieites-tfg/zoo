@@ -143,7 +143,7 @@ check_hosts ns:
 launch_chart ns:
   just check_hosts {{ns}}
 
-  helm upgrade --install zoo-{{ns}} ./charts/zoo \
+  helm upgrade --install zoo-{{ns}} helm-repository/zoo \
   -n {{ns}} \
   -f charts/zoo/values.yaml \
   -f charts/zoo/values-{{ns}}.yaml \
@@ -155,7 +155,7 @@ launch_chart ns:
   --set zoo-mongo.root.password=$MONGO_ROOT_PASS
 
 template ns:
-  helm template zoo-{{ns}} ./charts/zoo \
+  helm template zoo-{{ns}} helm-repository/zoo \
   -n {{ns}} \
   -f charts/zoo/values.yaml \
   -f charts/zoo/values-{{ns}}.yaml \
