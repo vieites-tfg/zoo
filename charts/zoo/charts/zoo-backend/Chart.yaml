@@ -1,6 +1,0 @@
-apiVersion: v2
-name: zoo-backend
-description: Subchart for the backend of the Zoo
-type: application
-version: 0.0.0
-appVersion: "0.0.0"

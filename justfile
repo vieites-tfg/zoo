@@ -142,23 +142,13 @@ check_hosts ns:
 
 launch_chart ns:
   just check_hosts {{ns}}
-
-  helm upgrade --install zoo-{{ns}} helm-repository/zoo \
-  -n {{ns}} \
-  -f charts/zoo/values.yaml \
-  -f charts/zoo/values-{{ns}}.yaml \
-  --set global.ghcrSecret.enabled=true \
-  --set global.ghcrSecret.password=$CR_PAT \
-  --set zoo-backend.mongo.root.user=$MONGO_ROOT \
-  --set zoo-backend.mongo.root.password=$MONGO_ROOT_PASS \
-  --set zoo-mongo.root.user=$MONGO_ROOT \
-  --set zoo-mongo.root.password=$MONGO_ROOT_PASS
+  set -a; . ./.env; set +a
+  # helmfile --namespace={{ns}} --environment={{ns}} apply
+  helmfile --namespace={{ns}} apply
 
 template ns:
   helm template zoo-{{ns}} helm-repository/zoo \
   -n {{ns}} \
-  -f charts/zoo/values.yaml \
-  -f charts/zoo/values-{{ns}}.yaml \
   --set global.ghcrSecret.enabled=true \
   --set global.ghcrSecret.password=$CR_PAT \
   --set zoo-backend.mongo.root.user=$MONGO_ROOT \
