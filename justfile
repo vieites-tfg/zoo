@@ -84,14 +84,6 @@ pkg_remote_local package:
 
 cluster := "zoo-cluster"
 
-alias ss := set_secret
-set_secret:
-  kubectl create secret docker-registry ghcr-secret \
-    --docker-server=ghcr.io \
-    --docker-username=vieites \
-    --docker-password=$CR_PAT \
-    -n dev
-
 apply_ingress:
   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
   sleep 0.5
@@ -143,8 +135,7 @@ check_hosts ns:
 launch_chart ns:
   just check_hosts {{ns}}
   set -a; . ./.env; set +a
-  # helmfile --namespace={{ns}} --environment={{ns}} apply
-  helmfile --namespace={{ns}} apply
+  helmfile -n {{ns}} apply
 
 template ns:
   helm template zoo-{{ns}} helm-repository/zoo \
