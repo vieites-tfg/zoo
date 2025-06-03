@@ -1,0 +1,25 @@
+repositories:
+  - name: helm-repository
+    url: https://raw.githubusercontent.com/vieites-tfg/helm-repository/gh-pages/
+
+releases:
+  - name: zoo-{{ .Namespace }}
+    namespace: {{ .Namespace }}
+    chart: helm-repository/zoo
+    version: 0.0.0
+    values:
+      - "git::https://github.com/vieites-tfg/values.git@values-{{ .Namespace }}.yaml?ref=main"
+      - "git::https://github.com/vieites-tfg/helm-repository.git@zoo/values.yaml?ref=main"
+      - global:
+          ghcrSecret:
+            enabled: true
+            password: {{ requiredEnv "CR_PAT" | quote }}
+      - zoo-backend:
+          mongo:
+            root:
+              user: {{ requiredEnv "MONGO_ROOT" | quote }}
+              password: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
+      - zoo-mongo:
+          auth:
+            rootUser: {{ requiredEnv "MONGO_ROOT" | quote }}
+            rootPassword: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
