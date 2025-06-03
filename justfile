@@ -138,11 +138,5 @@ launch_chart ns:
   helmfile -n {{ns}} apply
 
 template ns:
-  helm template zoo-{{ns}} helm-repository/zoo \
-  -n {{ns}} \
-  --set global.ghcrSecret.enabled=true \
-  --set global.ghcrSecret.password=$CR_PAT \
-  --set zoo-backend.mongo.root.user=$MONGO_ROOT \
-  --set zoo-backend.mongo.root.password=$MONGO_ROOT_PASS \
-  --set zoo-mongo.root.user=$MONGO_ROOT \
-  --set zoo-mongo.root.password=$MONGO_ROOT_PASS
+  set -a; . ./.env; set +a
+  helmfile -n {{ns}} template
