@@ -47,6 +47,7 @@ A continuación se indica el software junto con las versiones utilizadas para el
 | Dagger | latest | https://dagger.io |
 | Kind | 0.27.0 | https://kind.sigs.k8s.io/ |
 | Helm | v3.17.3 | https://helm.sh/docs/ |
+| Helmfile | v1.1.0 | https://helmfile.readthedocs.io/en/latest/#installation |
 | Node (opcional) | 23.7.0 | https://nodejs.org/en |
 | Yarn (opcional) | 1.22.22 | https://yarnpkg.com/ |
 | npm (opcional) | 10.9.2 | https://www.npmjs.com/ |
@@ -170,29 +171,46 @@ dagger --sec-env file://../.env call frontend publish-pkg --front tcp://localhos
 
 ### Con Kubernetes
 
-Para probarlo necesitaremos tener Kind y Helm instalados. Se proporciona más arriba los links correspondientes.
+Para probarlo necesitaremos tener Kind, Helm y helmfile instalados. Se proporcionan más arriba los links correspondientes.
 
 Ejecutaremos los siguientes comandos:
 
 > [!important]
 > Es necesario tener un CR_PAT válido almacenado en el `.env` para ser capaces de obtener las imágenes del frontend y del backend.
 
+En el caso de ser la **primera vez que se realiza la instalación de la chart** en local, es necesario instalar el repositorio de [bitnami](https://github.com/bitnami/charts), del cual se utiliza la [chart de mongodb](https://artifacthub.io/packages/helm/bitnami/mongodb/16.5.12). Esto se puede hacer con el siguiente comando:
+
 ```bash
-just create_cluster # Crea el cluster de kind
-just apply_ingress launch_chart dev # Aplica un ingress y lanza la chart con los valores almacenados en el .env
+helm repo add bitnami https://charts.bitnami.com/bitnami`
 ```
+
+A continuación, ejecutamos los comandos necesarios para levantar el cluster de Kind con posibilidad de incluir un ingress y aceptar así conexiones desde el exterior. Entonces, levantamos la chart en el namespace que queramos.
+
+```bash
+just create_cluster # Crea el cluster de kind y los namespaces
+just apply_ingress launch_chart dev # Aplica un ingress y lanza la chart
+```
+
+La chart se lanza obteniendo los valores del archivo `.env`, y se levanta el namespace indicado.
 
 Una vez ejecutados los comandos anteriores, tendremos a nuestra disposición las urls necesarias para acceder tanto al frontend como al backend.
 
-Podemor acceder a cada uno de ellos en:
+Podemos acceder a cada uno de ellos en:
 
 ```bash
-http://zoo-dev.example.com:8080     # frontend
-http://api-zoo-dev.example.com:8080 # backend
+http://zoo-[namespace].example.com:8080             # frontend
+http://api-zoo-[namespace].example.com:8080/animals # backend
 ```
 
+Con [k9s](https://k9scli.io/) podemos comprobar todo lo que se ha levantado.
 
-### Con just
+Para desinstalar la release de helm que acabamos de instalar, podemos ejecutar:
+
+```bash
+helm uninstall zoo-[namespace] -n [namespace]
+```
+
+### Sin Kubernetes
 
 1. Instala todos los paquetes necesarios. **Este paso se debe realizar antes de cualquier otra opción**.
 

@@ -20,6 +20,6 @@ releases:
               user: {{ requiredEnv "MONGO_ROOT" | quote }}
               password: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
       - zoo-mongo:
-          root:
-            user: {{ requiredEnv "MONGO_ROOT" | quote }}
-            password: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
+          auth:
+            rootUser: {{ requiredEnv "MONGO_ROOT" | quote }}
+            rootPassword: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
