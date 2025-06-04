@@ -135,8 +135,14 @@ check_hosts ns:
 launch_chart ns:
   just check_hosts {{ns}}
   set -a; . ./.env; set +a
-  helmfile -n {{ns}} apply
+  helmfile -f ../values/helmfile.yaml.gotmpl -e {{ns}} sync
 
-template ns:
+alias tc := template_chart
+template_chart ns:
   set -a; . ./.env; set +a
-  helmfile -n {{ns}} template
+  helmfile -f ../values/helmfile.yaml.gotmpl -e {{ns}} template
+
+alias lc := lint_chart
+lint_chart ns:
+  set -a; . ./.env; set +a
+  helmfile -f ../values/helmfile.yaml.gotmpl -e {{ns}} lint
