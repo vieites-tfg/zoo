@@ -7,8 +7,7 @@
   "dependencies": [
     {
       "name": "kind",
-      "source": "github.com/aweris/daggerverse/kind@kind/v0.0.1",
-      "pin": "2e89d21b03b7a4d59d17b99db4232f935e89f005"
+      "source": "../kind"
     }
   ]
 }

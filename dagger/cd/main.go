@@ -3,70 +3,145 @@ package main
 import (
 	"context"
 	"dagger/cd/internal/dagger"
+	"strings"
 )
 
-type Cd struct{
+type Cd struct {
 	// Docker socket to connect to the external Docker Engine. Please carefully
 	// use this option it can expose your host to the container.
 	// E.g. /var/run/docker.sock
 	// +required
 	Socket *dagger.Socket
 
-	// `.env` file with the credentials to use the private images and the variables
-	// related to the mongo database.
+	// It should be the tcp://127.0.0.1 followed by any port.
+	// E.g. tcp://127.0.0.1:3000
 	// +required
-	SecEnv *dagger.File
-
-	// `helmfile.yaml` necessary to launch the chart.
-	// +optional
-	Helmfile *dagger.File
+	KindSvc *dagger.Service
 
 	// The name for the cluster.
-	// +required
-	clusterName string
+	// +optional
+	ClusterName string
+
+	// The name for the cluster.
+	// +optional
+	ConfigFile *dagger.File
 }
 
 func New(
 	socket *dagger.Socket,
-	secEnv *dagger.File,
-	//+optional
-	helmfile *dagger.File) *Cd {
+	kindSvc *dagger.Service,
+	// +optional
+	clusterName string,
+	// +optional
+	configFile *dagger.File,
+) *Cd {
+	if clusterName == "" {
+		clusterName = "zoo-cluster"
+	}
+
 	return &Cd{
-		Socket: socket,
-		Helmfile: helmfile,
-		SecEnv: secEnv,
-		clusterName: "zoo-cluster",
+		Socket:      socket,
+		KindSvc:     kindSvc,
+		ClusterName: clusterName,
+		ConfigFile:  configFile,
 	}
 }
 
-func (m *Cd) Cluster(
-	ctx context.Context,
-
-	// An executable file to create the kind cluster
-	// +required
-	script *dagger.File,
-) *dagger.Container {
-	ctr := dag.
-		Kind(m.Socket).
-		Container().
+func (m *Cd) ToolingContainer() *dagger.Container {
+	return dag.Container().From("alpine:3.18").
 		WithExec([]string{"apk", "update"}).
-		WithExec([]string{"apk", "add", "--no-cache", "git"}).
-		WithExec([]string{"git", "clone", "https://github.com/vieites-tfg/values.git", "/app/values"}).
-		WithExec([]string{"wget", "https://github.com/helmfile/helmfile/releases/download/v1.1.0/helmfile_1.1.0_linux_386.tar.gz"}).
-		WithExec([]string{"tar", "xzvf", "helmfile_1.1.0_linux_386.tar.gz"}).
-		WithExec([]string{"mv", "./helmfile", "/usr/local/bin"}).
-		WithExec([]string{"mkdir", "-p", "/app"}).
-		WithFile("/app/.env", m.SecEnv).
-		WithFile("/app/create_cluster.sh", script, dagger.ContainerWithFileOpts{Permissions: 0555})
-	
-		if m.Helmfile == (&dagger.File{}) {
-			ctr = ctr.WithFile("/app/values/helmfile.yaml.gotmpl", m.Helmfile)
-		}
-
-	return ctr.WithExec([]string{"/app/create_cluster.sh"})
+		WithExec([]string{"apk", "add", "--no-cache", "git", "wget"}).
+		WithExec([]string{"sh", "-c", `
+			wget https://get.helm.sh/helm-v3.15.2-linux-amd64.tar.gz && \
+			tar -zxvf helm-v3.15.2-linux-amd64.tar.gz && \
+			mv linux-amd64/helm /usr/local/bin/
+		`}).
+		WithExec([]string{"sh", "-c", `
+			wget https://github.com/helmfile/helmfile/releases/download/v0.165.0/helmfile_0.165.0_linux_amd64.tar.gz && \
+			tar -zxvf helmfile_0.165.0_linux_amd64.tar.gz && \
+			mv helmfile /usr/local/bin/
+		`})
 }
 
-// Should call Cd.Cluster and install the values in order to launch everything
-func (m *Cd) Launch() (string, error) {
-	return "", nil
+func (m *Cd) Deploy(ctx context.Context) *dagger.Container {
+	toolingCtr := m.ToolingContainer()
+
+	kindClient := dag.
+		Kind(m.Socket, m.KindSvc, dagger.KindOpts{ClusterName: m.ClusterName, ConfigFile: m.ConfigFile}).
+		Container()
+
+	helmBinary := toolingCtr.File("/usr/local/bin/helm")
+	helmfileBinary := toolingCtr.File("/usr/local/bin/helmfile")
+	usrDir := toolingCtr.Directory("/usr")
+
+	clusterClientWithTools := kindClient.
+		WithDirectory("/usr", usrDir).
+		WithFile("/usr/local/bin/helm", helmBinary).
+		WithFile("/usr/local/bin/helmfile", helmfileBinary)
+
+	return clusterClientWithTools.
+		WithExec([]string{"mkdir", "-p", "/app"}).
+		WithExec([]string{"kubectl", "create", "namespace", "dev"}).
+		WithExec([]string{"kubectl", "create", "namespace", "pre"}).
+		WithExec([]string{"kubectl", "create", "namespace", "pro"})
+}
+
+func (m *Cd) Launch(
+	ctx context.Context,
+
+	// `.env` file with the credentials to use the private images and the variables
+	// related to the mongo database.
+	// +required
+	secEnv *dagger.File,
+
+	// `helmfile.yaml` necessary to launch the chart.
+	// +optional
+	helmfile *dagger.File,
+) (*dagger.Container, error) {
+	ctr := m.Deploy(ctx).
+		WithExec([]string{"git", "clone", "https://github.com/vieites-tfg/values.git", "/app/values"})
+
+	if helmfile == (&dagger.File{}) {
+		ctr = ctr.WithFile("/app/values/helmfile.yaml.gotmpl", helmfile)
+	}
+
+	ctr, err := setEnvVariables(ctx, ctr, secEnv)
+	if err != nil {
+		return nil, err
+	}
+
+	ctr = ctr.
+		WithWorkdir("/app/values").
+		WithExec([]string{"helmfile", "-e", "dev", "sync"})
+
+	return ctr, nil
+}
+
+func setEnvVariables(
+	ctx context.Context,
+	ctr *dagger.Container,
+	env *dagger.File,
+) (*dagger.Container, error) {
+	envContents, err := env.Contents(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(envContents, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			key := parts[0]
+			value := parts[1]
+			secretValue := dag.SetSecret(key, value)
+			ctr = ctr.WithSecretVariable(key, secretValue)
+		}
+	}
+	return ctr, nil
 }
