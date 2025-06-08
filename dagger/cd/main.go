@@ -47,10 +47,10 @@ func New(
 	}
 }
 
-func (m *Cd) ToolingContainer() *dagger.Container {
+func (m *Cd) Base() *dagger.Container {
 	return dag.Container().From("alpine:3.18").
 		WithExec([]string{"apk", "update"}).
-		WithExec([]string{"apk", "add", "--no-cache", "git", "wget"}).
+		WithExec([]string{"apk", "add", "--no-cache", "wget"}).
 		WithExec([]string{"sh", "-c", `
 			wget https://get.helm.sh/helm-v3.15.2-linux-amd64.tar.gz && \
 			tar -zxvf helm-v3.15.2-linux-amd64.tar.gz && \
@@ -63,21 +63,20 @@ func (m *Cd) ToolingContainer() *dagger.Container {
 		`})
 }
 
-func (m *Cd) Deploy(ctx context.Context) *dagger.Container {
-	toolingCtr := m.ToolingContainer()
+func (m *Cd) Cluster(ctx context.Context) *dagger.Container {
+	base := m.Base()
 
 	kindClient := dag.
 		Kind(m.Socket, m.KindSvc, dagger.KindOpts{ClusterName: m.ClusterName, ConfigFile: m.ConfigFile}).
 		Container()
 
-	helmBinary := toolingCtr.File("/usr/local/bin/helm")
-	helmfileBinary := toolingCtr.File("/usr/local/bin/helmfile")
-	usrDir := toolingCtr.Directory("/usr")
+	helmBinary := base.File("/usr/local/bin/helm")
+	helmfileBinary := base.File("/usr/local/bin/helmfile")
 
 	clusterClientWithTools := kindClient.
-		WithDirectory("/usr", usrDir).
 		WithFile("/usr/local/bin/helm", helmBinary).
-		WithFile("/usr/local/bin/helmfile", helmfileBinary)
+		WithFile("/usr/local/bin/helmfile", helmfileBinary).
+		WithExec([]string{"apk", "add", "--no-cache", "git"})
 
 	return clusterClientWithTools.
 		WithExec([]string{"mkdir", "-p", "/app"}).
@@ -98,7 +97,7 @@ func (m *Cd) Launch(
 	// +optional
 	helmfile *dagger.File,
 ) (*dagger.Container, error) {
-	ctr := m.Deploy(ctx).
+	ctr := m.Cluster(ctx).
 		WithExec([]string{"git", "clone", "https://github.com/vieites-tfg/values.git", "/app/values"})
 
 	if helmfile == (&dagger.File{}) {
