@@ -113,3 +113,13 @@ func PublishPkg(
 		WithExec([]string{"yarn", "publish", "--access", "restricted", fmt.Sprintf("/app/packages/%s", pkg), "--non-interactive"}).
 		Stdout(ctx)
 }
+
+func Cypress(src *dagger.Directory) *dagger.Container {
+	return dagger.Connect().
+		Container().
+		From("cypress/browsers").
+		WithMountedDirectory("/e2e", src).
+		WithWorkdir("/e2e").
+		WithExec([]string{"npx", "cypress", "install"}).
+		WithExec([]string{"yarn", "add", "lerna@8.2.1", "-W"})
+}

@@ -143,13 +143,21 @@ De esta manera **ya tenemos levantada completamente nuestra aplicación**:
 Podemos realizar esto mediante los siguientes comandos:
 
 ```bash
-# Tests
-dagger --sec-env file://../.env call backend test
-dagger --sec-env file://../.env call frontend test --front tcp://localhost:8080
-# Linter
+# Backend
 dagger --sec-env file://../.env call backend lint
+dagger --sec-env file://../.env call backend test
+# Frontend
 dagger --sec-env file://../.env call frontend lint
+dagger --sec-env file://../.env call endtoend
 ```
+
+También se pueden hacer los tests del frontend pasando un servicio como parámetro de la siguiente manera:
+
+```bash
+dagger --sec-env file://../.env call frontend test --front=tcp://localhost:8080
+```
+
+El comando anterior implica tener levantado el frontend en `localhost:8080`, y también estar conectado al backend. Es decir, la aplicación debe estar funcionando completamente.
 
 > [!important]
 > Como se puede observar, para pasar los tests del frontend es necesario tener toda la aplicación levantada, tanto frontend como backend, ya que se tratan de tests end-to-end. Esto es porque hay que pasar como parámetro el servicio del frontend, el cual debe estar **obligatoriamente** disponible en el puerto 8080.

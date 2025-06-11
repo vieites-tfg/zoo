@@ -105,5 +105,45 @@ func (m *Dagger) Frontend(
 		Name:    "frontend",
 		Base:    base,
 		Secrets: SecMap{Keys: keys, Values: values},
+		Ci:      m,
 	}, nil
+}
+
+func (m *Dagger) Endtoend(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+) (string, error) {
+	back, err := m.Backend(ctx, src)
+	if err != nil {
+		return "", err
+	}
+
+	backSvc, err := back.Service(ctx, src)
+	if err != nil {
+		return "", err
+	}
+
+	backendSvc, err := backSvc.Start(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	front, err := m.Frontend(ctx, src)
+	if err != nil {
+		return "", err
+	}
+
+	frontendSvc, err := front.Service(ctx).Start(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	test := Cypress(src).
+		WithServiceBinding("zoo-frontend", frontendSvc).
+		WithServiceBinding("zoo-backend", backendSvc).
+		WithEnvVariable("BASE_URL", "http://zoo-frontend").
+		WithExec([]string{"yarn", "run", "e2e"})
+
+	return test.Stdout(ctx)
 }
