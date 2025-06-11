@@ -67,7 +67,10 @@ func (m *Cd) Cluster(ctx context.Context) *dagger.Container {
 	base := m.Base()
 
 	kindClient := dag.
-		Kind(m.Socket, m.KindSvc, dagger.KindOpts{ClusterName: m.ClusterName, ConfigFile: m.ConfigFile}).
+		Kind(m.Socket, m.KindSvc, dagger.KindOpts{
+			ClusterName: m.ClusterName,
+			ConfigFile: m.ConfigFile,
+		}).
 		Container()
 
 	helmBinary := base.File("/usr/local/bin/helm")
@@ -78,11 +81,22 @@ func (m *Cd) Cluster(ctx context.Context) *dagger.Container {
 		WithFile("/usr/local/bin/helmfile", helmfileBinary).
 		WithExec([]string{"apk", "add", "--no-cache", "git"})
 
+	applyIngress := []string{"sh", "-c", `
+		kubectl apply -f \
+		https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml &&
+		sleep 0.5 &&
+		kubectl wait --namespace ingress-nginx \
+		--for=condition=ready pod \
+		--selector=app.kubernetes.io/component=controller \
+		--timeout=90s
+	`}
+
 	return clusterClientWithTools.
-		WithExec([]string{"mkdir", "-p", "/app"}).
+		WithExec(applyIngress).
 		WithExec([]string{"kubectl", "create", "namespace", "dev"}).
 		WithExec([]string{"kubectl", "create", "namespace", "pre"}).
-		WithExec([]string{"kubectl", "create", "namespace", "pro"})
+		WithExec([]string{"kubectl", "create", "namespace", "pro"}).
+		WithExec([]string{"mkdir", "-p", "/app"})
 }
 
 func (m *Cd) Launch(
@@ -100,7 +114,7 @@ func (m *Cd) Launch(
 	ctr := m.Cluster(ctx).
 		WithExec([]string{"git", "clone", "https://github.com/vieites-tfg/values.git", "/app/values"})
 
-	if helmfile == (&dagger.File{}) {
+	if helmfile != nil {
 		ctr = ctr.WithFile("/app/values/helmfile.yaml.gotmpl", helmfile)
 	}
 
@@ -112,7 +126,7 @@ func (m *Cd) Launch(
 	ctr = ctr.
 		WithWorkdir("/app/values").
 		WithExec([]string{"helmfile", "-e", "dev", "sync"})
-
+	
 	return ctr, nil
 }
 
