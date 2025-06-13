@@ -1,3 +1,61 @@
 \chapter{Introdución}
 
-Obxectivos Xerais, Relación da Documentación que conforma a Memoria, Descrición do Sistema, Información Adicional de Interese (métodos, técnicas ou arquitecturas utilizadas, xustificación da súa elección, etc.).
+% Obxectivos Xerais, Relación da Documentación que conforma a Memoria, Descrición do Sistema, Información Adicional de Interese (métodos, técnicas ou arquitecturas utilizadas, xustificación da súa elección, etc.).
+
+\section{Objetivos generales}
+
+% qué problema se resuelve y cuál es el propósito de este trabajo
+
+\subsection*{Objetivos principales}
+
+En este trabajo se pretende demostrar y evaluar la viabilidad, eficiencia y flexibilidad de Dagger\cite{dagger} como motor de CI/CD (\textit{Continuous Integration}/\textit{Continuous Delivery})\cite{ci,cd}, con el fin de estandarizar y modernizar los ciclos de vida del desarrollo de software.
+
+No solo se va a utilizar Dagger como complemento del ciclo de desarrollo de una aplicación, sino que se va a comparar con la no utilización de este. Se evaluarán las ventajas que tiene su uso frente a métodos convencionales, entre las que destacarán la gestión de caché y el uso de contenedores.
+
+Se van a proporcionar ejemplos de módulos creados con Dagger, los cuales estarán especialmente diseñados para cumplir los ciclos tanto de CI  como de CD  de una aplicación \textit{dummy}. De esta manera se podrá comprobar que este mismo proceso se puede llevar a cabo para cualquier aplicación, y de una manera sencilla.
+
+\subsection*{Objetivos secundarios}
+
+Para lograr los objetivos principales es necesario llevar a cabo varios pasos:
+\begin{itemize}
+  \item Creación de un monorepo\cite{monorepo} en GitHub.
+
+    Todo el código principal se almacenará en un mismo repositorio. De esta manera se evitarán complicaciones debido a la gestión de dependencias de cada una de las partes de la aplicación. Permitirá controlar todo el código fuente de una manera más sencilla al tratarse de un proyecto relativamente pequeño.
+  \item Diseño y creación de una aplicación \textit{dummy}.
+
+    Es necesario una aplicación sobre la que realizar los ciclos de CI/CD. Esta consistirá en una página web (frontend) de gestión de un zoo, la cual realizará peticiones a una API (backend) que estará conectada a una base de datos.
+  \item Implementación de un \textit{pipeline} CI/CD.
+
+    Se creará un módulo de Dagger para cada uno de los procesos (CI y CD). El módulo de CI permitirá desde compilar la aplicación, hasta publicar las imágenes de Docker y los paquetes NPM de cada una de las partes. Por otro lado, el módulo de CD será el encargado de utilizar esas imágenes que se han publicado previamente y desplegar la aplicación en el entorno correspondiente.
+  \item Entorno orquestado.
+
+    El \textit{pipeline} de CD termina con el despliegue de la aplicación sobre Kubernetes\cite{kubernetes}, utilizando Helm\cite{helm}. Esto permite levantar la aplicación en el entorno que le corresponda, según el estado en el que se encuentra cada versión.
+
+  \item Análisis comparativo
+
+    Finalmente, se realiza un análisis de las ventajas que ofrece Dagger frente a métodos convencionales.
+\end{itemize}
+
+\section{Relación de la documentación}
+
+\begin{itemize}
+  \item Capítulo 1: Introducción.
+
+    Este capítulo, en el cual se describen la finalidad del proyecto, las tecnologías a utilizar, de manera breve; y la estructura, a grandes rasgos, del trabajo en sí.
+
+  \item Capítulo 2: Estado del arte y fundamentos teóricos.
+
+    En el segundo capítulo se detallan los conceptos más importantes de CI/CD. Además, se estudia la evolución de las herramientas DevOps\cite{devops}, incluyendo Dagger como una de las últimas y más innovadoras herramientas en este sector, y se compara con las otras tecnologías.
+  \item Capítulo 3: Diseño y arquitectura del sistema.
+
+    Aquí se describen las tecnologías utilizadas para implementar la aplicación \textit{dummy}. También se explica cómo se ha organizado la infraestructura de despliegue.
+  \item Capítulo 4: Implementación del \textit{pipeline} con Dagger.
+
+    Aquí se indican los pasos que se han dado para crear los \textit{pipelines} con Dagger, utilizando el SDK para definirlos como código. Este es el núcleo del proyecto.
+  \item Capítulo 5: Pruebas y resultados.
+
+    En este capítulo se presentan las pruebas que se han llevado a cabo. Se habla de las dificultades que se han tenido, así como de las ventajas que ofrece Dagger frente a otras tecnologías, aportando comparaciones cuantitativas y cualitativas.
+  \item Capítulo 6: Conclusiones y líneas futuras.
+
+    Finalmente, se resumen los hechos que se han obtenido, se valora el resultado final del uso de Dagger y se indica si ha cumplido con las expectativas. Además, se añaden puntos de mejora o extensiones del proyecto.
+\end{itemize}
