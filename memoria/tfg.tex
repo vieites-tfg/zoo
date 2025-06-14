@@ -8,13 +8,40 @@
 \usepackage{float}
 \usepackage{latexsym}
 \usepackage{a4}
+\usepackage{xcolor}
 \usepackage{listings}
 \usepackage{enumitem}
 \usepackage{hyperref} % menús no pdf pero non leva ben co package galician
 
 \setlist{itemsep=1pt,topsep=1pt}
 \addto\captionsgalician{\def\contentsname{Memoria tipo B -- \'{I}ndice xeral }}
-	
+
+\definecolor{backcolor}{rgb}{0.95,0.95,0.92}
+\lstset{
+  caption=\lstname,
+  captionpos=b,
+  label=lst:code,
+  basicstyle=\ttfamily\footnotesize,
+  numbers=left,
+  commentstyle=\color{gray},
+  keywordstyle=\color{blue},
+  stringstyle=\color{green!60!black},
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  keepspaces=true,
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=l,
+  % framexleftmargin=8mm,
+  % framextopmargin=2pt,
+  backgroundcolor=\color{backcolor},
+  rulesepcolor=\color{gray!50},
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+  escapeinside={(*@}{@*)}
+}
+\renewcommand*{\lstlistlistingname}{Índice de Listings}
 
 \begin{document}
 \include{capitulos/titulo}
@@ -30,6 +57,7 @@
 \tableofcontents
 \listoffigures
 \listoftables
+\lstlistoflistings
 
 % Agora incluimos os capítulos. Cambiamos a numeración e as cabeceiras
 \cleardoublepage

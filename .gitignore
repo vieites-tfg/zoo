@@ -13,6 +13,8 @@ local_packages/
 *.blg
 *.lof
 *.lot
+*.lol
+*.synctex.gz
 *.fls
 *.fdb_latexmk
 *.synctex.gze
