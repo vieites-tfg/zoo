@@ -10,6 +10,7 @@
 \usepackage{a4}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage{listingsutf8}
 \usepackage{enumitem}
 \usepackage{hyperref} % menús no pdf pero non leva ben co package galician
 
@@ -17,6 +18,7 @@
 \addto\captionsgalician{\def\contentsname{Memoria tipo B -- \'{I}ndice xeral }}
 
 \definecolor{backcolor}{rgb}{0.95,0.95,0.92}
+\newcommand{\greencolor}{green!70!black}
 \lstset{
   caption=\lstname,
   captionpos=b,
@@ -25,7 +27,7 @@
   numbers=left,
   commentstyle=\color{gray},
   keywordstyle=\color{blue},
-  stringstyle=\color{green!60!black},
+  stringstyle=\color{\greencolor},
   showspaces=false,
   showstringspaces=false,
   showtabs=false,
@@ -42,6 +44,28 @@
   escapeinside={(*@}{@*)}
 }
 \renewcommand*{\lstlistlistingname}{Índice de Listings}
+
+\lstdefinelanguage{Dockerfile}{
+  keywords={FROM, RUN, COPY, ADD, ENTRYPOINT, CMD,  ENV, ARG, WORKDIR, EXPOSE, LABEL, USER, VOLUME, STOPSIGNAL, ONBUILD, MAINTAINER, HEALTHCHECK},
+  keywordstyle=\color{blue}\bfseries,
+  identifierstyle=\color{black},
+  comment=[l]{\#},
+  commentstyle=\color{gray}\ttfamily,
+  stringstyle=\color{\greencolor}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\lstdefinelanguage{docker-compose}{
+  keywords={services, depends_on, hostname, image, environment, container_name, ports, volumes, links},
+  keywordstyle=\color{blue}\bfseries,
+  identifierstyle=\color{black},
+  comment=[l]{\#},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{\greencolor}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
 
 \begin{document}
 \include{capitulos/titulo}

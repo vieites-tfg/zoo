@@ -39,13 +39,35 @@ La integración de código en un repositorio no se trata simplemente de modifica
   \item Reportar cualquier error en el caso de que exista.
 \end{itemize}
 
-Todo lo anterior se debe realizar de manera automatizada, con el fin de integrar el código modificado en la aplicación lo más rápido posible.
+Todo lo anterior se debe realizar de manera automatizada, con el fin de integrar el código modificado en el repositorio lo más rápido posible.
+
+\subsection*{\textit{Continuous Delivery}}
+
+\begin{figure}
+  \centerline{\includegraphics[width=17cm]{figuras/cd}}
+  \caption{Proceso de despliegue continuo.\cite{img.cd}}
+  \label{ci}
+\end{figure}
+
+Tras haber construido la aplicación durante la integración continua, toca desplegar la aplicación. El proceso de despliegue automático de nuevas versiones de una aplicación que han pasado el ciclo de CI se conoce como ``despliegue continuo''.
+
+Esto, evidentemente, tiene como requisito que la aplicación que se está construyendo tenga el despliegue como uno de los pasos en su ciclo de vida, lo cual no tiene por qué ser así. En este trabajo sí que ocurre, ya que la aplicación \textit{dummy} que se construye es una página web, junto con una API y una base de datos.
+
+Es necesario que exista relación entre los desarrolladores y los encargados de desplegar la aplicación. Sin embargo, hoy en día encontramos el rol DevOps\cite{devops} en muchas empresas, lo cual implica que la persona que ocupa este rol debe tener conocimiento tanto del desarrollo de la aplicación como del despliegue de la misma.
+
+Esta transición a la cultura DevOps permite a los equipos desplegar sus aplicaciones más fácilmente. Además, incluye la necesidad de que el despliegue sea una parte muy importante en el proceso de desarrollo.
+
+Al igual que en la integración continua, en este ciclo también es necesario automatizar el proceso despliegue de una aplicación. Esto siempre va a disminuir la posibilidad de error humano.
+
+Con el despliegue continuo podemos tener \textit{feedback} más rápido por parte del usuario, lo que permitirá mejorar y corregir errores más rápidamente. Además, se despliegan mucho más habitualmente cambios, por lo que los errores en producción son menos probables y, en el caso de que los haya, más fáciles de corregir. Esto es gracias también a llevar un historial de los cambios mediante una herramienta de control de versiones como Git.
 
 \section{Métodos convencionales}
 
 \subsection*{\textit{Continuous Integration}}
 
 Como cabe esperar, los pasos mencionados anteriormente que forman parte de la integración continua van a depender del tipo de aplicación que se esté construyendo, y de las tecnologías que se estén utilizando. Además, esta secuencia de acciones pueden incluir unos pocos comandos en trabajos o proyectos sencillos, o necesitar varios \textit{scripts} complejos en el caso de aplicaciones más avanzadas. Por lo tanto, es necesario tener una herramienta que permita realizar los pasos mencionados anteriormente, sin la necesidad de memorizar o saber a ciencia cierta cada uno de los comandos o scripts que hay que ejecutar para comprobar que el código de la aplicación es correcto.
+
+\subsubsection*{Make}
 
 Para ello existe \texttt{make}\cite{make}, una aplicación de línea de comandos que permite definir bloques de comandos o reglas, aportando a cada bloque un nombre u objetivo que se pretende obtener ejecutando dicha regla. Se suele crear un archivo llamado \texttt{Makefile} para definir todas las reglas que se precisen.
 
@@ -78,6 +100,8 @@ clean:
 
 Un ejemplo muy típico de compilación de un programa escrito en \texttt{C} sería el que se puede observar en el Listing \ref{lst:make}.
 
+\subsubsection*{Just}
+
 Sin embargo, en este trabajo se utiliza una versión más nueva y polivalente llamada \texttt{just}\cite{just}. Este software tiene la misma finalidad que \texttt{make}, ejecutar comandos específicos de un proyecto. Pero este incluye muchas más funcionalidades, entre las cuales destacan:
 
 \begin{itemize}
@@ -88,7 +112,7 @@ Sin embargo, en este trabajo se utiliza una versión más nueva y polivalente ll
   \item Ser capaz de ser invocado desde cualquier subdirectorio.
 \end{itemize}
 
-\begin{lstlisting}[label=lst:just]{Extracto de justfile utilizado en el proyecto}
+\begin{lstlisting}[language=make,label=lst:just]{Extracto de justfile utilizado en el proyecto}
 # --- ALIASES ---
 # Defines shortcuts (aliases) for longer commands.
 alias dv := down_vol
@@ -127,5 +151,103 @@ down_vol:
 \end{lstlisting}
 
 Como se puede comprobar en el Listing \ref{lst:just}, el archivo de configuración de \texttt{just}, en este caso nombrado habitualmente \texttt{justfile}, tiene una estructura similar a la de un \texttt{Makefile}. La diferencia principal es que los nombres de las recetas no hacen referencia a un archivo objetivo que se supone que se debe crear al ejecutar el bloque de comandos, sino que se trata simplemente del nombre de la receta.
+
+\subsection*{\textit{Continuous Delivery}}
+
+\subsubsection*{Docker}
+
+La revolución del despliegue de aplicaciones llegó hace más de una década, con la aparición de Docker\cite{docker}. Esta es una herramienta que permite levantar entornos virtualizados, completamente aislados del entorno local de la máquina local, conocidos como contenedores. En ellos se instalan las dependencias necesarias para ejecutar la aplicación correspondiente. Estos contenedores son muy ligeros en cuanto a espacio y uso de recursos, ya que almacenan únicamente lo necesario para correr el software que queremos desplegar.
+
+El hecho de que el despliegue de los contenedores sea de manera virtualizada permite que estos se ejecuten en cualquier entorno u ordenador personal, lo cual evita el conocido problema de: ``En mi máquina funciona''. La portabilidad es uno de los factores más importantes en la filosofía de Docker.
+
+\begin{lstlisting}[language=Dockerfile,label=lst:dockerfile]{Extracto de Dockerfile utilizado en el proyecto}
+# Base
+
+FROM node:20 AS base
+
+WORKDIR /app
+
+COPY package.json lerna.json yarn.lock* ./
+
+COPY packages packages/
+
+RUN yarn install
+
+RUN yarn global add lerna@8.2.1
+
+RUN yarn global add @vercel/ncc
+
+# Frontend build stage
+
+FROM base AS frontend-build
+
+WORKDIR /app
+
+RUN lerna run --scope @vieites-tfg/zoo-frontend build 
+
+# Frontend
+
+FROM nginx:alpine AS frontend
+
+WORKDIR /usr/share/nginx/html
+
+COPY --from=frontend-build /app/packages/frontend/dist .
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+\end{lstlisting}
+
+Un contenedor de Docker se puede levantar a través de la línea de comandos, o mediante la definición de un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{building stages}, distintos estados de la construcción. Esto permite construir imágenes intermedias para su reutilización, o simplemente para terminar con una imagen en la cual se encuentre únicamente lo necesario para correr la aplicación en cuestión.
+
+\subsubsection*{Docker Compose}
+
+Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''.
+
+\begin{lstlisting}[language=docker-compose,label=lst:dockercompose]{docker-compose.yaml usado en el proyecto}
+
+services:
+  zoo-frontend:
+    image: ghcr.io/vieites-tfg/zoo-frontend
+    container_name: zoo-frontend
+    hostname: zoo-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - zoo-backend
+    environment:
+      NODE_ENV: production
+      YARN_CACHE_FOLDER: .cache
+
+  zoo-backend:
+    image: ghcr.io/vieites-tfg/zoo-backend
+    container_name: zoo-backend
+    hostname: zoo-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    environment:
+      NODE_ENV: production
+      YARN_CACHE_FOLDER: .cache
+      MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT:-27017}/${MONGO_DATABASE}?authSource=admin"
+
+  mongodb:
+    image: mongo:7.0
+    container_name: zoo-mongo
+    hostname: mongodb
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASS}
+    ports:
+      - "${MONGO_PORT_HOST:-27017}:${MONGO_PORT:-27017}"
+    volumes:
+      - ./mongo-init/:/docker-entrypoint-initdb.d/
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
+\end{lstlisting}
 
 \section{Dagger}
