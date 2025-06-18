@@ -2,31 +2,31 @@
 
 Antes de empezar a escribir código, se deben entender los conceptos fundamentales que permitirán llevar a cabo este trabajo.
 
-Lo que se intenta mejorar utilizando Dagger es el ciclo completo de CI/CD de una aplicación. Por lo tanto, es fundamental definir los conceptos de \textit{Continuous Integration} y el \textit{Continuous Delivery}. Una vez se comprenda a qué se refieren esos términos, se podrán entender los métodos y tecnologías convencionales que permiten implementar dichos procesos. Será entonces cuando se pueda introducir Dagger, un método innovador para realizar \textit{pipelines}, el cual aporta muchas ventajas y se comparará con otras tecnologías disponibles en el sector.
+Lo que se intenta mejorar utilizando Dagger es el ciclo completo de CI/CD de una aplicación. Por lo tanto, es fundamental definir los conceptos de \textit{Continuous Integration} y el \textit{Continuous Delivery}. Una vez se comprenda a qué se refieren esos términos, se podrán entender los métodos y tecnologías convencionales que permiten implementar dichos procesos. Será entonces cuando se pueda introducir Dagger, un método innovador para realizar \textit{pipelines}.
 
 \section{CI/CD}
 
-CI/CD son las siglas de \textit{Continuous Integration}/\textit{Continuous Delivery}, o en casos más específicos, este último también se puedo conocer como \textit{Continuous Deployment}.
+CI/CD son las siglas de \textit{Continuous Integration}/\textit{Continuous Delivery}, o en casos más específicos, este último también se puede conocer como \textit{Continuous Deployment}.
 
 Se trata de un conjunto de pasos automatizados, utilizados en el desarrollo de software para llevar el código desde su implementación inicial hasta el despliegue de la aplicación. Estos pasos incluyen:
 
 \begin{itemize}
   \item Integración de cambios en el código.
-  \item La compilación de la aplicación con los cambios realizados.
+  \item Compilación de la aplicación con los cambios realizados.
   \item Realización de pruebas.
   \item Creación y publicación de imágenes de Docker y paquetes NPM.
-  \item Despliegue de la aplicación (modelo \textit{push}\cite{push})
+  \item Despliegue de la aplicación.
 \end{itemize}
 
 \subsection*{\textit{Continuous Integration}}
 
-Se basa en la integración de código de manera constante, día a día, en un repositorio compartido por programadores. Cada uno de los programadores realiza cambios en el código y lo integra en el repositorio. Una vez se realizan cambios, estos deben pasar una serie de pruebas para que se incluyan definitivamente en el código fuente de la aplicación (Fig. \ref{ci}).
-
 \begin{figure}
   \centerline{\includegraphics[width=10cm]{figuras/ci}}
-  \caption{Proceso de integración continua.\cite{img.ci}}
-  \label{ci}
+  \caption{Proceso de integración continua.\cite{img:ci}}
+  \label{fig:ci}
 \end{figure}
+
+Se basa en la integración de código de manera constante, día a día, en un repositorio compartido por programadores. Cada uno de los programadores realiza cambios en el código y lo integra en el repositorio. Una vez se realizan cambios, estos deben pasar una serie de pruebas para que se incluyan definitivamente en el código fuente de la aplicación (Fig. \ref{fig:ci}).
 
 Desde hace años se utiliza un sistema de control de versiones para gestionar el código de cualquier proyecto. Este tipo de herramientas permite a un equipo controlar el estado del código en cada momento, siendo capaces de conocer el historial de los cambios realizados, saber quién ha hecho cada cambio y tener la capacidad de revertir alguna modificación en el caso de ser necesario. La herramienta de control de versiones más utilizada hoy en día, y la que se utiliza en este proyecto, es Git\cite{git}.
 
@@ -45,8 +45,8 @@ Todo lo anterior se debe realizar de manera automatizada, con el fin de integrar
 
 \begin{figure}
   \centerline{\includegraphics[width=17cm]{figuras/cd}}
-  \caption{Proceso de despliegue continuo.\cite{img.cd}}
-  \label{ci}
+  \caption{Proceso de despliegue continuo.\cite{img:cd}}
+  \label{fig:cd}
 \end{figure}
 
 Tras haber construido la aplicación durante la integración continua, toca desplegar la aplicación. El proceso de despliegue automático de nuevas versiones de una aplicación que han pasado el ciclo de CI se conoce como ``despliegue continuo''.
