@@ -4,6 +4,7 @@ local_packages/
 
 .cache
 .env
+.DS_Store
 
 *.aux
 *.log
