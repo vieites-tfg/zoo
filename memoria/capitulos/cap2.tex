@@ -19,6 +19,7 @@ Se trata de un conjunto de pasos automatizados, utilizados en el desarrollo de s
 \end{itemize}
 
 \subsection*{\textit{Continuous Integration}}
+\label{subsec:CI}
 
 \begin{figure}
   \centerline{\includegraphics[width=10cm]{figuras/ci}}
@@ -49,7 +50,7 @@ Todo lo anterior se debe realizar de manera automatizada, con el fin de integrar
   \label{fig:cd}
 \end{figure}
 
-Tras haber construido la aplicación durante la integración continua, toca desplegar la aplicación. El proceso de despliegue automático de nuevas versiones de una aplicación que han pasado el ciclo de CI se conoce como ``despliegue continuo''.
+Tras haber construido la aplicación durante el proceso de integración continua, toca desplegar la aplicación. El despliegue automático de nuevas versiones de una aplicación que han pasado el ciclo de CI se conoce como ``despliegue continuo''.
 
 Esto, evidentemente, tiene como requisito que la aplicación que se está construyendo tenga el despliegue como uno de los pasos en su ciclo de vida, lo cual no tiene por qué ser así. En este trabajo sí que ocurre, ya que la aplicación \textit{dummy} que se construye es una página web, junto con una API y una base de datos.
 
@@ -59,13 +60,15 @@ Esta transición a la cultura DevOps permite a los equipos desplegar sus aplicac
 
 Al igual que en la integración continua, en este ciclo también es necesario automatizar el proceso despliegue de una aplicación. Esto siempre va a disminuir la posibilidad de error humano.
 
-Con el despliegue continuo podemos tener \textit{feedback} más rápido por parte del usuario, lo que permitirá mejorar y corregir errores más rápidamente. Además, se despliegan mucho más habitualmente cambios, por lo que los errores en producción son menos probables y, en el caso de que los haya, más fáciles de corregir. Esto es gracias también a llevar un historial de los cambios mediante una herramienta de control de versiones como Git.
+Con el despliegue continuo podemos tener \textit{feedback} más rápido por parte del usuario, lo que permitirá mejorar y corregir errores más rápidamente. Además, se despliegan con más frecuencia cambios realizados en la aplicación, por lo que los errores en producción son menos probables y, en el caso de que los haya, más fáciles de corregir. Esto es gracias también a llevar un historial de los cambios mediante una herramienta de control de versiones como Git.
 
-\section{Métodos convencionales}
+\section{Ecosistema de herramientas}
 
-\subsection*{\textit{Continuous Integration}}
+Un \textit{pipeline} moderno se compone de diferentes tipos de herramientas, cada una con sus características y finalidades. Se pueden agrupar en los ciclos que se han indicado anteriormente, CI y CD. El grupo de herramientas de CI facilitan la construcción y empaquetado de la aplicación que se va a construir, mientras que las de CD permiten la aplicación empaquetada previamente.
 
-Como cabe esperar, los pasos mencionados anteriormente que forman parte de la integración continua van a depender del tipo de aplicación que se esté construyendo, y de las tecnologías que se estén utilizando. Además, esta secuencia de acciones pueden incluir unos pocos comandos en trabajos o proyectos sencillos, o necesitar varios \textit{scripts} complejos en el caso de aplicaciones más avanzadas. Por lo tanto, es necesario tener una herramienta que permita realizar los pasos mencionados anteriormente, sin la necesidad de memorizar o saber a ciencia cierta cada uno de los comandos o scripts que hay que ejecutar para comprobar que el código de la aplicación es correcto.
+\subsection*{Herramientas de construcción y empaquetado}
+
+Como cabe esperar, los pasos mencionados en \ref{subsec:CI}, que forman parte de la integración continua, van a depender del tipo de aplicación que se esté construyendo, y de las tecnologías que se estén utilizando. Además, esta secuencia de acciones pueden incluir unos pocos comandos en trabajos o proyectos sencillos, o necesitar varios \textit{scripts} complejos en el caso de aplicaciones más avanzadas. Por lo tanto, es necesario tener una herramienta de construcción que permita realizar los pasos mencionados anteriormente, sin la necesidad de memorizar cada uno de los comandos o \textit{scripts} que hay que ejecutar.
 
 \subsubsection*{Make}
 
@@ -102,7 +105,7 @@ Un ejemplo muy típico de compilación de un programa escrito en \texttt{C} ser�
 
 \subsubsection*{Just}
 
-Sin embargo, en este trabajo se utiliza una versión más nueva y polivalente llamada \texttt{just}\cite{just}. Este software tiene la misma finalidad que \texttt{make}, ejecutar comandos específicos de un proyecto. Pero este incluye muchas más funcionalidades, entre las cuales destacan:
+En este trabajo se utiliza una herramienta de construcción más nueva y polivalente llamada \texttt{just}\cite{just}. Este software tiene la misma finalidad que \texttt{make}, ejecutar comandos específicos de un proyecto. Pero este incluye muchas más funcionalidades, entre las cuales destacan:
 
 \begin{itemize}
   \item Poder pasar parámetros a las ``recetas'' (las ``reglas'' en \texttt{make}).
@@ -152,13 +155,11 @@ down_vol:
 
 Como se puede comprobar en el Listing \ref{lst:just}, el archivo de configuración de \texttt{just}, en este caso nombrado habitualmente \texttt{justfile}, tiene una estructura similar a la de un \texttt{Makefile}. La diferencia principal es que los nombres de las recetas no hacen referencia a un archivo objetivo que se supone que se debe crear al ejecutar el bloque de comandos, sino que se trata simplemente del nombre de la receta.
 
-\subsection*{\textit{Continuous Delivery}}
-
 \subsubsection*{Docker}
 
-La revolución del despliegue de aplicaciones llegó hace más de una década, con la aparición de Docker\cite{docker}. Esta es una herramienta que permite levantar entornos virtualizados, completamente aislados del entorno local de la máquina local, conocidos como contenedores. En ellos se instalan las dependencias necesarias para ejecutar la aplicación correspondiente. Estos contenedores son muy ligeros en cuanto a espacio y uso de recursos, ya que almacenan únicamente lo necesario para correr el software que queremos desplegar.
+Docker\cite{docker} es una herramienta que permite empaquetar aplicaciones, creando imágenes con las dependencias necesarias  para que la aplicación se lance sin problemas. Las imágenes generadas se pueden ejecutar, creando contenedores, que son entornos completamente aislados del contexto de la máquina en la que han levantado. Estos contenedores son muy ligeros en cuanto a espacio y uso de recursos, ya que almacenan únicamente lo necesario para correr el software que queremos desplegar.
 
-El hecho de que el despliegue de los contenedores sea de manera virtualizada permite que estos se ejecuten en cualquier entorno u ordenador personal, lo cual evita el conocido problema de: ``En mi máquina funciona''. La portabilidad es uno de los factores más importantes en la filosofía de Docker.
+La mayor ventaja que proporciona el empaquetado de aplicaciones con Docker, es la portabilidad. Aunque hay que tener en cuenta la arquitectura de la máquina, las imágenes se pueden lanzar en cualquier entorno con Docker instalado, lo cual evita el conocido problema de: ``En mi máquina funciona''.
 
 \begin{lstlisting}[language=Dockerfile,label=lst:dockerfile]{Extracto de Dockerfile utilizado en el proyecto}
 # Base
@@ -198,14 +199,39 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 \end{lstlisting}
 
-Un contenedor de Docker se puede levantar a través de la línea de comandos, o mediante la definición de un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{building stages}, distintos estados de la construcción. Esto permite construir imágenes intermedias para su reutilización, o simplemente para terminar con una imagen en la cual se encuentre únicamente lo necesario para correr la aplicación en cuestión.
+El proceso más habitual a la hora de construir una imagen de Docker es definir un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{multi-stge builds}, distintos estados de la construcción. Esto permite construir imágenes de Docker más pequeñas y optimizadas separando el proceso de construcción en distintas fases.
+
+Una vez definido el \texttt{Dockerfile}, se puede construir y ejecutar la imagen con la secuencia de comandos del Listing \ref{lst:dockerbuildrun}
+
+\begin{lstlisting}[language=bash,label=lst:dockerbuildrun]{Construir y correr una imagen de Docker}
+docker build -t my-image .
+
+docker run --rm -d -p 8080:80 my-image
+\end{lstlisting}
+
+El comando de la línea 1 construye la imagen que se define en el \texttt{Dockerfile} del directorio de trabajo actual (\texttt{.}), con el nombre \texttt{my-image}. Con el siguiente comando se ejecuta la imagen. Las \textit{flags} indican:
+
+\begin{itemize}
+  \item \texttt{--rm}
+
+    Se eliminará el contenedor creado al finalizar su ejecución.
+
+  \item \texttt{-d}
+
+    El contenedor correrá en \textit{background}.
+
+  \item \texttt{-p 8080:80}
+
+    Se mapea el puerto 8080 de la máquina local al puerto 80 del contenedor.
+\end{itemize}
+
+\subsection*{Plataformas de despliegue}
 
 \subsubsection*{Docker Compose}
 
-Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''.
+Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''\cite{docker-compose}. Esta permite simular entornos con múltiples contenedores para desarrollar localmente.
 
 \begin{lstlisting}[language=docker-compose,label=lst:dockercompose]{docker-compose.yaml usado en el proyecto}
-
 services:
   zoo-frontend:
     image: ghcr.io/vieites-tfg/zoo-frontend
@@ -249,5 +275,87 @@ services:
 volumes:
   mongo_data:
 \end{lstlisting}
+
+En el archivo que se muestra en el Listing \ref{lst:dockercompose}, se puede observar cómo se configura el despliegue de tres servicios diferentes. Cada uno de los servicios se construye a partir de una imagen de Docker. Las imágenes correspondientes al frontend y al backend de la aplicación (\texttt{zoo-frontend} y \texttt{zoo-backend}, respectivamente) se generan y almacenan en un registro de GitHub al finalizar el ciclo de CI. Una vez publicadas, se pueden descargar indicando en el campo \texttt{image} el registro en el que están almacenadas junto con su nombre, como se puede ver en las líneas 4 y 16.
+
+Simplemente, utilizando el comando del Listing \ref{lst:dcup}:
+
+\begin{itemize}
+  \item Se levantan los tres servicios.
+  \item Se les pasarán las variables de entorno indicadas.
+  \item Se podrá acceder a ellos a través de los puertos establecidos, siendo el primer número el puerto local y el segundo el puerto del contenedor (\texttt{<local>:<contenedor>}).
+  \item Se compartirán los volúmenes mencionados.
+\end{itemize}
+
+\begin{lstlisting}[language=bash,label=lst:dcup]{Despliegue con Docker Compose}
+docker compose up
+\end{lstlisting}
+
+Los valores de las variables de entorno, los indicados como \texttt{\$\{variable\}}, se obtienen de un archivo \texttt{.env}, el cual debe estar presente en el mismo directo que el archivo de configuración. En otro caso, es posible indicar la ruta al archivo mediante el campo \texttt{env\_file}, dentro de cada uno de los servicios configurados.
+
+Docker Compose no es una plataforma de producción, se utiliza únicamente con el fin de desarrollar localmente, y es muy útil en el caso de querer hacer pruebas rápidas de una aplicación sencilla.
+
+\subsection*{Kubernetes}
+
+El proyecto Kubernetes\cite{kubernetes} nació un año después que Docker. Es una herramienta de software que permite orquestar contenedores. Permite gestionar el ciclo de vida de las aplicaciones en contenedores que viven en un \textit{cluster}. Entre sus características principales destacan:
+
+\begin{itemize}
+  \item Escalado automático.
+
+    Aumenta o disminuye automáticamente el número de contenedores en ejecución. Esto va a depender de la cantidad de réplicas de una misma aplicación que se hayan indicado en su configuración. Kubernetes siempre va a intentar mantener el estado del \textit{cluster} cumpliendo los parámetros que se indicaron en las plantillas de configuración de cada uno de los servicios.
+
+  \item Autorreparación.
+
+    Si un contenedor falla, se reinicia o se reemplaza por otra instancia del mismo servicio, garantizando la continuidad de este.
+
+  \item Descubrimiento de servicios y balanceo de carga.
+
+    Se exponen los contenedores entre ellos y/o a Internet. Además, permite distribuir el tráfico de red, evitando así sobrecargas.
+\end{itemize}
+
+\begin{figure}
+  \centerline{\includegraphics[width=10cm]{figuras/k8s}}
+  \caption{Arquitectura de Kubernetes.\cite{img:k8s}}
+  \label{fig:k8s}
+\end{figure}
+
+Un \textit{cluster} de Kubernetes se compone de dos tipos principales de servidores (``nodos''):
+
+\begin{itemize}
+  \item El \textit{Control Plane}.
+
+    Toma todas las decisiones. Se encarga de que todo el sistema funcione como debe.
+
+  \item Los nodos de trabajo.
+
+    Donde realmente se ejecutan las aplicaciones. Reciben órdenes del \textit{Control Plane}. Puede y suele haber más de un nodo de trabajo en un \textit{cluster}.
+\end{itemize}
+
+Kubernetes te permite definir diferentes elementos en archivos \texttt{YAML}. Estos archivos describen el estado que deseamos que tenga el sistema en todo momento. Kubernetes se encarga de procesar estos archivos e intentar hacer que el estado real del sistema sea igual al estado deseado.
+
+Entre los elementos que se pueden construir se encuentran los siguientes:
+
+\begin{itemize}
+  \item Pod.
+
+    Es la unidad más pequeña que se puede crear. Puede tener uno o más contenedores, pero lo normal es que tenga solo uno. Su función es encapsular y ejecutar la aplicación que le corresponda, que se indica mediante una imagen de Docker.
+  \item Deployment.
+
+    Se trata de un controlador de Pods. Normalmente se utiliza este tipo de elementos en vez de crear Pods directamente. Esto es porque le puedes indicar la cantidad de Pods (réplicas) que deseas que haya en todo momento en el sistema, y el \textit{deployment} lo hace por ti.
+  \item Service.
+
+    Debido a que los Pods son efímeros, es decir, se crean y se destruyen constantemente, cambiando así su dirección IP; es necesario tener un elemento que funcione como punto fijo de acceso a un Pod. Para eso sirve un Service. Estos proporcionan un nombre y una IP únicos y fijos para los Pods.
+  \item Ingress.
+
+    Es un elemento más avanzado que un Service. Permite gestionar el acceso desde Internet, dirigiendo las peticiones hacia los servicios correctos dentro del \textit{cluster}.
+
+  \item ConfigMap.
+
+    Este elemento está diseñado para almacenar valores no sensibles. Se definen en formato clave-valor. Permite separar la configuración de una aplicación de su código.
+
+  \item Secret.
+
+    Es muy similar a un ConfigMap, pero está diseñado para almacenar y gestionar información sensible. Su función es guardar datos que no se deberían mostrar a simple vista en la configuración de una aplicación, como contraseñas o \textit{tokens} de autenticación.
+\end{itemize}
 
 \section{Dagger}
