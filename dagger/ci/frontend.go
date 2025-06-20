@@ -14,6 +14,9 @@ type Frontend struct {
 
 	// The secrets needed to launch the package.
 	Secrets   SecMap
+
+	// The main object.
+	Ci *Dagger
 }
 
 // Builds the backend package, generating only one executable file and returns the container.
@@ -70,7 +73,6 @@ func (m *Frontend) PublishImage(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
-	front *dagger.Service,
 ) ([]string, error) {
 	var err error
 
@@ -79,7 +81,7 @@ func (m *Frontend) PublishImage(
 		return []string{}, err
 	}
 
-	_, err = m.Test(ctx, src, front)
+	_, err = m.Ci.Endtoend(ctx, src)
 	if err != nil {
 		return []string{}, err
 	}
@@ -92,7 +94,6 @@ func (m *Frontend) PublishPkg(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
-	front *dagger.Service,
 ) (string, error) {
 	var err error
 
@@ -101,20 +102,10 @@ func (m *Frontend) PublishPkg(
 		return "", err
 	}
 
-	_, err = m.Test(ctx, src, front)
+	_, err = m.Ci.Endtoend(ctx, src)
 	if err != nil {
 		return "", err
 	}
 
 	return PublishPkg(ctx, m.Base, m.Name, m.Secrets.Get("CR_PAT"))
-}
-
-func Cypress(src *dagger.Directory) *dagger.Container {
-	return dagger.Connect().
-		Container().
-		From("cypress/browsers").
-		WithMountedDirectory("/e2e", src).
-		WithWorkdir("/e2e").
-		WithExec([]string{"npx", "cypress", "install"}).
-		WithExec([]string{"yarn", "add", "lerna@8.2.1", "-W"})
 }
