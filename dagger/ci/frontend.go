@@ -81,9 +81,9 @@ func (m *Frontend) PublishImage(
 		return []string{}, err
 	}
 
-	_, err := m.Ci.Endtoend(ctx, src)
+	_, err = m.Ci.Endtoend(ctx, src)
 	if err != nil {
-		return "", err
+		return []string{}, err
 	}
 
 	return PublishImage(ctx, m.Base, m.Ctr(ctx), m.Name, m.Secrets.Get("CR_PAT"))
@@ -102,7 +102,7 @@ func (m *Frontend) PublishPkg(
 		return "", err
 	}
 
-	_, err := m.Ci.Endtoend(ctx, src)
+	_, err = m.Ci.Endtoend(ctx, src)
 	if err != nil {
 		return "", err
 	}

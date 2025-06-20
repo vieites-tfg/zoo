@@ -93,23 +93,7 @@ apply_ingress:
   --timeout=90s
 
 create_cluster:
-  #!/usr/bin/env bash
-  cat <<EOF | kind create cluster --name {{cluster}} --config=-
-  kind: Cluster
-  apiVersion: kind.x-k8s.io/v1alpha4
-  nodes:
-  - role: control-plane
-    kubeadmConfigPatches:
-    - |
-      kind: InitConfiguration
-      nodeRegistration:
-        kubeletExtraArgs:
-          node-labels: "ingress-ready=true"
-    extraPortMappings:
-    - containerPort: 80
-      hostPort: 8080
-      protocol: TCP
-  EOF
+  kind create cluster --name {{cluster}} --config=./kind.yaml
 
   kubectl create namespace dev
   kubectl create namespace pre
