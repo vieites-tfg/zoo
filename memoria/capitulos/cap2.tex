@@ -167,69 +167,69 @@ Docker\cite{docker} es una herramienta que permite empaquetar aplicaciones, crea
 
 La mayor ventaja que proporciona el empaquetado de aplicaciones con Docker, es la portabilidad. Aunque hay que tener en cuenta la arquitectura de la máquina, las imágenes se pueden lanzar en cualquier entorno con Docker instalado, lo cual evita el conocido problema de: ``En mi máquina funciona''.
 
-% \begin{lstlisting}[language=Dockerfile,label=lst:dockerfile]{Extracto de Dockerfile utilizado en el proyecto}
-% # Base
-%
-% FROM node:20 AS base
-%
-% WORKDIR /app
-%
-% COPY package.json lerna.json yarn.lock* ./
-%
-% COPY packages packages/
-%
-% RUN yarn install
-%
-% RUN yarn global add lerna@8.2.1
-%
-% RUN yarn global add @vercel/ncc
-%
-% # Frontend build stage
-%
-% FROM base AS frontend-build
-%
-% WORKDIR /app
-%
-% RUN lerna run --scope @vieites-tfg/zoo-frontend build 
-%
-% # Frontend
-%
-% FROM nginx:alpine AS frontend
-%
-% WORKDIR /usr/share/nginx/html
-%
-% COPY --from=frontend-build /app/packages/frontend/dist .
-%
-% EXPOSE 80
-%
-% CMD ["nginx", "-g", "daemon off;"]
-% \end{lstlisting}
-%
-% El proceso más habitual a la hora de construir una imagen de Docker es definir un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{multi-stge builds}, distintos estados de la construcción. Esto permite construir imágenes de Docker más pequeñas y optimizadas separando el proceso de construcción en distintas fases.
-%
-% Una vez definido el \texttt{Dockerfile}, se puede construir y ejecutar la imagen con la secuencia de comandos del Listing \ref{lst:dockerbuildrun}
+\begin{lstlisting}[language=Dockerfile,label=lst:dockerfile]{Extracto de Dockerfile utilizado en el proyecto}
+# Base
 
-% \begin{lstlisting}[language=bash,label=lst:dockerbuildrun]{Construir y correr una imagen de Docker}
-% docker build -t my-image .
-%
-% docker run --rm -d -p 8080:80 my-image
-% \end{lstlisting}
-%
-% El comando de la línea 1 construye la imagen que se define en el \texttt{Dockerfile} del directorio de trabajo actual (\texttt{.}), con el nombre \texttt{my-image}. Con el siguiente comando se ejecuta la imagen. Las \textit{flags} indican:
-%
-% \begin{itemize}
-%   \item \texttt{--rm}
-%
-%     Se eliminará el contenedor creado al finalizar su ejecución.
-%
-%   \item \texttt{-d}
-%
-%     El contenedor correrá en \textit{background}.
-%
-%   \item \texttt{-p 8080:80}
-%
-%     Se mapea el puerto 8080 de la máquina local al puerto 80 del contenedor.
-% \end{itemize}
+FROM node:20 AS base
+
+WORKDIR /app
+
+COPY package.json lerna.json yarn.lock* ./
+
+COPY packages packages/
+
+RUN yarn install
+
+RUN yarn global add lerna@8.2.1
+
+RUN yarn global add @vercel/ncc
+
+# Frontend build stage
+
+FROM base AS frontend-build
+
+WORKDIR /app
+
+RUN lerna run --scope @vieites-tfg/zoo-frontend build 
+
+# Frontend
+
+FROM nginx:alpine AS frontend
+
+WORKDIR /usr/share/nginx/html
+
+COPY --from=frontend-build /app/packages/frontend/dist .
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+\end{lstlisting}
+
+El proceso más habitual a la hora de construir una imagen de Docker es definir un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{multi-stage builds}, distintos estados de la construcción. Esto permite construir imágenes de Docker más pequeñas y optimizadas separando el proceso de construcción en distintas fases.
+
+Una vez definido el \texttt{Dockerfile}, se puede construir y ejecutar la imagen con la secuencia de comandos del Listing \ref{lst:dockerbuildrun}
+
+\begin{lstlisting}[language=bash,label=lst:dockerbuildrun]{Construir y correr una imagen de Docker}
+docker build -t my-image .
+
+docker run --rm -d -p 8080:80 my-image
+\end{lstlisting}
+
+El comando de la línea 1 construye la imagen que se define en el \texttt{Dockerfile} del directorio de trabajo actual (\texttt{.}), con el nombre \texttt{my-image}. Con el siguiente comando se ejecuta la imagen. Las \textit{flags} indican:
+
+\begin{itemize}
+  \item \texttt{--rm}
+
+    Se eliminará el contenedor creado al finalizar su ejecución.
+
+  \item \texttt{-d}
+
+    El contenedor correrá en \textit{background}.
+
+  \item \texttt{-p 8080:80}
+
+    Se mapea el puerto 8080 de la máquina local al puerto 80 del contenedor.
+\end{itemize}
 
 \subsection*{Plataformas de despliegue}
 
@@ -237,73 +237,74 @@ La mayor ventaja que proporciona el empaquetado de aplicaciones con Docker, es l
 
 Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''\cite{docker-compose}. Esta permite simular entornos con múltiples contenedores para desarrollar localmente.
 
-% \begin{lstlisting}[language=docker-compose,label=lst:dockercompose]{docker-compose.yaml usado en el proyecto}
-% services:
-%   zoo-frontend:
-%     image: ghcr.io/vieites-tfg/zoo-frontend
-%     container_name: zoo-frontend
-%     hostname: zoo-frontend
-%     ports:
-%       - "8080:80"
-%     depends_on:
-%       - zoo-backend
-%     environment:
-%       NODE_ENV: production
-%       YARN_CACHE_FOLDER: .cache
-%
-%   zoo-backend:
-%     image: ghcr.io/vieites-tfg/zoo-backend
-%     container_name: zoo-backend
-%     hostname: zoo-backend
-%     ports:
-%       - "3000:3000"
-%     depends_on:
-%       - mongodb
-%     environment:
-%       NODE_ENV: production
-%       YARN_CACHE_FOLDER: .cache
-%       MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT:-27017}/${MONGO_DATABASE}?authSource=admin"
-%
-%   mongodb:
-%     image: mongo:7.0
-%     container_name: zoo-mongo
-%     hostname: mongodb
-%     environment:
-%       - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
-%       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT}
-%       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASS}
-%     ports:
-%       - "${MONGO_PORT_HOST:-27017}:${MONGO_PORT:-27017}"
-%     volumes:
-%       - ./mongo-init/:/docker-entrypoint-initdb.d/
-%       - mongo_data:/data/db
-%
-% volumes:
-%   mongo_data:
-% \end{lstlisting}
+\begin{lstlisting}[language=docker-compose,label=lst:dockercompose]{docker-compose.yaml usado en el proyecto}
+services:
+  zoo-frontend:
+    image: ghcr.io/vieites-tfg/zoo-frontend
+    container_name: zoo-frontend
+    hostname: zoo-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - zoo-backend
+    environment:
+      NODE_ENV: production
+      YARN_CACHE_FOLDER: .cache
 
-% En el archivo que se muestra en el Listing \ref{lst:dockercompose}, se puede observar cómo se configura el despliegue de tres servicios diferentes. Cada uno de los servicios se construye a partir de una imagen de Docker. Las imágenes correspondientes al frontend y al backend de la aplicación (\texttt{zoo-frontend} y \texttt{zoo-backend}, respectivamente) se generan y almacenan en un registro de GitHub al finalizar el ciclo de CI. Una vez publicadas, se pueden descargar indicando en el campo \texttt{image} el registro en el que están almacenadas junto con su nombre, como se puede ver en las líneas 4 y 16.
+  zoo-backend:
+    image: ghcr.io/vieites-tfg/zoo-backend
+    container_name: zoo-backend
+    hostname: zoo-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    environment:
+      NODE_ENV: production
+      YARN_CACHE_FOLDER: .cache
+      MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT:-27017}/${MONGO_DATABASE}?authSource=admin"
 
-% Simplemente, utilizando el comando del Listing \ref{lst:dcup}:
-%
-% \begin{itemize}
-%   \item Se levantan los tres servicios.
-%   \item Se les pasarán las variables de entorno indicadas.
-%   \item Se podrá acceder a ellos a través de los puertos establecidos, siendo el primer número el puerto local y el segundo el puerto del contenedor (\texttt{<local>:<contenedor>}).
-%   \item Se compartirán los volúmenes mencionados.
-% \end{itemize}
-%
-% \begin{lstlisting}[language=bash,label=lst:dcup]{Despliegue con Docker Compose}
-% docker compose up
-% \end{lstlisting}
-%
-% Los valores de las variables de entorno, los indicados como \texttt{\$\{variable\}}, se obtienen de un archivo \texttt{.env}, el cual debe estar presente en el mismo directo que el archivo de configuración. En otro caso, es posible indicar la ruta al archivo mediante el campo \texttt{env\_file}, dentro de cada uno de los servicios configurados.
+  mongodb:
+    image: mongo:7.0
+    container_name: zoo-mongo
+    hostname: mongodb
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASS}
+    ports:
+      - "${MONGO_PORT_HOST:-27017}:${MONGO_PORT:-27017}"
+    volumes:
+      - ./mongo-init/:/docker-entrypoint-initdb.d/
+      - mongo_data:/data/db
 
-Docker Compose no es una plataforma de producción, se utiliza únicamente con el fin de desarrollar localmente, y es muy útil en el caso de querer hacer pruebas rápidas de una aplicación sencilla.
+volumes:
+  mongo_data:
+\end{lstlisting}
 
-\subsection*{Kubernetes}
+En el archivo que se muestra en el Listing \ref{lst:dockercompose}, se puede observar cómo se configura el despliegue de tres servicios diferentes. Cada uno de los servicios se construye a partir de una imagen de Docker. Las imágenes correspondientes al frontend y al backend de la aplicación (\texttt{zoo-frontend} y \texttt{zoo-backend}, respectivamente) se generan y almacenan en un registro de GitHub al finalizar el ciclo de CI. Una vez publicadas, se pueden descargar indicando en el campo \texttt{image} el registro en el que están almacenadas junto con su nombre, como se puede ver en las líneas 4 y 16.
 
-El proyecto Kubernetes\cite{kubernetes} nació un año después que Docker. Es una herramienta de software que permite orquestar contenedores. Permite gestionar el ciclo de vida de las aplicaciones en contenedores que viven en un \textit{cluster}. Entre sus características principales destacan:
+Simplemente, utilizando el comando del Listing \ref{lst:dcup}:
+
+\begin{itemize}
+  \item Se levantan los tres servicios.
+  \item Se les pasarán las variables de entorno indicadas.
+  \item Se podrá acceder a ellos a través de los puertos establecidos, siendo el primer número el puerto local y el segundo el puerto del contenedor (\texttt{<local>:<contenedor>}).
+  \item Se compartirán los volúmenes mencionados.
+\end{itemize}
+
+\begin{lstlisting}[language=bash,label=lst:dcup]{Despliegue con Docker Compose}
+docker compose up
+\end{lstlisting}
+
+Los valores de las variables de entorno, los indicados como \texttt{\$\{variable\}}, se obtienen de un archivo \texttt{.env}, el cual debe estar presente en el mismo directo que el archivo de configuración. En otro caso, es posible indicar la ruta al archivo mediante el campo \texttt{env\_file}, dentro de cada uno de los servicios configurados.
+
+Docker Compose no es una plataforma de producción, se utiliza únicamente con el fin de desarrollar localmente, y es muy útil en el caso de querer hacer pruebas rápidas de una aplicación sencilla. Se puede tomar como un precursor conceptual a la orquestación más compleja que realiza Kubernetes\ref{subsec:k8shelm}.
+
+\subsection*{Kubernetes \& Helm}
+\label{subsec:k8shelm}
+
+El proyecto Kubernetes nació un año después que Docker. Es una herramienta de software que permite orquestar contenedores. Permite gestionar el ciclo de vida de las aplicaciones en contenedores que viven en un \textit{cluster}. Entre sus características principales destacan:
 
 \begin{itemize}
   \item Escalado automático.
@@ -364,4 +365,206 @@ Entre los elementos que se pueden construir se encuentran los siguientes:
     Es muy similar a un ConfigMap, pero está diseñado para almacenar y gestionar información sensible. Su función es guardar datos que no se deberían mostrar a simple vista en la configuración de una aplicación, como contraseñas o \textit{tokens} de autenticación.
 \end{itemize}
 
+Complementando a Kubernetes tenemos Helm, que se trata de un gestor de paquetes para Kubernetes. Su propósito es ayudar a instalar y administrar el ciclo de vida de las aplicaciones de Kubernetes. Además, las Helm Charts son formatos de archivos YAML que te permiten definir los objetos de Kubernetes de una manera dinámica. Esto te permite definir aplicaciones mucho más complejas.
+
+\begin{figure}
+  \centerline{\includegraphics[width=10cm]{figuras/helm}}
+  \caption{Arquitectura de Helm.\cite{img:helm}}
+  \label{fig:helm}
+\end{figure}
+
+\begin{lstlisting}[language=helm]{Ejemplo de objeto Ingress utilizado en este proyecto.}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-ingress
+spec:
+  rules:
+    - host: {{ tpl .Values.ingress.hostTemplate . }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-{{ .Chart.Name }}-svc
+                port:
+                  number: {{ .Values.service.port }}
+\end{lstlisting}
+
 \section{Dagger}
+
+\begin{figure}
+  \centerline{\includegraphics[width=10cm]{figuras/dagger}}
+  \caption{\textit{pipelines} con Dagger sobre un \textit{runtime} compatible con Docker.\cite{img:dagger}}
+  \label{fig:dagger}
+\end{figure}
+
+Dagger es el pilar fundamental de este trabajo. Se trata de un kit de desarrollo de software que permite a los desarrolladores crear \textit{pipelines} CI/CD, y ejecutarlos en cualquier sitio.
+
+La principal idea de los creadores de Dagger siempre ha sido poder crear \textit{pipelines} portables, que no sea necesario implementarlos de nuevo cada cierto tiempo debido a cambios en el entorno de desarrollo o de pruebas. Esta portabilidad se consigue utilizando cualquier \textit{runtime} de Docker para ejecutar las funciones que forman parte del SDK\cite{sdk} de Dagger, así como las que definen los propios desarrolladores. Además, desde el principio se ha evitado el uso de archivos YAML, que está siendo el lenguaje de configuración más utilizado por parte de la mayoría de aplicaciones.
+
+\subsubsection*{CUE}
+
+Dagger comenzó utilizando un lenguaje de configuración muy potente llamado CUE\cite{cue}. Este se podría ver como una extensión de JSON, pero con más funcionalidades. Todo lo escrito en JSON se puede traducir a CUE, pero no al revés. En el Listing \ref{lst:cue} se puede ver un ejemplo de código de Dagger en el que se utiliza CUE para lanzar un ``plan''. En él se descarga la imagen de Docker de Alpine y se almacena en un registro levantado en la máquina local.
+
+\begin{lstlisting}[language=go,label=lst:cue]{Código de Dagger con CUE}
+package main
+
+import (
+    "dagger.io/dagger"
+    "universe.dagger.io/docker"
+)
+
+dagger.#Plan & {
+    actions: {
+        pull: docker.#Pull & {
+            source: "alpine"
+        }
+        push: docker.#Push & {
+            image: pull.output
+            dest:  "localhost:5042/alpine"
+        }
+    }
+}
+\end{lstlisting}
+
+Esta es la primera vez que se pueden ejecutar \textit{pipelines} definidas de manera programática, ejecutadas sobre un \textit{runtime} de Docker, y de manera relativamente funcional. Además, se puede ejecutar toda la secuencia de acciones de manera local, permitiendo realizar pruebas y buscar errores sin necesidad de hacer uso de otras herramientas de CI como GitHub Actions.
+
+Además, Dagger hace un uso exhaustivo de la caché. Todas las acciones son cacheadas automáticamente. Esto es una funcionalidad muy útil, ya que va a hacer que un \textit{pipeline} se ejecute hasta un 90\% más rápido, como ha ocurrido en pruebas realizadas en este trabajo, que se comentan más adelante. Si se pone como ejemplo la ejecución de tests sobre una aplicación, la primera vez que se lanza el \textit{pipeline}, este tiene que ejecutarse completamente:
+
+\begin{enumerate}
+  \item Instalar las dependencias.
+  \item Compilar la aplicación.
+  \item Correr los tests.
+\end{enumerate}
+
+Dependiendo del tipo de aplicación y, evidentemente, de la conexión a Internet, esto puede tardar desde unos segundos hasta varios minutos. Pero con Dagger solo ocurre una vez. La primera vez. Gracias a la caché, todas las acciones repetitivas, como la instalación de dependencias o la compilación de la aplicación, se almacenan en la caché, ahorrando así mucho tiempo a la hora de realizar pruebas de cualquier tipo. Mientras tanto, con otras herramientas se tendría que esperar siempre la misma cantidad de tiempo para cada una de las veces que se quiere lanzar el \textit{pipeline}. Y, además, muchas veces ni siquiera serda de manera local, habría que depender de aplicaciones que pueden fallar o no estar disponibles en algún momento.
+
+\subsubsection*{CI/CD como código}
+
+Dagger a querido ir más allá pensando que los desarrolladores deberían ser capaces de crear sus \textit{pipelines} de la misma manera que crean sus aplicaciones, escribiendo código. Es así como el SDK de Go\cite{go} para Dagger, el cual se utiliza en este trabajo. Go es un lenguaje de programación con muchos casos de uso. Desde la creación de servicios de red y en la nube, hasta aplicaciones CLI y desarrollo web. Es conocido también por su simplicidad en cuanto a sintaxis y por tener una librería estándar muy completa, aportando muchas de las herramientas necesarias para realizar proyectos comunes. Además, facilita la implementación de programación concurrente, gracias a las \textit{goroutines}, similares a los hilos de ejecución de un sistema operativo, pero mucho más ligeros. En el Listing \ref{lst:daggergo} se puede observar un ejemplo de código\cite{daggergo} utilizando el SDK de Go.
+
+\begin{lstlisting}[language=go,label=lst:daggergo]{Primeros ejemplos del SDK de Go de Dagger.}
+package main
+
+import (
+  "context"
+  "fmt"
+  "os"
+
+  "dagger.io/dagger"
+)
+
+func main() {
+  err := doCi()
+  if err != nil {
+    fmt.Println(err)
+  }
+}
+
+func doCi() error {
+  ctx := context.Background()
+
+  // create a Dagger client
+  client, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stdout))
+  if err != nil {
+    return err
+  }
+  defer client.Close()
+
+  src := client.Host().Directory(".") // get the projects source directory
+
+  yarn := client.Container().From("yarnpkg/node-yarn"). // initialize new container from yarn image
+  WithDirectory("/src", src).WithWorkdir("/src"). // mount source directory to /src
+  WithExec([]string{"yarn", "test"}) // execute yarn test command
+
+  // get test output
+  test, err := yarn.Stdout(ctx)
+  if err != nil {
+    return err
+  }
+  // print output to console
+  fmt.Println(test)
+
+  // execute build command and get build output
+  build, err := yarn.WithExec([]string{"yarn", "build"}).Stdout(ctx)
+  if err != nil {
+    return err
+  }
+  // print output to console
+  fmt.Println(build)
+
+  return nil
+}
+\end{lstlisting}
+
+Todo lo anterior hace de Go una elección excelente para empezar la lista de lenguajes de programación sobre los que el equipo de Dagger implementaría su propio SDK, que hasta el día de hoy incluyen: Java, PHP, Node y Python. 
+
+\subsubsection*{GraphQL}
+
+Pero, ¿cómo es capaz el equipo de Dagger de desarrollar SDKs específicos para cada lenguaje tan rápidamente? Gracias al uso de GraphQL\cite{graphql}, un lenguaje para manipulación y consulta de datos.
+
+\begin{figure}
+  \centerline{\includegraphics[width=14cm]{figuras/graphql}}
+  \caption{Uso de la API de GraphQL para Dagger.\cite{img:graphql}}
+  \label{fig:graphql}
+\end{figure}
+
+Se puede ver su funcionamiento en la Figura \ref{fig:graphql}. El SDK de cada uno de los lenguajes funcionan como traductores del código que escribes en dicho lenguaje a sentencias que entiende el motor de Dagger. Esto es a través de la API de GraphQL de Dagger. El motor de Dagger es el que se encarga de ejecutar las instrucciones en un entorno controlado. De esta manera, no son los propios SDKs los que corren los programas dependiendo del lenguaje, sino que funcionan como clientes de la API para traducir la secuencia de acciones y ejecutarse en un mismo entorno.
+
+\subsubsection*{Dagger \textit{functions}}
+
+Entonces, tras varias mejoras y nuevas versiones, el equipo de Dagger implementó las ``funciones de Dagger''. Estas funciones son el componente principal de Dagger hoy en día. Cada una de las operaciones principales de Dagger se pueden llamar a través de una función, utilizando una API. Además, estas se pueden encadenar, generando \textit{pipelines} dinámicas en una sola llamada. De esta manera, se puede decir finalmente que gracias a Dagger podemos programar nuestros ciclos CI/CD, en el lenguaje que queramos, dentro de los que están disponibles.
+
+\begin{lstlisting}[language=go,label=lst:daggerfunctions]{Extracto de funciones de Dagger de este trabajo}
+// Builds the frontend package, generating only one executable
+// file and returns the container.
+func (m *Frontend) Build(ctx context.Context) *dagger.Container {
+  build := m.Base.
+    WithWorkdir("/app").
+    WithExec([]string{"lerna", "run", "--scope", "@vieites-tfg/zoo-frontend", "build"})
+
+  return build
+}
+
+// Based on the build stage, gets the executable file and creates
+// a ready to run container with Nginx and the port 80 exported.
+func (m *Frontend) Ctr(ctx context.Context) *dagger.Container {
+  build := m.Build(ctx)
+
+  dist := build.Directory("/app/packages/frontend/dist")
+
+  ctr := dag.
+    Container().
+    From("nginx:alpine").
+    WithWorkdir("/usr/share/nginx/html").
+    WithDirectory(".", dist).
+    WithExposedPort(80).
+    WithEntrypoint([]string{"nginx", "-g", "daemon off;"})
+
+  return ctr
+}
+\end{lstlisting}
+
+La existencia de las funciones de Dagger permite la creación de módulos, un conjunto de funciones que toman una entrada y producen una salida en concreto. Los módulos creados por la comunidad se pueden encontrar en el Daggerverse\cite{daggerverse}. Este es el lugar en el que se comparten módulos de Dagger, los cuales se pueden utilizar en el caso de que alguno sea necesario para el \textit{pipeline} que se quiera crear.
+
+\subsubsection*{CLI}
+
+Otra funcionalidad que tiene Dagger es su CLI\cite{cli} (\textit{Command-Line Interface}). A través de ella puedes llamar a funciones de módulos de Dagger, tanto de de tu sistema de archivos local como directamente de un repositorio de Git.
+
+\begin{lstlisting}[language=bash,label=lst:callbackend]{Comando para lanzar el backend del proyecto}
+dagger call --sec-env=file//../../.env backend service up --ports 3000:3000
+\end{lstlisting}
+
+De esta manera (Listing \ref{lst:callbackend}) es como se ejecutan las funciones que se definen en los módulos creados en este trabajo. Toda la documentación al respecto se puede encontrar en \textbf{CITAR APÉNDICE}.
+
+\subsubsection*{Resumen}
+
+Dagger es una herramienta revolucionaria que redefine la manera de crear \textit{pipelines} de CI/CD, permitiendo implementarlos como código y evitar que los desarrolladores tengan que lidiar con archivos de configuración estáticos como YAML. Ofrece SDKs en una variedad de lenguajes de programación, tales como Go, Python o Node, que actúan como clientes del motor central de Dagger.
+
+Una de sus ventajas más significativas es su portabilidad, la cual se consigue al ejecutar todas las operaciones sobre un \textit{runtime} de Docker. De esta manera se garantiza que cualquier \textit{pipeline} definido con Dagger funcione de igual manera sin importar la máquina en la que se ejecuta.
+
+Otro de sus pilares es la gestión que hace de la caché. Dagger cachea cada una de las acciones ejecutadas. Gracias a esto, tras la primera ejecución de un \textit{pipeline}, las siguientes ejecuciones son significativamente más rápidas. Así se reducen los tiempos de espera, permitiendo a los desarrolladores trabajar más rápido.
+
+Finalmente, la evolución hacia las ``Dagger \textit{functions}'' y la creación de módulos permite un gran nivel de reutilización. Estos módulos, que pueden ser compartidos a través del Daggerverse, junto con su CLI para invocarlos, proponen una manera muy poderosa de crear \textit{pipelines} para construir, probar y desplegar aplicaciones.

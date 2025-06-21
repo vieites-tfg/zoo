@@ -19,7 +19,7 @@ type Frontend struct {
 	Ci *Dagger
 }
 
-// Builds the backend package, generating only one executable file and returns the container.
+// Builds the frontend package, generating only one executable file and returns the container.
 func (m *Frontend) Build(ctx context.Context) *dagger.Container {
 	build := m.Base.
 		WithWorkdir("/app").

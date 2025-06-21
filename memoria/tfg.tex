@@ -66,6 +66,33 @@
   morestring=[b]',
   morestring=[b]"
 }
+\lstdefinelanguage{helm}{
+  keywords={
+    apiVersion, kind, metadata, name, namespace, labels, annotations,
+    spec, status, data, port, number,
+    replicas, selector, matchLabels, template, strategy, type,
+    containers, initContainers, image, imagePullPolicy, command, args,
+    ports, containerPort, hostPort, protocol, name,
+    env, value, valueFrom, secretKeyRef, configMapKeyRef, key,
+    resources, requests, limits, cpu, memory,
+    volumeMounts, mountPath, readOnly, subPath,
+    volumes, persistentVolumeClaim, claimName, secret, secretName, configMap,
+    restartPolicy, terminationGracePeriodSeconds, activeDeadlineSeconds,
+    service, clusterIP, loadBalancerIP, externalIPs, sessionAffinity,
+    rules, host, http, paths, path, pathType, backend, serviceName,
+    servicePort, tls, stringData,
+    Values, Release, Chart, Files, Capabilities, Template,
+    include, tpl, toYaml, fromYaml, nindent, quote, required
+  },
+  keywordstyle=\color{blue}\bfseries,
+  identifierstyle=\color{black},
+  comment=[l]{\#},
+  commentstyle=\color{gray}\ttfamily,
+  stringstyle=\color{\greencolor}\ttfamily,
+  morestring=[b]',
+  morestring=[b]",
+  moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}}
+}
 
 % \includeonly{capitulos/introducion}
 
