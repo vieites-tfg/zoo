@@ -10,18 +10,18 @@
 
 En este trabajo se pretende demostrar y evaluar la viabilidad, eficiencia y flexibilidad de Dagger\cite{dagger} como motor de CI/CD (\textit{Continuous Integration}/\textit{Continuous Delivery})\cite{ci,cd}, con el fin de estandarizar y modernizar los ciclos de vida del desarrollo de software.
 
-No solo se va a utilizar Dagger como complemento del ciclo de desarrollo de una aplicación, sino que se va a comparar con la no utilización de este. Se evaluarán las ventajas que tiene su uso frente a métodos convencionales, entre las que destacarán su portabilidad, al poder crear \textit{pipelines} de manera programática, implementando funciones que corren dentro de contenedores, permitiendo al programador tener el control total del entorno en el que se ejecuta la aplicación. En vez de intentar unir \textit{scripts} creados a mano en diferentes entornos, el programador es capaz de componer acciones reusbles, utilizando un lenguaje de programación y una API a su disposición.
+Se realizará el mismo flujo de trabajo, tanto utilizando Dagger como sin usarlo, y se compararán los resultados en cuanto a rendimiento. Se evaluarán las ventajas que tiene su uso frente a métodos convencionales, entre las que destacarán su portabilidad, al correr sobre un \textit{runtime} de Docker; y su capacidad programática, ya que se pueden crear \textit{pipelines} implementando funciones en el lunguaje conocido para el desarrollador. En vez de coordinar \textit{scripts} creados a mano en diferentes entornos, el programador es capaz de componer acciones reusbles, utilizando un lenguaje de programación y una API a su disposición.
 
 Se van a proporcionar ejemplos de módulos creados con Dagger, los cuales estarán especialmente diseñados para cumplir los ciclos tanto de CI como de CD de una aplicación \textit{dummy}. De esta manera se podrá comprobar que este mismo proceso se puede llevar a cabo para cualquier aplicación, y de una manera sencilla.
 
-Estas son las preguntas se resuelven a lo largo del presente trabajo:
+Lo que sigue son las preguntas a las que este trabajo busca responder:
 
 \begin{itemize}
-  \item ¿Cómo de viable es desarrollar módulos de Dagger para la gestión de un ciclo de CI/CD de una aplicación?
+  \item ¿Qué grado de complejidad tiene desarrollar módulos de Dagger para la gestión de un ciclo de CI/CD de una aplicación?
   \item ¿Vale realmente la pena aprender a utilizar esta herramienta?
   \item ¿Es capaz de aumentar la velocidad de desarrollo de una aplicación?
   \item ¿Es fácilmente integrable en cualquier tipo de aplicación?
-  \item ¿Qué puntos débiles resuelve Dagger frente al uso de otros métodos convencionales?
+  \item ¿Qué puntos débiles corrige Dagger frente al uso de otros métodos convencionales?
 
     \textbf{ELIMINAR}: infierno del YAML, testeo local, portabilidad, lenguaje real para crear abstracciones
   \item ¿Qué desafios, limitaciones o desventajas se encuentran al trabajar con Dagger?
@@ -43,7 +43,7 @@ Para lograr los objetivos principales es necesario llevar a cabo varios pasos:
     Se creará un módulo de Dagger para cada uno de los procesos (CI y CD). El módulo de CI permitirá desde compilar la aplicación, hasta publicar las imágenes de Docker y los paquetes NPM tanto del frontend como del backend. Por otro lado, el módulo de CD será el encargado de utilizar esas imágenes que se han publicado previamente y desplegar la aplicación en el entorno correspondiente.
   \item Entorno orquestado.
 
-    El \textit{pipeline} de CD termina con el despliegue de la aplicación sobre Kubernetes\cite{kubernetes}, utilizando Helm\cite{helm}. Esto permite levantar la aplicación en el entorno que le corresponda, según el estado en el que se encuentra cada versión.
+    El ciclo de CD termina en un entorno orquestado por Kubernetes\cite{kubernetes}, configurado a través de una \textit{chart} de Helm\cite{helm}. La fase final del \textit{pipeline} de Dagger no despliega la aplicación, sino que actualiza la configuración en un repositorio de estado. El despliegue sigue un modelo GitOps\cite{gitops} gestionado por ArgoCD\cite{argocd}, el cual se encarga de detectar los cambios en el repositorio de estado y actualizar los \textit{clusters} en consecuencia.
 
   \item Análisis comparativo
 
