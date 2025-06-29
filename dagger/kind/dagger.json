@@ -1,0 +1,7 @@
+{
+  "name": "kind",
+  "engineVersion": "v0.18.11",
+  "sdk": {
+    "source": "go"
+  }
+}

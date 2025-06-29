@@ -1,14 +1,13 @@
 {
   "name": "cd",
-  "engineVersion": "v0.18.10",
+  "engineVersion": "v0.18.11",
   "sdk": {
     "source": "go"
   },
   "dependencies": [
     {
       "name": "kind",
-      "source": "github.com/prefapp/daggerverse/kind@fcb79b3325a91c2e17a913e51b7ff308b6b61752",
-      "pin": "fcb79b3325a91c2e17a913e51b7ff308b6b61752"
+      "source": "../kind"
     }
   ]
 }
