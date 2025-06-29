@@ -119,17 +119,35 @@ func (m *Dagger) Endtoend(
 		return "", err
 	}
 
+	front, err := m.Frontend(ctx, src)
+	if err != nil {
+		return "", err
+	}
+
+	// Linter
+	_, err = back.Lint(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = front.Lint(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	// Backend tests
+	_, err = back.Test(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	// Frontend tests
 	backSvc, err := back.Service(ctx, src)
 	if err != nil {
 		return "", err
 	}
 
 	backendSvc, err := backSvc.Start(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	front, err := m.Frontend(ctx, src)
 	if err != nil {
 		return "", err
 	}
