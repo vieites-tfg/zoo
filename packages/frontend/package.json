@@ -1,7 +1,7 @@
 {
   "name": "@vieites-tfg/zoo-frontend",
   "repository": "https://github.com/vieites-tfg/zoo.git",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"

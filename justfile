@@ -28,7 +28,7 @@ init:
 dev:
   docker compose up -d
 
-e2e:
+test_frontend:
   #!/usr/bin/env bash
   if [[ "$(docker images -f reference=cypress | wc -l | xargs)" != "2" ]]
   then
@@ -47,10 +47,6 @@ alias tb := test_backend
 test_backend:
   @just _run "lerna" "run test --scope @vieites-tfg/zoo-backend"
 
-alias tf := test_frontend
-test_frontend:
-  just e2e
-
 test:
   just test_backend
   just test_frontend
@@ -60,27 +56,27 @@ lint:
 
 alias ib := image_build
 image_build package:
-  ./image.sh build {{package}}
+  ./scripts/image.sh build {{package}}
 
 alias ip := image_push
 image_push package:
-  ./image.sh push {{package}}
+  ./scripts/image.sh push {{package}}
 
 alias ibp := image_build_push
 image_build_push package:
-  ./image.sh all {{package}}
+  ./scripts/image.sh all {{package}}
 
 alias pr := pkg_remote
 pkg_remote package:
-  ./push_package.sh remote {{package}}
+  ./scripts/push_package.sh remote {{package}}
 
 alias pl := pkg_local
 pkg_local package:
-  ./push_package.sh local {{package}}
+  ./scripts/push_package.sh local {{package}}
 
 alias prl := pkg_remote_local
 pkg_remote_local package:
-  ./push_package.sh all {{package}}
+  ./scripts/push_package.sh all {{package}}
 
 cluster := "zoo-cluster"
 
@@ -93,7 +89,7 @@ apply_ingress:
   --timeout=90s
 
 create_cluster:
-  kind create cluster --name {{cluster}} --config=./kind.yaml
+  kind create cluster --name {{cluster}} --config=./cluster/kind_local.yaml
 
   kubectl create namespace dev
   kubectl create namespace pre
@@ -130,3 +126,11 @@ alias lc := lint_chart
 lint_chart ns:
   set -a; . ./.env; set +a
   helmfile -f ../values/helmfile.yaml.gotmpl -e {{ns}} lint
+
+alias cac := create_all_clusters
+create_all_clusters:
+  ./scripts/create_envs.sh
+
+alias dac := delete_all_clusters
+delete_all_clusters:
+  printf "dev\npre\npro" | xargs -I% kind delete cluster --name %

@@ -1,7 +1,7 @@
 {
   "name": "@vieites-tfg/zoo-backend",
   "repository": "https://github.com/vieites-tfg/zoo.git",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
   "publishConfig": {
