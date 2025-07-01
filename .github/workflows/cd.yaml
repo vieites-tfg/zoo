@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  cd:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
@@ -24,8 +24,14 @@ jobs:
           # Create SOPS files
           mkdir -p sops
 
+          cat <<EOF > ./sops/.sops.yaml
+          ${{ secrets.SOPS_CONFIG_FILE }}
+          EOF
+          echo "----- SOPS CONFIG -----"
+          cat ./sops/.sops.yaml
+          echo "-----------------------"
+
           echo "${{ secrets.SOPS_PRIVATE_KEY }}" > ./sops/age.agekey
-          echo "${{ secrets.SOPS_CONFIG_YAML }}" > ./sops/.sops.yaml
     
       - name: Run Dagger CD module
         uses: dagger/dagger-for-github@8.0.0

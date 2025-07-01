@@ -4,4 +4,5 @@ sops/
 local_packages/
 
 .cache
+.secrets.yaml
 .env
