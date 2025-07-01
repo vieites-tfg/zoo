@@ -27,9 +27,6 @@ jobs:
           cat <<EOF > ./sops/.sops.yaml
           ${{ secrets.SOPS_CONFIG_FILE }}
           EOF
-          echo "----- SOPS CONFIG -----"
-          cat ./sops/.sops.yaml
-          echo "-----------------------"
 
           echo "${{ secrets.SOPS_PRIVATE_KEY }}" > ./sops/age.agekey
     
