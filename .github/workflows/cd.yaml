@@ -1,0 +1,41 @@
+name: Dagger CD
+
+on:
+  push:
+    branches: main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Recreate needed files
+        run: |
+          # Create .env
+          echo "MONGO_DATABASE=${{ secrets.MONGO_DATABASE }}" > ./.env
+          echo "MONGO_ROOT=${{ secrets.MONGO_ROOT }}" >> ./.env
+          echo "MONGO_ROOT_PASS=${{ secrets.MONGO_ROOT_PASS }}" >> ./.env
+          echo "CR_PAT=${{ secrets.CR_PAT }}" >> ./.env
+          echo "STATE_REPO=${{ secrets.STATE_REPO }}" >> ./.env
+
+          # Create SOPS files
+          mkdir -p sops
+
+          echo "${{ secrets.SOPS_PRIVATE_KEY }}" > ./sops/age.agekey
+          echo "${{ secrets.SOPS_CONFIG_YAML }}" > ./sops/.sops.yaml
+    
+      - name: Run Dagger CD module
+        uses: dagger/dagger-for-github@8.0.0
+        with:
+          module: ./dagger/cd
+          call: |
+            --socket=/var/run/docker.sock \
+            --kind-svc=tcp://localhost:3000 \
+            --config-file=file://cluster/kind_local.yaml \
+            launch \
+            --sec-env=file://.env \
+            --env="dev" \
+            --age-key=file://sops/age.agekey \
+            --sops-config=file://sops/.sops.yaml
