@@ -29,6 +29,7 @@ func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) (*dagger.Conta
 		WithFile("lerna.json", src.File("lerna.json")).
 		WithFile("yarn.lock", src.File("yarn.lock")).
 		WithDirectory("packages", src.Directory("packages")).
+		WithDirectory(".git", src.Directory(".git")).
 		WithExec([]string{"yarn", "install"}).
 		WithExec([]string{"yarn", "global", "add", "lerna@8.2.1"}).
 		WithExec([]string{"yarn", "global", "add", "@vercel/ncc"})

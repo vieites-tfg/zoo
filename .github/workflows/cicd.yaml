@@ -1,0 +1,124 @@
+name: Dagger CD
+
+on:
+  push:
+    branches: [ main ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+jobs:
+  cicd:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout zoo repository
+        uses: actions/checkout@v4
+        with:
+          path: zoo
+
+      - name: Checkout state repository
+        uses: actions/checkout@v4
+        with:
+          repository: vieites-tfg/state
+          path: state
+          token: ${{ secrets.STATE_REPO }}
+
+      - name: Install Dagger
+        uses: dagger/dagger-for-github@8.0.0
+
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
+      - name: Determine environment
+        id: determine_env
+        run: |
+          cd "${GITHUB_WORKSPACE}/zoo"
+
+          tag=$(git rev-parse --short=8 HEAD) # default
+
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            envi="dev"
+          elif [[ "${{ github.event_name }}" == "release" ]]; then
+            if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+              envi="pre"
+            else
+              envi="pro"
+            fi
+            tag="${{ github.event.release.name }}"
+          else
+            # Workflow dispatch
+            envi="dev"
+          fi
+
+          echo "Determined environment: ${envi}"
+          echo "Determined tag: ${tag}"
+          echo "environment=${envi}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Recreate needed files
+        run: |
+          cd "${GITHUB_WORKSPACE}/zoo"
+
+          # Create .env
+          echo "MONGO_DATABASE=${{ secrets.MONGO_DATABASE }}" > ./.env
+          echo "MONGO_ROOT=${{ secrets.MONGO_ROOT }}" >> ./.env
+          echo "MONGO_ROOT_PASS=${{ secrets.MONGO_ROOT_PASS }}" >> ./.env
+          echo "CR_PAT=${{ secrets.CR_PAT }}" >> ./.env
+          echo "STATE_REPO=${{ secrets.STATE_REPO }}" >> ./.env
+
+          # Create SOPS files
+          mkdir -p sops
+          echo "${{ secrets.SOPS_PRIVATE_KEY }}" > ./sops/age.agekey
+          cat <<EOF > ./sops/.sops.yaml
+          ${{ secrets.SOPS_CONFIG_FILE }}
+          EOF
+
+      - name: Run Dagger CI module
+        run: |
+          set -euo pipefail
+
+          update_state () {
+            local env_path="${GITHUB_WORKSPACE}/state/${{ steps.determine_env.outputs.environment }}"
+            local pkg=$1
+            local tag=$2
+            
+            echo "Updating state for package '${pkg}' with tag '${tag}' in '${env_path}'"
+            
+            yq -i ".${pkg}.image.tag = \"${tag}\"" "${env_path}/${pkg}.yaml"
+
+            cd "${env_path}"
+            git config --global user.name "GitHub Actions Bot"
+            git config --global user.email "dvieitest@gmail.com"
+            git add .
+            git diff --staged --quiet || git commit -m "feat(${pkg}): update image to ${tag}"
+            git push
+
+            cd -
+          }
+
+          cd "${GITHUB_WORKSPACE}/zoo/dagger/ci"
+
+          tag="${{ steps.determine_env.outputs.tag }}"
+
+          dagger call --sec-env=file://../../.env backend publish-image --tag "${tag}"
+          update_state "zoo-backend" "${tag}"
+
+          dagger call --sec-env=file://../../.env frontend publish-image --tag "${tag}"
+          update_state "zoo-frontend" "${tag}"
+
+      - name: Run Dagger CD module
+        run: |
+          cd "${GITHUB_WORKSPACE}/zoo"
+
+          dagger call -m "./dagger/cd" \
+            --socket=/var/run/docker.sock \
+            --kind-svc=tcp://localhost:3000 \
+            --config-file=file://cluster/kind_local.yaml \
+            launch \
+            --sec-env=file://.env \
+            --env=${{ steps.determine_env.outputs.environment }} \
+            --age-key=file://sops/age.agekey \
+            --sops-config=file://sops/.sops.yaml

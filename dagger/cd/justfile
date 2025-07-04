@@ -15,3 +15,10 @@ launch:
     --env="dev" \
     --age-key=file://{{sops}}/age.agekey \
     --sops-config=file://{{sops}}/.sops.yaml
+
+cluster *more:
+  dagger call \
+    --socket=/var/run/docker.sock \
+    --kind-svc=tcp://localhost:3000 \
+    --config-file=file://{{cluster}}/kind_local.yaml \
+    cluster {{more}}

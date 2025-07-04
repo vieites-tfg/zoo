@@ -73,20 +73,21 @@ func (m *Frontend) PublishImage(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
-) ([]string, error) {
+	tag string,
+) (string, error) {
 	var err error
 
 	_, err = m.Lint(ctx)
 	if err != nil {
-		return []string{}, err
+		return "", err
 	}
 
 	_, err = m.Ci.Endtoend(ctx, src)
 	if err != nil {
-		return []string{}, err
+		return "", err
 	}
 
-	return PublishImage(ctx, m.Base, m.Ctr(ctx), m.Name, m.Secrets.Get("CR_PAT"))
+	return PublishImage(ctx, m.Ctr(ctx), m.Name, m.Secrets.Get("CR_PAT"), tag)
 }
 
 // Publish the npm package.

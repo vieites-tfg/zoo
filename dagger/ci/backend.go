@@ -106,20 +106,20 @@ func (m *Backend) Lint(ctx context.Context) (string, error) {
 }
 
 // Publish the Docker image of the package with the "latest" and the npm package (inside the 'package.json') versions.
-func (m *Backend) PublishImage(ctx context.Context) ([]string, error) {
+func (m *Backend) PublishImage(ctx context.Context, tag string) (string, error) {
 	var err error
 
 	_, err = m.Lint(ctx)
 	if err != nil {
-		return []string{}, err
+		return "", err
 	}
 
 	_, err = m.Test(ctx)
 	if err != nil {
-		return []string{}, err
+		return "", err
 	}
 
-	return PublishImage(ctx, m.Base, m.Ctr(ctx), m.Name, m.Secrets.Get("CR_PAT"))
+	return PublishImage(ctx, m.Ctr(ctx), m.Name, m.Secrets.Get("CR_PAT"), tag)
 }
 
 func getMongoPort(ctx context.Context, port *dagger.Secret) (int, error) {

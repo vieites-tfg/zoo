@@ -24,7 +24,7 @@ for ENV in "${ENVS[@]}"; do
 
     echo "--- Creating cluster '${ENV}' ---"
     kind create cluster --config "${CLUSTER_DIR}/kind_${ENV}.yaml" \
-        --wait 5m
+        --wait 5m || continue
 
     echo "--- Installing Ingress Controller in cluster '${ENV}' ---"
     kubectl apply -f "${INGRESS_MANIFEST}" --context "${CONTEXT}"
@@ -58,6 +58,10 @@ for ENV in "${ENVS[@]}"; do
     kubectl apply -f "${ARGO_DIR}/argo_${ENV}.yaml" --context "${CONTEXT}"
     kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=argocd-server \
         -n argocd --context "${CONTEXT}" --timeout=5m
+
+    echo "--- Applying ArgoCD UI banner for '${ENV}' ---"
+    kubectl patch configmap argocd-cm -n argocd --context "${CONTEXT}" --type merge \
+        -p "{\"data\":{\"ui.bannercontent\":\"${BANNER_TEXT}\"}}"
 
     echo "--- Cluster '${ENV}' setup complete ---"
     pass=$(kubectl -n argocd get secret argocd-initial-admin-secret \

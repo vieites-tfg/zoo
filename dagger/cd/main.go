@@ -61,21 +61,21 @@ func (m *Cd) Base() *dagger.Container {
 		WithExec([]string{"apk", "update"}).
 		WithExec([]string{"apk", "add", "--no-cache", "wget"}).
 		WithExec([]string{"sh", "-c", `
-      wget https://get.helm.sh/helm-v3.15.2-linux-amd64.tar.gz && \
-      tar -zxvf helm-v3.15.2-linux-amd64.tar.gz && \
+      wget https://get.helm.sh/helm-v3.15.2-linux-amd64.tar.gz &&
+      tar -zxvf helm-v3.15.2-linux-amd64.tar.gz &&
       mv linux-amd64/helm /usr/local/bin/
     `}).
 		WithExec([]string{"sh", "-c", `
-      wget https://github.com/helmfile/helmfile/releases/download/v0.165.0/helmfile_0.165.0_linux_amd64.tar.gz && \
-      tar -zxvf helmfile_0.165.0_linux_amd64.tar.gz && \
+      wget https://github.com/helmfile/helmfile/releases/download/v0.165.0/helmfile_0.165.0_linux_amd64.tar.gz &&
+      tar -zxvf helmfile_0.165.0_linux_amd64.tar.gz &&
       mv helmfile /usr/local/bin/
     `}).
 		WithExec([]string{"sh", "-c", `
-      wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && \
+      wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 &&
       chmod a+x /usr/local/bin/yq
     `}).
 		WithExec([]string{"sh", "-c", `
-      wget https://github.com/getsops/sops/releases/download/v3.8.1/sops-v3.8.1.linux.amd64 -O /usr/local/bin/sops && \
+      wget https://github.com/getsops/sops/releases/download/v3.8.1/sops-v3.8.1.linux.amd64 -O /usr/local/bin/sops &&
       chmod a+x /usr/local/bin/sops
     `})
 }
@@ -98,8 +98,7 @@ func (m *Cd) Cluster(ctx context.Context) *dagger.Container {
 		WithFile("/usr/local/bin/helm", helmBinary).
 		WithFile("/usr/local/bin/helmfile", helmfileBinary).
 		WithFile("/usr/local/bin/yq", yqBinary).
-		WithFile("/usr/local/bin/sops", sopsBinary).
-		WithExec([]string{"apk", "add", "--no-cache", "git"})
+		WithFile("/usr/local/bin/sops", sopsBinary)
 
 	return clusterClientWithTools.
 		WithExec([]string{"mkdir", "-p", "/app"})
@@ -130,6 +129,7 @@ func (m *Cd) Launch(
 	helmfile *dagger.File,
 ) (*dagger.Directory, error) {
 	ctr := m.Cluster(ctx).
+		WithExec([]string{"apk", "add", "--no-cache", "git"}).
 		WithExec([]string{"git", "clone", "https://github.com/vieites-tfg/state.git", "/app/state"})
 
 	if helmfile != nil {

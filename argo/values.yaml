@@ -1,7 +1,6 @@
 configs:
   cm:
     kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
-    ui.bannercontent: "We are in DEV"
     ui.bannerpermanent: "true"
 
 repoServer:
