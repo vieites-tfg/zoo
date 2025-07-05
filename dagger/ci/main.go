@@ -5,7 +5,7 @@ import (
 	"dagger/dagger/internal/dagger"
 )
 
-type Dagger struct {
+type Ci struct {
 	// This is the '.env' file with the environment variables needed to launch the application.
 	// +required
 	SecEnv  *dagger.Secret
@@ -13,14 +13,14 @@ type Dagger struct {
 	secrets secrets
 }
 
-func New(secEnv *dagger.Secret) *Dagger {
-	return &Dagger{
+func New(secEnv *dagger.Secret) *Ci {
+	return &Ci{
 		SecEnv: secEnv,
 	}
 }
 
 // Builds the base image from the Dockerfile.
-func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) (*dagger.Container, error) {
+func (m *Ci) Base(ctx context.Context, src *dagger.Directory) (*dagger.Container, error) {
 	ctr := dag.
 		Container().
 		From("node:20").
@@ -38,7 +38,7 @@ func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) (*dagger.Conta
 }
 
 // Init configures the content with the .env environment variables
-func (m *Dagger) Init(
+func (m *Ci) Init(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
@@ -62,7 +62,7 @@ func (m *Dagger) Init(
 }
 
 // Functions related to the backend package.
-func (m *Dagger) Backend(
+func (m *Ci) Backend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
@@ -89,7 +89,7 @@ func (m *Dagger) Backend(
 }
 
 // Functions related to the backend package.
-func (m *Dagger) Frontend(
+func (m *Ci) Frontend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
@@ -110,7 +110,7 @@ func (m *Dagger) Frontend(
 	}, nil
 }
 
-func (m *Dagger) Endtoend(
+func (m *Ci) Endtoend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,

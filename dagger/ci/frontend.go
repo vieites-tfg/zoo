@@ -16,7 +16,7 @@ type Frontend struct {
 	Secrets   SecMap
 
 	// The main object.
-	Ci *Dagger
+	Ci *Ci
 }
 
 // Builds the backend package, generating only one executable file and returns the container.
