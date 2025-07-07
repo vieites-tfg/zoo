@@ -1,181 +1,397 @@
 # TFG - Ciclo completo de CI/CD con Dagger utilizando Kubernetes
 
-> [!warning]
-> Este proyecto aún está en progreso. En este README se indica todo lo necesario para probar las funcionalidades que están implementadas.
+## Repositorios
 
-## Estructura del monorepo
+Este trabajo se compone de tres repositorios bien diferenciados y con su protia funcionalidad. Todos ellos se pueden encontrar en esta organización, `vieites-tfg`.
 
-Esta es la estructura general del monorepo. Se muestran únicamente los elementos más destacables.
+- `zoo`: Este repositorio. Es el principal del trabajo. En él se encuentra todo el código fuente, desde la aplicación *dummy* hasta la implementación de los módulos de Dagger. Es el único necesario para probar las diferentes funcionalidades.
+- `helm-repository`: Alberga las Chart de Helm que describen el despliegue de la aplicación *dummy* en Kubernetes.
+- `state`: En él se almacenan los valores de las Charts de Helm correspondientes a cada uno de los entornos en los que se puede desplegar la aplicación. Funciona como única fuente de verdad. También es el lugar de donde ArgoCD obtiene los recursos de Kubernetes, con el fin de ser desplegados.
+
+Cada uno de los repositorios tiene su propio `README`. Consultar los demás para más información.
+
+# Zoo
+
+## Estructura general del repositorio
 
 ```bash
-├── packages/
-│   ├── backend/
-│   └── frontend/
-├── mongo-init/
-├── example.env
-├── justfile
-├── lerna.json
-├── package.json
-├── yarn.lock
-├── docker-compose.yaml
-└── Dockerfile
+argo
+├── argo_dev.yaml
+├── argo_pre.yaml
+├── argo_pro.yaml
+└── values.yaml
+cluster
+├── kind_dev.yaml
+├── kind_local.yaml
+├── kind_pre.yaml
+└── kind_pro.yaml
+dagger
+├── cd
+└── ci
+docker-compose.yml
+Dockerfile
+example.env
+mongo-init
+└── init-zoo.js
+packages
+├── backend
+└── frontend
+scripts
+├── create_envs.sh
+├── image.sh
+└── push_package.sh
+sops
+├── .sops.yaml
+└── age.agekey
 ```
 
-## Funcionalidades
+Este repositorio funciona como un monorepo, lo cual indica que todo el código fuente se encuentra en este único lugar.
 
-- [x] Configuración inicial del monorepo utilizando Lerna.
-- [x] Uso de Docker Compose para la orquestación y comunicación de los servicios.
-- [/] Aplicación *dummy* de gestión de un zoo:
-    - [x] Configuración de la base de datos (MongoDB).
-    - [x] API REST para comunicación con la base de datos (Node.js + TypeScript).
-    - [/] Frontend para consumir la API (Vue.js + TypeScript).
-- [ ] Uso de Kubernetes para la gestión de los servicios.
-- [ ] Creación de un módulo de Dagger para la realización de un ciclo completo de CI/CD.
+### Aplicación *dummy*
 
-## Requisitos
+Consta de un *frontend* y un *backend*, ambos creados con Typescript, y utilizando Vue para el frontend. Se gestiona utilizando una herramienta de gestión de monorepos llamada Lerna. En la raíz del repositorio se pueden encontrar archivos de configuración de Lerna y Node.js. El código correspondiente al *frontend* y al *backend* se incluyen en el directorio `packages`. El *backend* se conecta a una base de datos de animales de un zoo, y proporciona una API que el *frontend* consume, con el fin de poder realizar acciones CRUD sobre la base de datos.
 
-### Software
+### Dagger
+
+En el directorio `dagger` se encuentran las implementaciones de los módulos correspondientes a los flujos de CI y CD. Estos se pueden ejecutar localmente teniendo Dagger y Docker instalados. Se utilizan en el workflow de GitHub encargado de realizar todo el flujo de testeo, publicación y despliegue.
+
+### Otros
+
+También se pueden encontrar varios ejecutables en el directorio de `scripts`, de los cuales `create_envs.sh` es el más interesante. Este permite levantar los clusters en local para probar el despliegue de la aplicación en los tres entornos posibles: `dev`, `pre` y `pro`.
+
+En todos los clusters se instala ArgoCD, aplicación creada específicamente para Kubernetes y que utiliza el método *pull*, siguiendo la filisofía GitOps, leyendo los recursos a desplegar del repositorio de estado (`state`) mencionado anteriormente. Este tiene una rama `deploy`, en la que se suben los archivos necesarios para que Argo lea y despliegue la aplicación.
+
+Se configuran los clusters y las propias instancias de Argo de manera diferente para cada uno de los clusters. Estas configuraciones se pueden encontrar en los directorios `cluster` y `argo`.
+
+Además, este trabajo tiene una memoria asociada, en la cual se pueden encontrar unas claves privada y pública, junto con otros *tokens*, necesarias para poder probar la implementación. Estas claves y *tokens* tienen varios propósitos:
+
+- Claves privada y pública: Se utilizan para encriptar y desencriptar los secretos (`Secrets`) de Kubernetes.
+- `tokens`: Un `CR_PAT`, que permite acceder al Container Registry de GitHub, donde se encuentran las imágenes de Docker de la aplicación; y un `STATE_REPO`, necesario para poder actualizar el repositorio de estado y actualizar los recursos que se van a desplegar.
+
+## Prueba mínima
+
+Aquí se describen los requisitos de software y pasos a seguir para probar de la manera más simple la aplicación. Con esta prueba se comprobará que se pueden obtener los recursos de Kubernetes y levantar la aplicación en los diferentes entornos, pudiendo visualizar todos estos recursos en ArgoCD.
+
+Los elementos que van a influir en esta prueba serán: los clusters junto con sus configuraciones y las de ArgoCD, y el repositorio de estado, en el cual ya debería haber recursos preparados para desplegar.
+
+### Requisitos software
 
 A continuación se indica el software junto con las versiones utilizadas para el desarrollo del proyecto.
 
+> [!note]
+> **No** se ha probado en un sistema operativo Windows, por lo que no se asegura su funcionamiento en este.
+> Sí se ha probado en MacOS y distrybuciones Linux.
 
 | **Software** | **Version** | **Docs** |
 |---|---|---|
-| Git | 2.48.1 | https://git-scm.com/ |
-| Just | v1.39.0 | https://github.com/casey/just |
-| Docker | v27.5.1 (con `compose` habilitado) | https://www.docker.com/ |
-| Dagger | latest | https://dagger.io |
-| Kind | 0.27.0 | https://kind.sigs.k8s.io/ |
-| Helm | v3.17.3 | https://helm.sh/docs/ |
-| Helmfile | v1.1.0 | https://helmfile.readthedocs.io/en/latest/#installation |
-| Node (opcional) | 23.7.0 | https://nodejs.org/en |
-| Yarn (opcional) | 1.22.22 | https://yarnpkg.com/ |
-| npm (opcional) | 10.9.2 | https://www.npmjs.com/ |
-| Lerna (opcional) | v8.1.9 | https://lerna.js.org/ |
+| Git | 2.48.1 | https://git-scm.com/book/en/v2/Getting-Started-Installing-Git |
+| Just | v1.39.0 | https://github.com/casey/just?tab=readme-ov-file#installation |
+| Docker | v27.5.1 | https://docs.docker.com/desktop/ |
+| Kubectl | v1.33 | https://kubernetes.io/docs/tasks/tools/#kubectl |
+| Kind | 0.27.0 | https://kubernetes.io/docs/tasks/tools/#kind |
+| Helm | v3.17.3 | https://helm.sh/docs/intro/install/ |
 
+### Cómo probar
 
-### Variables de entorno
+1. Clonar este repositorio.
 
-Es necesario configurar el archivo `.env`. Para ello, se proporciona un `example.env` de ejemplo, el cual hay que renombrar a `.env`.
-
-```bash
-mv example.env .env
-```
-
-```env
-MONGO_DATABASE=<database_name>  # required
-MONGO_PORT=<container_port>     # optional (default: 27017)
-MONGO_PORT_HOST=<host_port>     # optional (default: 27017)
-MONGO_ROOT=<root_name>          # required
-MONGO_ROOT_PASS=<root_password> # required
-CR_PAT=                         # optional (para realizar acciones con el registry remoto)
-```
-
-## Cómo probarlo
-
-Primero hay que clonar el repositorio y acceder a él.
+Se clona el repositorio y se accede al directorio.
 
 ```bash
 git clone https://github.com/vieites-tfg/zoo ~/zoo
 cd ~/zoo
 ```
 
-### Con Dagger
+2. Clave privada
 
-Dagger es un software construido por los creadores de Docker. Permite ejecutar cualquier tipo de workflow de manera local utilizando contenedores, todo esto de manera programática, con cada vez más SDK para diferentes lenguajes. Es la herramienta más importante en este proyecto, ya que vamos a implementar un módulo de Dagger que permita realizar un ciclo completo de CI/CD, dando la posibilidad de levantar todo el entorno con Kubernetes, no solo con contenedores de Docker.
-
-Para probar la aplicación dummy con Dagger es necesario primeramente tener [instalado Dagger](https://docs.dagger.io/install) en su última versión.
-
-Una vez instalado, debemos movernos al directorio correspondiente al módulo de Dagger para esta aplicación:
+> [!warning]
+> Reservar únicamente para la entrega final de la memoria.
 
 ```bash
-cd dagger
+mkdir -p ./sops # crear el directorio en el caso de que no exista
+echo "AGE-SECRET-KEY-1CTS4S4QNNZ9N9YXXM288LSE9VKPJ220E57ZHC4558WMZ8LG2QWKQFFER8C" > ./sops/age.agekey
 ```
 
-Desde aquí podemos ejecutar cualquir comando de dagger.
+3. Ejecutar el script de creación de los entornos.
 
-1. Muestra las funciones disponibles:
+```bash
+./scripts/create_envs.sh
+```
+
+El script anterior:
+- Crea tres clusters (`dev`, `pre` y `pro`), con tres contextos diferentes (`kind-{{cluster}}`), con su propia configuración.
+- Introduce la clave privada, creada previamente, en cada uno de los clusters, para permitir a ArgoCD desencriptar los secretos.
+- Instala ArgoCD en cada uno de los clusters, con sus respectivas configuraciones, obteniendo cada uno los recursos de despliegue del entorno que le toca.
+
+4. Acceso a los clusters.
+
+A medida que se van creando los clusters, las contraseñas del usuario `admin` de Argo se van mostrando. También se muestran todas al finalizar la ejecución del script.
+
+Para poder acceder a cada uno de los clusters, lo primero que hay que hacer es mapear un puerto local libre al puerto 443 del servidor de Argo. Esto se consigue de la siguiente manera:
+
+```bash
+kubectl port-forward svc/argocd-server -n argocd --context kind-{{cluster}} 8086:443
+```
+
+En el anterior comando, hay que cambiar `{{cluster}}` por aquel al que se quiera acceder. Se podrá acceder a Argo a través del navegador en `localhost:8086`
+
+Se pide usuario y contraseña para entrar, que son `admin` y la contraseña de dicho cluster, mostrada en la salida del script que se ha ejecutado antes.
+
+5. Acceder a la aplicación. (opcional)
+
+Lo primero que hay que hacer es configurar los hosts del ordenador para que se resuelvan las rutas como `localhost`. Para ello se puede ejecutar el siguiente comando:
+
+```bash
+just check_hosts dev pre pro
+```
+
+El comando anterior modifica el archivo `/etc/hosts`, incluyendo las líneas nesecarias para poder resolver las rutas de acceso a la aplicación. Es necesario tener permisos de usuario o poner la contraseña de este en el caso de que se pida.
+
+Hay que tener en cuenta que cada entorno tiene su propio puerto, que son:
+- `dev`: 8080
+- `pre`: 8081
+- `pro`: 8082
+
+> [!note]
+> Los anteriores puertos se podrían modificar, pero sería necesario actualizar tanto las configuraciones de los clusters en `zoo/cluster` como los valores de los puertos del Ingress en el repositorio de estado `state` para cada uno de los entornos. Esto implicaría tener que hacer un nuevo despliegue con el fin de actualizar los valores en los propios recursos de Kubernetes. No sería necesario publicar nuevas imágenes.
+
+Ahora se puede acceder a la aplicación de gestión del zoo. a través de las siguientes rutas en el navegador:
+
+- *frontend*: `zoo-{{entorno}}.example.com:{{puerto_entorno}}`
+- *backend*: `api-zoo-{{entorno}}.example.com:{{puerto_entorno}}`
+
+### Conclusión
+
+Se comprueba que funciona el despliegue de la aplicación para cualquiera de los entornos. Esta configuración permite al desarrollador tener a su disposición cada una de las versiones y comprobar que el despliegue se realiza correctamente. El uso de ArgoCD y la capacidad de obtener los recursos de una única fuente de verdad hace de este flujo de despliegue algo esencial en cualquier equipo de desarrollo.
+
+Es necesario mencionar que, en entornos de producción reales, los clusters se encontrarían en la nube. Sin embargo, se podría mantener el cluster de desarrollo `dev`, con el fin de realizar implementaciones y probar su funcionamiento sin depender de herramientas remotas.
+
+A continuación se indica cómo probar los módulos de Dagger.
+
+## Prueba de Dagger
+
+En este caso se va mostrar cómo probar tanto los módulos de Dagger como el workflow completo de CI/CD, desde la simulación de implementación de una nueva característica en la aplicación, pasando por su despliegue en todos los entornos.
+
+### Requisitos de software
+
+Incluyendo los de la prueba anterior.
+
+| **Software** | **Version** | **Docs** |
+|---|---|---|
+| Dagger | latest | https://docs.dagger.io/install/ |
+| act | 0.2.79 | https://nektosact.com/installation/index.html |
+
+Para la simulación de una nueva *feature* se utilizar *act*, herramienta que permite ejecutar workflows de GitHub de manera local. Con ella se simulará el disparo de los eventos que hac que el workflow se ejecute, y se comportará de la misma manera que haría en remoto.
+
+### Cómo probar
+
+1. Creación de archivos `.env` y `.secrets.yaml`
+
+Es necesario modificar los archivos `example.env` y `example.secrets.yaml` con los datos pertinentes.
+
+Así quedarían los archivos:
+
+```bash
+# .env
+MONGO_DATABASE=zoo
+MONGO_ROOT=carer
+MONGO_ROOT_PASS=carerpass
+CR_PAT=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
+STATE_REPO=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
+```
+
+```yaml
+# .secrets.yaml
+MONGO_DATABASE: zoo
+MONGO_ROOT: carer
+MONGO_ROOT_PASS: carerpass
+CR_PAT: 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
+STATE_REPO: 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
+SOPS_CONFIG_FILE: |
+  creation_rules:
+      - path_regex: ".*\\\\.ya?ml$"
+        unencrypted_regex: "^(apiVersion|metadata|kind|type)$"
+        age: age15peyc7pedj8gjqwnarat6s3u87wy4j5xtf7t96vuj74m3l9xq5ys0r4sag
+SOPS_PRIVATE_KEY: AGE-SECRET-KEY-1CTS4S4QNNZ9N9YXXM288LSE9VKPJ220E57ZHC4558WMZ8LG2QWKQFFER8C
+```
+
+Se puede copiar el contenido anterior y pegarlo en su respectivo archivo. Posteriormente, hay que cambiar el nombre de estos, eliminando la parte de `example`.
+
+```bash
+mv example.env .env
+mv example.secrets.yaml .secrets.yaml
+```
+
+2. Prueba local del módulo de CI.
+
+El módulo de CI de Dagger se divide en funciones para *frontend* y para *backend*, por separado. Las funciones son las mismas para ambos, pero internamente se comportan diferente.
+
+Aquí se muestra un diagrama de la implementación de este módulo.
+
+![ci_schema](assets/ci_schema.png)
+
+En el diagrama se ve:
+- `CI`: La estructura principal, con cinco funciones, dos de las cuales permiten acceder a las estructuras de *frontend* y *backend*, por separado.
+- `Frontend` y `Backend`: Estructuras dedicadas, con implementación diferente para cada una de las funciones que proporcionan, que en este caso son las mismas para ambos.
+
+Para poder utilizar el comando `dagger`, es necesario estar en un directorio de trabajo en el que exista un módulo de Dagger, o bien proporcionarlo con la opción `-m`. Para facilitar la explicación, se ejecutarán los comandos desde el directorio correspondiente al módulo de CI.
+
+```bash
+cd dagger/ci
+```
+
+Se pueden obtener las funciones de `CI`, junto con los campos de la estructura, con el comando:
 
 ```bash
 dagger functions
 ```
 
-Veremos varias opciones, de las cuales nos interesan `backend` y `frontend`. Estas funciones incluyen lar acciones disponibles para cada uno de los paquetes, que en este caso son las mismas. Podemos verlas con estos comandos:
+Para conocer las funciones y campos de las demás estructuras se ejecuta:
 
 ```bash
 dagger call backend --help
 dagger call frontend --help
 ```
 
-2. Levantar la aplicación:
+`CI` tiene un parámetro requerido, que se trata del archivo `.env` que se ha creado anteriormente. A continuación se muestra cómo se ejecutarían los tests *end-to-end* de la aplicación, teniendo en cuenta que hay que encontrarse en el directorio del módulo y que el archivo `.env` se ha creado correctamente en la raíz del repositorio:
 
-Para ello debemos lanzar el backend por un lado y el frontend por otro. Primero ejecutamos el comando que levantará el backend de la aplicación.
+```bash
+dagger call --sec-env=file://../../.env endtoend
+```
+
+La primera vez que se ejecuta el comando anterior puede tardar alrededor de 10 minutos. Siempre dependiendo de la conexión a Internet que se tenga. La segunda vez, ese tiempo debería reducirse considerablemente, alrededor de un 40%, tardando así 6 minutos. Este tiempo puede reducirse más, a medida que se realizan ejecuciones del mismo, hasta alrededor de un 60% del tiempo inicial.
+
+Otro ejemplo sería, levantar el frontend y el backend y hacer que se comuniquen de manera local.
+
+```bash
+dagger call --sec-env=file://../../.env backend service up --ports 3010:3000
+dagger call --sec-env=file://../../.env frontend service up --ports 8090:80
+```
+
+Simplemente, ejecutando los comandos anteriores en terminales diferentes, los servicios serán capaces de comunicarse. Estos estarán disponibles en `localhost:{{puerto}}`. Para acceder a la API se añade la ruta `/animals`.
+
+En los comandos anteriores, `up` es una función del tipo Service, propio de Dagger, que se devuelve en la función `service`, como se muestra en el diagrama anteriro.`--ports` es un argumento de la función `up`.
+
+Otros ejemplos de comandos:
+
+```bash
+dagger call --sec-env=file://../../.env [backend|frontend] lint
+dagger call --sec-env=file://../../.env [backend|frontend] test
+dagger call --sec-env=file://../../.env [backend|frontend] publish-image --tag "{{tag}}"
+dagger call --sec-env=file://../../.env [backend|frontend] publish-pkg
+```
+
+3. Prueba local del módulo de CD.
+
+El módulo de CD tiene la siguiente implementación.
+
+![cd_schema](assets/cd_schema.png)
+
+La función principal de este módulo es `deploy`, que se encarga de:
+- Construir todos los recursos de Kubernetes, haciendo uso de los repositorios `helm-repository` y `state`.
+- Encriptar los secretos.
+- Subir los cambios al repositorio de estado.
+
+Para conseguir esto, se hace uso de [este módulo](https://daggerverse.dev/mod/github.com/prefapp/daggerverse/kind@42985961eb3d61fa98aa71d2f67922a933b5caa3), que permite crear un cluster de KinD.
 
 > [!note]
-> Siempre es necesario indicar el archivo .env, ya que es un requisito para lanzar la aplicación tener las variables mencionadas anteriormente definidas.
+> No se recomienda la ejecución en local de este módulo, pero se explica igual cómo se haría.
 
-Este comando habilita la API en la URL `localhost:3000/animals`. Para saber más échale un vistazo al [apartado sobre la API](#prueba-la-api)
-
-```bash
-# Terminal 1
-dagger --sec-env file://../.env call backend service up --ports 3000:3000
-```
-
-En otra terminal vamos a levantar el frontend con este comando:
+Para realizar un despliegue habría que ingresar al directorio del módulo y ejecutar el siguiente comando:
 
 ```bash
-# Terminal 2
-dagger --sec-env file://../.env call frontend service up --ports 8080:80
+cd ~/zoo/dagger/cd
+
+just deploy dev
+# just deploy pre
+# just deploy pro
+
+# lo anterior ejecuta:
+dagger call \
+    --socket=/var/run/docker.sock \
+    --kind-svc=tcp://localhost:3000 \
+    --config-file=file://../../cluster/kind_local.yaml \
+    launch \
+    --sec-env=file://../../.env \
+    --env={{env}} # <- cambiar {{env}} por "dev", "pre" o "pro" \
+    --age-key=file://../../sops/age.agekey \
+    --sops-config=file://../../sops/.sops.yaml
 ```
 
-> [!important]
-> El frontend debe levantarse siempre en el puerto 8080 para poder realizar lost test end-to-end.
+3. Prueba con `act`.
 
-El comando anterior nos permite acceder a la aplicación en la URL `localhost:8080`.
+`act` es una herramienta que permite ejecutar workflows de GitHub en local, pudiendo indicar el *trigger* que dispara el workflow. 
 
-De esta manera **ya tenemos levantada completamente nuestra aplicación**:
-- Una base de datos MongoDB.
-- Una API conectada a la base de datos.
-- Un frontend que consume dicha API.
+De esta manera, se puede probar cómo sería el flujo de ejecución en el caso de que se introdujera en la rama principal una nueva característica de la aplicación.
 
-3. Pasar test y linter.
+El workflow encargado de realizar las operaciones de CI y CD es el que se encuentra en `.github/workflows/cicd.yaml`.
 
-Podemos realizar esto mediante los siguientes comandos:
+La definición de los objetos del *trigger* `release` se encuentran en el directorio `.github/workflows/events`.
+
+Una vez se tenga `act` instalado, se puede iniciar la **promoción de entornos**.
+
+Antes de nada, para comprobar que se ha realizado el cambio, se realizarán los siguientes pasos para asegurarse de que las *tags* de la imagen de `dev` es nueva:
 
 ```bash
-# Backend
-dagger --sec-env file://../.env call backend lint
-dagger --sec-env file://../.env call backend test
-# Frontend
-dagger --sec-env file://../.env call frontend lint
-dagger --sec-env file://../.env call endtoend
+git switch -c environments-test
 ```
 
-También se pueden hacer los tests del frontend pasando un servicio como parámetro de la siguiente manera:
+El comando anterior creará una rama nueva con el nombre `environments-test`.
+
+Ahora se puede cambiar el título de la página web. Este se encuentra en el archivo `packages/frontend/src/components/MainTitle.vue`, de "Zoo" a algo como "Mi zoo".
+
+Se debe crear un *commit* para que la imagen use como *tag* los ocho primeros caracteres de este:
 
 ```bash
-dagger --sec-env file://../.env call frontend test --front=tcp://localhost:8080
+git add .
+git commit -m 'cambio de nombre'
 ```
 
-El comando anterior implica tener levantado el frontend en `localhost:8080`, y también estar conectado al backend. Es decir, la aplicación debe estar funcionando completamente.
+Así se utilizará el *commit* anterior para generar el nombre de la *tag* de las imágenes.
 
-> [!important]
-> Como se puede observar, para pasar los tests del frontend es necesario tener toda la aplicación levantada, tanto frontend como backend, ya que se tratan de tests end-to-end. Esto es porque hay que pasar como parámetro el servicio del frontend, el cual debe estar **obligatoriamente** disponible en el puerto 8080.
+#### dev
 
-4. Subir imágenes de Docker y paquetes npm al registro de GitHub.
-
-Para subir las imágenes de Docker, es necesario estar logueado en el registro, tal y como se indica en la [documentación de GitHub](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry).
-
-Aquí, para el frontend, también **es necesario tener levantada toda la aplicación**, ya que se pasa el linter y se ejecutan los tests previamente a publicar la imagen de Docker o el paquete npm, por si hubiera algún error.
+Ahora se puede subir todo al entorno de "dev", simulando un `push` (*trigger* por defecto de `act`) a la rama principal, como si el cambio anterior se hubiera realizado en una PR y si hubieran aprobado los cambios. Esto se puede hacer, desde la raíz del repositorio, con el siguiente comando:
 
 ```bash
-# Imágenes de Docker
-dagger --sec-env file://../.env call backend publish-image
-dagger --sec-env file://../.env call frontend publish-image --front tcp://localhost:8080
-# Imágenes de Docker
-dagger --sec-env file://../.env call backend publish-pkg
-dagger --sec-env file://../.env call frontend publish-pkg --front tcp://localhost:8080
+# se utiliza el archivo .secrets.yaml creado anteriormente
+act --secret-file .secrets.yaml
 ```
+
+Una vez terminada la ejecución, si se tiene levantado el cluster de `dev`, se debería poder sincronizar Argo. Para comprobar que se ha actualizado la imagen correctamente, se puede visualizar la *tag* que está en uso en el Deployment del frontend `zoo-dev-frontend`, y buscar el campo `spec.template.spec.containers.image`, en la pestaña de "*Live manifest*". Este campo debería contener la nueva imagen generada.
+
+También se puede entrar en la propia web, en `zoo-dev.example.com:8080`, para ver el nuevo título.
+
+#### pre
+
+Para pasar los cambios que se han realizado al entorno de `pre`, sería neceario crear una `pre-release`. Se va a simular su creación utilizando la configuración de dicho evento, que se encuentra en `.github/events/prerelease.json`.
+
+Lo mejor para comprobar que se actualiza correctamente, es cambiar el nombre de la `pre-release`, en el campo `name` del archivo del evento. Por ejemplo, `0.0.123-snapshot`.
+
+Con el siguiente comando se realizará la simulación:
+
+```bash
+act release --eventpath .github/events/prerelease.json --secret-file .secrets.yaml
+```
+
+El archivo de comprobación del recurso es, en este caso, `zoo-pre-frontend`, y el mismo campo que antes.
+
+La url sería `zoo-dev.example.com:8081`.
+
+#### pro
+
+Ahora, es necesario realizar algo parecido al paso anterior. Se modifica el archivo `.github/events/release.json`, y se pone el mismo `name` que anter, pero sin la coletilla `snapshot`, es decir, `0.0.123`.
+
+Se simula el cambio al entorno de `pro`.
+
+```bash
+act release --eventpath .github/events/release.json --secret-file .secrets.yaml
+```
+
+### Conclusión
+
+Se puede comprobar que el ciclo completo funciona correctamente, y la flexibilidad que da poder ejecutar los módulos de Dagger en local. Esto facilita el desarrollo de características nuevas para la aplicación sin miedo a que se produzca un fallo durante la ejecución del workflow de GitHub en la nube. Así, el resultado que va a dar la ejecución de dicho workflow ya se sabe de antemano, porque se ha probado de manera local, en un entorno controlado gracias a Docker. Por lo tanto, se sabe que este se va a comportar de la misma manera en cualquier otro sistema.
+
 
 ### Con Kubernetes
 

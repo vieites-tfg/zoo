@@ -104,7 +104,7 @@ func (m *Cd) Cluster(ctx context.Context) *dagger.Container {
 		WithExec([]string{"mkdir", "-p", "/app"})
 }
 
-func (m *Cd) Launch(
+func (m *Cd) Deploy(
 	ctx context.Context,
 
 	// `.env` file with the credentials to use the private images and the variables
@@ -242,8 +242,8 @@ func setEnvVariables(
 		return nil, err
 	}
 
-	lines := strings.Split(envContents, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(envContents, "\n")
+	for line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue

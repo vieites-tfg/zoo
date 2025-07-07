@@ -99,18 +99,21 @@ alias dc := delete_cluster
 delete_cluster:
   kind delete cluster -n {{cluster}}
 
-check_hosts ns:
+check_hosts +ns:
   #!/usr/bin/env bash
-  host=$(grep "zoo-{{ns}}" /etc/hosts | wc -l | xargs)
-  if [[ $host == "0" ]]
-  then
-    echo "127.0.0.1 zoo-{{ns}}.example.com" | sudo tee -a /etc/hosts
-  fi
-  host=$(grep "api-zoo-{{ns}}" /etc/hosts | wc -l | xargs)
-  if [[ $host == "0" ]]
-  then
-    echo "127.0.0.1 api-zoo-{{ns}}.example.com" | sudo tee -a /etc/hosts
-  fi
+  for n in {{ns}}
+  do
+    host=$(grep "zoo-$n" /etc/hosts | wc -l | xargs)
+    if [[ $host == "0" ]]
+    then
+        echo "127.0.0.1 zoo-$n.example.com" | sudo tee -a /etc/hosts
+    fi
+    host=$(grep "api-zoo-$n" /etc/hosts | wc -l | xargs)
+    if [[ $host == "0" ]]
+    then
+        echo "127.0.0.1 api-zoo-$n.example.com" | sudo tee -a /etc/hosts
+    fi
+  done
 
 launch_chart ns:
   just check_hosts {{ns}}

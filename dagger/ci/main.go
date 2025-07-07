@@ -110,6 +110,7 @@ func (m *Ci) Frontend(
 	}, nil
 }
 
+// Runs the linter and the tests for both the frontend and the backend.
 func (m *Ci) Endtoend(
 	ctx context.Context,
 	// +defaultPath="/"
