@@ -1,4 +1,4 @@
-\documentclass[12pt,twoside,a4paper]{book}
+\documentclass[12pt,oneside,a4paper]{book}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
@@ -68,6 +68,7 @@
   morestring=[b]"
 }
 \lstdefinelanguage{helm}{
+  alsoletter={.,/},
   keywords={
     apiVersion, metadata, name, namespace, annotations,
     spec, status, data, port, number,
@@ -77,14 +78,18 @@
     env, value, valueFrom, secretKeyRef, configMapKeyRef, key,
     resources, requests, limits, cpu, memory,
     volumeMounts, mountPath, readOnly, subPath,
-    volumes, persistentVolumeClaim, claimName, secret, secretName, configMap,
-    restartPolicy, terminationGracePeriodSeconds, activeDeadlineSeconds,
-    service, clusterIP, loadBalancerIP, externalIPs, sessionAffinity,
+    volumes, persistentVolumeClaim, claimName, secretName, configMap,
+    restartPolicy, service, clusterIP, loadBalancerIP,
+    externalIPs, sessionAffinity, servicePort, tls, stringData,
     rules, host, http, paths, path, pathType, backend, serviceName,
-    servicePort, tls, stringData,
     Values, Release, Chart, Files, Capabilities, Template,
     include, tpl, toYaml, fromYaml, nindent, quote, required,
-    networking, nodes, apiServerPort, extraPortMappings, role
+    networking, nodes, apiServerPort, extraPortMappings, role, project,
+    source, repoURL, targetRevision, destination, syncPolicy, automated,
+    prune, selfHeal, syncOptions, server, creation_rules, path_regex,
+    unencrypted_regex, generators, config.kubernetes.io/function, exec,
+    files, configs, cm, kustomize.buildOptions, ui.bannerpermanent, repoServer,
+    emptyDir
   },
   keywordstyle=\color{blue}\bfseries,
   identifierstyle=\color{black},
@@ -96,6 +101,9 @@
   moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}},
   literate={
     {kind:}{{{\textcolor{blue}{kind:}}}}5
+    {secret:}{{{\textcolor{blue}{secret:}}}}7
+    {age:}{{{\textcolor{blue}{age:}}}}4
+    {image:}{{{\textcolor{blue}{image:}}}}6
   }
 }
 
@@ -128,33 +136,27 @@
 
 \begin{document}
 \include{capitulos/titulo}
-\cleardoublepage
-% \include{capitulos/certificacion} % paxina de certificación (optativa)
-\cleardoublepage
-% \include{capitulos/agradecementos} % paxina de agradecementos (optativa) 
-\cleardoublepage
+\clearpage
 \include{capitulos/resumo} % páxina de resumo (optativa) 
 
-\cleardoublepage
-\pagestyle{plain}
 \tableofcontents
 \listoffigures
 \listoftables
 \lstlistoflistings
 
 % Agora incluimos os capítulos. Cambiamos a numeración e as cabeceiras
-\cleardoublepage
+\clearpage
 \pagenumbering{arabic}
 \setcounter{page}{1}
 \pagestyle{headings}
 \include{capitulos/introducion}
-\cleardoublepage
+\clearpage
 \include{capitulos/cap2}
-\cleardoublepage
+\clearpage
 \include{capitulos/cap3}
-\cleardoublepage
+\clearpage
 \include{capitulos/cap4}
-\cleardoublepage
+\clearpage
 \include{capitulos/exemplos}
 %
 % Engadir os capitulos que fagan falta
