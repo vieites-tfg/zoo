@@ -9,7 +9,7 @@ on:
 
 jobs:
   cicd:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout zoo repository
         uses: actions/checkout@v4
@@ -25,12 +25,6 @@ jobs:
 
       - name: Install Dagger
         uses: dagger/dagger-for-github@8.0.0
-
-      - name: Install yq
-        run: |
-          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
-          sudo chmod +x /usr/local/bin/yq
-          yq --version
 
       - name: Determine environment
         id: determine_env
