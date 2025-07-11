@@ -19,3 +19,4 @@ local_packages/
 *.fls
 *.fdb_latexmk
 *.synctex.gze
+*.synctex(busy)

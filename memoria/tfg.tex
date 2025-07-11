@@ -12,6 +12,7 @@
 \usepackage{listings}
 \usepackage{listingsutf8}
 \usepackage{enumitem}
+\usepackage[tikz]{bclogo}
 \usepackage{hyperref} % menús no pdf pero non leva ben co package galician
 
 \setlist{itemsep=1pt,topsep=1pt}
@@ -46,7 +47,7 @@
 \renewcommand*{\lstlistlistingname}{Índice de Listings}
 
 \lstdefinelanguage{Dockerfile}{
-  keywords={FROM, RUN, COPY, ADD, ENTRYPOINT, CMD,  ENV, ARG, WORKDIR, EXPOSE, LABEL, USER, VOLUME, STOPSIGNAL, ONBUILD, MAINTAINER, HEALTHCHECK},
+  keywords={FROM, RUN, COPY, ADD, ENTRYPOINT, CMD, ENV, ARG, WORKDIR, EXPOSE, LABEL, USER, VOLUME, STOPSIGNAL, ONBUILD, MAINTAINER, HEALTHCHECK},
   keywordstyle=\color{blue}\bfseries,
   identifierstyle=\color{black},
   comment=[l]{\#},
@@ -68,7 +69,7 @@
 }
 \lstdefinelanguage{helm}{
   keywords={
-    apiVersion, kind, metadata, name, namespace, labels, annotations,
+    apiVersion, metadata, name, namespace, annotations,
     spec, status, data, port, number,
     replicas, selector, matchLabels, template, strategy, type,
     containers, initContainers, image, imagePullPolicy, command, args,
@@ -82,7 +83,8 @@
     rules, host, http, paths, path, pathType, backend, serviceName,
     servicePort, tls, stringData,
     Values, Release, Chart, Files, Capabilities, Template,
-    include, tpl, toYaml, fromYaml, nindent, quote, required
+    include, tpl, toYaml, fromYaml, nindent, quote, required,
+    networking, nodes, apiServerPort, extraPortMappings, role
   },
   keywordstyle=\color{blue}\bfseries,
   identifierstyle=\color{black},
@@ -91,14 +93,19 @@
   stringstyle=\color{\greencolor}\ttfamily,
   morestring=[b]',
   morestring=[b]",
-  moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}}
+  moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}},
+  literate={
+    {kind:}{{{\textcolor{blue}{kind:}}}}5
+  }
 }
 
 \lstdefinelanguage{workflows}{
   % Palabras clave principales de GitHub Actions
+  alsoletter={-},
   keywords={
     name, on, jobs, runs-on, container, services, id,
-    steps, uses, run, with, permissions, push,
+    steps, uses, run, with, permissions, push, release,
+    workflow_dispatch,
   },
   keywordstyle=\color{blue}\bfseries,
   identifierstyle=\color{black},

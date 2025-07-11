@@ -77,12 +77,109 @@ Se detalla más profundamente su implementación en el capítulo \ref{chap:dagge
 
 La fase final del ciclo de una aplicación es el despliegue. En este trabajo se levantan tres \textit{clusters} de KinD de manera local. Estos son los lugares en los que se despliega la aplicación. Generalmente se tienen diferentes \textit{clusters} con el fin de probar la aplicación en entornos distintos antes de desplegarla en el principal, que sería el de producción. El hecho de crearlos todos localmente hace que sean más sencillas las pruebas relacionadas con el despliegue. En equipos de desarrollo reales, los entornos de producción se encuentran en la nube. Sin embargo, sí que se pueden llegar a tener entornos locales para realizar pruebas de la aplicación.
 
+Los \textit{clusters} se crean con el \textit{script} que se muestra en el Linting \ref{lst:create-clusters}. Se han puesto comentarios en vez de código algunas partes para reducir su tamaño, a modo de pseudocódigo. Estos son los pasos que se siguen para crear cada uno de los \textit{clusters}:
+
+\begin{enumerate}
+  \item Se indica el banner que va a tener cada uno de los \textit{clusters} (líneas 5-12).
+  \item Se indica el contexto actual (línea 14), lo cual identifica cada \textit{cluster}. Esto es necesario a la hora de ejecutar comandos con \texttt{kubectl}, para asegurarse de que se está ejecutando cada comando sobre el \textit{cluster} que se precisa.
+  \item Se crea el \textit{cluster} con su configuración específica.
+\end{enumerate}
+
+\begin{lstlisting}[language=bash,label=lst:create-clusters]{Script de creación de los clusters}
+# Variables globales
+# ---
+
+for ENV in "${ENVS[@]}"; do
+  case "${ENV}" in
+    dev)
+      BANNER_TEXT="We are in DEV";;
+    # ... otros entornos
+  esac
+
+  CONTEXT="kind-${ENV}"
+
+  echo "--- Creating cluster '${ENV}' ---"
+  kind create cluster --config "${CLUSTER_DIR}/kind_${ENV}.yaml"
+
+  echo "--- Installing Ingress Controller in cluster '${ENV}' ---"
+  kubectl apply -f "${INGRESS_MANIFEST}" --context "${CONTEXT}"
+  kubectl wait --namespace ingress-nginx \
+    --for=condition=ready pod \
+    --selector=app.kubernetes.io/component=controller \
+    --timeout=120s \
+    --context "${CONTEXT}"
+
+  kubectl create namespace argocd || true
+
+  echo "--- Applying SOPS AGE Key for ArgoCD ---"
+  cat "${SOPS_DIR}/age.agekey" |
+    kubectl create secret generic sops-age -n argocd --context ${CONTEXT} \
+    --from-file=keys.txt=/dev/stdin
+
+  echo "--- Installing ArgoCD in cluster '${ENV}' ---"
+  helm repo add argo https://argoproj.github.io/argo-helm
+  helm repo update
+  helm install argocd argo/argo-cd \
+    -n argocd \
+    -f argo/values.yaml \
+    --wait \
+    --version 6.11.1 \
+    --kube-context "${CONTEXT}"
+
+  kubectl wait --for=condition=Available deployment --all \
+    -n argocd --context "${CONTEXT}" --timeout=5m
+
+  echo "--- Applying ArgoCD application for '${ENV}' ---"
+  kubectl apply -f "${ARGO_DIR}/argo_${ENV}.yaml" --context "${CONTEXT}"
+  kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=argocd-server \
+    -n argocd --context "${CONTEXT}" --timeout=5m
+
+  echo "--- Applying ArgoCD UI banner for '${ENV}' ---"
+  kubectl patch configmap argocd-cm -n argocd --context "${CONTEXT}" --type merge \
+    -p "{\"data\":{\"ui.bannercontent\":\"${BANNER_TEXT}\"}}"
+
+  echo "--- Cluster '${ENV}' setup complete ---"
+  pass=$(kubectl -n argocd get secret argocd-initial-admin-secret \
+    -o jsonpath="{.data.password}" | base64 -d)
+
+  current_pass="${ENV} password: ${pass}\n"
+  printf "${current_pass}"
+  PASSWORDS+="${current_pass}"
+done
+
+echo "--- All environments created successfully! ---"
+printf "${PASSWORDS}"
+\end{lstlisting}
+
+\begin{lstlisting}[language=helm,label=lst:conf-cluster]{Configuracion del cluster de dev}
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: dev
+networking:
+  apiServerPort: 6443
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 8080
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 8443
+    protocol: TCP
+\end{lstlisting}
+
 Los \textit{clusters} que se utilizan son los siguientes:
 
 \begin{itemize}
   \item \texttt{dev}.
 
-    Se trata del \textit{cluster} de desarrollo. En este se despliega la aplicación en el momento en el que se añade una nueva funcionalidad a la aplicación, ya sea en el \textit{frontend} o en el \textit{backend}. Esto implica, en términos de GitHub:
+    Se trata del \textit{cluster} de desarrollo. En este se despliega la aplicación en el momento en el que se añade una nueva funcionalidad, ya sea en el \textit{frontend} o en el \textit{backend}. Esto implica, en términos de GitHub:
 
     \begin{enumerate}
       \item Crear una \textit{Pull Request} (PR) en la que se implementa la nueva funcionalidad. Esta debe ser siempre lo más reducida posible, cumpliendo con la filosofía de CI. Esto implica que la intención del equipo de desarrollo debe ser desplegar nuevas funcionalidades o correcciones de errores en producción en el menor tiempo posible. Se puede conseguir esto planeando PRs cortas en cuanto a tiempo de desarrollo, evitando que el equipo tenga demasiado trabajo en progreso y asignando los recursos necesarios para que cada PR se lleve a cabo lo más rápidamente\cite{linear}.
@@ -91,11 +188,30 @@ Los \textit{clusters} que se utilizan son los siguientes:
       \item Integrar la funcionalidad o corrección en la rama principal del repositorio.
     \end{enumerate}
 
-    Tras haber terminado todos los pasos anteriores, se ejecuta un \textit{workflow} de GitHub que realiza todo el ciclo de CI y CD. El workflow es el que se ve en el Linting  \ref{lst:workflowcicd}
+    Tras haber terminado todos los pasos anteriores, se ejecuta un \textit{workflow} de GitHub que realiza todo el ciclo de CI y CD, independientemente del entorno en el que se vaya a desplegar. El workflow es el que se ve en el Linting \ref{lst:workflowcicd}. En este se realizan los siguientes pasos:
 
-    \begin{lstlisting}[language=workflows,label=lst:workflowcicd]{Workflow de CI/CD para desplegar en ``dev''}
-name: Dagger CD
+    \begin{enumerate}
+      \item Se clonan los repositorios necesarios (líneas 12-15).
+      \item Se instala Dagger (líneas 17-18).
+      \item Se determina el entorno y la \textit{tag} que se le pondrá a la imagen de Docker de los paquetes de la aplicación (\textit{backend} y \textit{frontend}) (líneas 20-29). Esta \textit{tag} es diferente para cada entorno. En el entorno de \texttt{dev} se trata de los ocho primeros caracteres del último \textit{commit} que se ha realizado. De esta manera se sabe a ciencia cierta el código que conforma la aplicación en dicha imagen, y facilita la detección de errores. El entorno es \texttt{dev} siempre que el evento que haya disparado el \textit{workflow} sea un \textit{push} de la PR a la rama principal, en este caso \texttt{main}.
+      \item Se recrean los archivos necesarios con las variables almacenadas en GitHub (líneas 31-39). Se proporcionan estos archivos y datos en los manuales de usuario
+        \begin{bclogo}[logo=\bcattention]{Important!}
+          CITAR MANUALES DE USUARIO
+        \end{bclogo}
+        para su testeo en local.
+      \item Se ejecuta el ciclo de CI para ambos paquetes de la aplicación y se publica cada una de las imágenes, indicando la \textit{tag} que se ha determinado previamente (líneas 51-57). Además, es necesario actualizar los valores de las \textit{tags} en el repositorio de estado, el cual tiene un campo específico para indicar este dato (líneas 45-49).
+        \begin{bclogo}[logo=\bcattention]{Important!}
+          CITAR APARTADO EN EL QUE SE HABLA DE STATE
+        \end{bclogo}
+      \item Se ejecuta el ciclo de CD, aportando los parámetros necesarios, entre los que se encuentran los archivos que se han construido previamente (líneas 59-69).
+    \end{enumerate}
 
+    Finalmente, la instancia de ArgoCD instalada en el entorno se sincroniza con el repositorio, obtiene los recursos de Kubernetes que se han almacenado en este y despliega la aplicación.
+
+\end{itemize}
+
+
+\begin{lstlisting}[language=workflows,label=lst:workflowcicd]{Workflow de CI/CD}
 on:
   push:
     branches: [ main ]
@@ -107,122 +223,65 @@ jobs:
   cicd:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout zoo repository
-        uses: actions/checkout@v4
-        with:
-          path: zoo
+      - % Clona el repositorio "zoo" en la ruta "/zoo"
 
-      - name: Checkout state repository
-        uses: actions/checkout@v4
-        with:
-          repository: vieites-tfg/state
-          path: state
-          token: ${{ secrets.STATE_REPO }}
+      - % Clona el repositorio "state" en la ruta "/state"
+        % utilizando el token STATE_REPO
 
       - name: Install Dagger
         uses: dagger/dagger-for-github@8.0.0
 
-      - name: Install yq
-        run: |
-          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
-          sudo chmod +x /usr/local/bin/yq
-          yq --version
-
       - name: Determine environment
-        id: determine_env
+        id: env_tag
         run: |
-          cd "${GITHUB_WORKSPACE}/zoo"
+          % Determina el entorno en el que se despliega, teniendo
+          % en cuenta el *trigger* que ha lanzado el workflow:
+          %   - *push*    -> main
+          %   - *release* -> *release* o *pre-release*
 
-          tag=$(git rev-parse --short=8 HEAD) # default
-
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            envi="dev"
-          elif [[ "${{ github.event_name }}" == "release" ]]; then
-            if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
-              envi="pre"
-            else
-              envi="pro"
-            fi
-            tag="${{ github.event.release.name }}"
-          else
-            # Workflow dispatch
-            envi="dev"
-          fi
-
-          echo "Determined environment: ${envi}"
-          echo "Determined tag: ${tag}"
           echo "environment=${envi}" >> "$GITHUB_OUTPUT"
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
 
       - name: Recreate needed files
         run: |
-          cd "${GITHUB_WORKSPACE}/zoo"
-
-          # Create .env
-          echo "MONGO_DATABASE=${{ secrets.MONGO_DATABASE }}" > ./.env
-          echo "MONGO_ROOT=${{ secrets.MONGO_ROOT }}" >> ./.env
-          echo "MONGO_ROOT_PASS=${{ secrets.MONGO_ROOT_PASS }}" >> ./.env
+          % Recrea el archivo .env para tenerlo disponible en
+          % "zoo"
           echo "CR_PAT=${{ secrets.CR_PAT }}" >> ./.env
-          echo "STATE_REPO=${{ secrets.STATE_REPO }}" >> ./.env
+          % .... se incluyen todas las variables
 
-          # Create SOPS files
-          mkdir -p sops
-          echo "${{ secrets.SOPS_PRIVATE_KEY }}" > ./sops/age.agekey
-          cat <<EOF > ./sops/.sops.yaml
-          ${{ secrets.SOPS_CONFIG_FILE }}
-          EOF
+          % Almacena la clave privada de "age"
+          % Crea el archivo de configuracion de SOPS
 
       - name: Run Dagger CI module
         run: |
-          set -euo pipefail
+          tag=${{ steps.env_tag.outputs.tag }} 
 
           update_state () {
-            local env_path="${GITHUB_WORKSPACE}/state/${{ steps.determine_env.outputs.environment }}"
-            local pkg=$1
-            local tag=$2
-            
-            echo "Updating state for package '${pkg}' with tag '${tag}' in '${env_path}'"
-            
-            yq -i ".${pkg}.image.tag = \"${tag}\"" "${env_path}/${pkg}.yaml"
-
-            cd "${env_path}"
-            git config --global user.name "GitHub Actions Bot"
-            git config --global user.email "dvieitest@gmail.com"
-            git add .
-            git diff --staged --quiet || git commit -m "feat(${pkg}): update image to ${tag}"
-            git push
-
-            cd -
+            % Actualiza el valor en "state" de la *tag* de la
+            % imagen para que se despliegue la que se acaba de
+            % publicar
           }
 
-          cd "${GITHUB_WORKSPACE}/zoo/dagger/ci"
-
-          tag="${{ steps.determine_env.outputs.tag }}"
-
-          dagger call --sec-env=file://../../.env backend publish-image --tag "${tag}"
+          dagger call --sec-env=file://.env backend \
+              publish-image --tag "${tag}"
           update_state "zoo-backend" "${tag}"
 
-          dagger call --sec-env=file://../../.env frontend publish-image --tag "${tag}"
+          dagger call --sec-env=file://.env frontend \
+              publish-image --tag "${tag}"
           update_state "zoo-frontend" "${tag}"
 
       - name: Run Dagger CD module
         run: |
-          cd "${GITHUB_WORKSPACE}/zoo"
-
           dagger call -m "./dagger/cd" \
             --socket=/var/run/docker.sock \
             --kind-svc=tcp://localhost:3000 \
             --config-file=file://cluster/kind_local.yaml \
             deploy \
             --sec-env=file://.env \
-            --env=${{ steps.determine_env.outputs.environment }} \
+            --env=${{ steps.env_tag.outputs.environment }} \
             --age-key=file://sops/age.agekey \
             --sops-config=file://sops/.sops.yaml
-    \end{lstlisting}
-
-\end{itemize}
-
-
+\end{lstlisting}
 
 % Además, también se encuentran en este repositorio los módulos de Dagger de CI y de CD, y los \textit{scripts} y archivos de configuración necesarios para lanzar en local los \textit{clusters} de KinD que representan cada uno de los entornos en los que se despliega la aplicación. El hecho de que todo lo anterior se encuentre en un mismo repositorio hace mucho más sencilla su gestión.
 
