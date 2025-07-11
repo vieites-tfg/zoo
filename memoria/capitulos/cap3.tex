@@ -1,3 +1,229 @@
-\chapter{Deseño}
+\chapter{Diseño y arquitectura del sistema}
 
-Debe describirse como se realiza o Sistema, a división deste en diferentes compoñentes e a comunicación entre eles. Así mesmo, determinarase o equipamento hardware e software necesario, xustificando a súa elección no caso de que non fose un requisito previo. Debe achegarse a un nivel suficiente de detalle que permita comprender a totalidade da estrutura do produto desenvolvido, utilizando no posible representacións gráficas.
+\section{Estructura general}
+
+El código del trabajo y todo lo que abarca se encuentra almacenando en \href{https://github.com/orgs/vieites-tfg/repositories?type=source}{GitHub}. Se han creado los repositorios necesarios en una misma organización de GitHub.
+
+Entre los repositorios creados se pueden encontrar:
+
+\begin{itemize}
+  \item \texttt{zoo}.
+
+    Este es el repositorio principal. Se trata de un \textit{monorepo}, en el que se encuentra implementado todo el código necesario para la realización del trabajo. Dentro del repositorio se encuentran:
+    \begin{itemize}
+      \item La aplicación de prueba sobre la que se apoya el proyecto, y que da nombre al repositorio, debido a que se trata de una aplicación de gestión de un zoo.
+      \item Los módulos de Dagger para realizar los ciclos de CI y CD.
+      \item Otros archivos, como \textit{scripts} y archivos de configuración.
+    \end{itemize}
+
+  \item \texttt{helm-repository}.
+
+    Este repositorio alberga las Charts de Helm que definen la estructura necesaria para desplegar la aplicación de prueba.
+
+  \item \texttt{state}.
+
+    Se trata del repositorio en el que se almacenan los valores que poblarán los recursos de Kubernetes, dependiendo del entorno en los que se despliegue la aplicación. Además, en este repositorio también existe una rama de despliegue, de la cual ArgoCD lee los manifiestos de los recursos que debe desplegar para cada uno de los entornos.
+\end{itemize}
+
+En la figura~\ref{fig:ghorg} se muestra un diagrama de la disposición de los repositorios y la relación entre ellos.
+
+\begin{figure}
+  \centerline{\includegraphics[width=15cm]{figuras/vieites-tfg}}
+  \caption{Diagrama del la organización de GitHub}
+  \label{fig:ghorg}
+\end{figure}
+
+\section*{zoo}
+
+Como se ha comentado anteriormente, el repositorio \texttt{zoo} está estructurado como un \textit{monorepo}. Un \textit{monorepo} es un repositorio con diferentes proyectos, los cuales se encuentran interrelacionados de una manera bien definida. A lo largo de esta sección se justifica la elección de este tipo de estructura, a la vez que se explica cómo están implementados las diferentes piezas de software.
+
+\subsection*{Aplicación de prueba}
+
+La primera razón para escoger este tipo de estructura es el hecho de querer crear una aplicación relativamente pequeña, una página web que consta de un \textit{frontend} y un \textit{backend} (se hará referencia a estos como ``paquetes'' a partir de ahora). Por lo tanto, se hace más sencillo gestionar estos dos paquetes si viven juntos en un único repositorio.
+
+Otra ventaja de utilizar un \textit{monorepo} tiene que ver con el software utilizado para crear los paquetes de la aplicación de prueba. Ambos se implementan utilizando Node.js, en lenguaje Typescript\cite{ts}. Los paquetes tienen dependencias propias, y se puede dar el caso de que ambos utilicen una o varias dependencias iguales. Usar un \textit{monorepo} permite tener esas dependencias en un mismo lugar, evitando su duplicado. Con esto se consigue reducir el tiempo de construcción de los paquetes.
+
+Sin embargo, es necesaria una herramienta que permita manejar los paquetes de manera independiente. Alguno de los motivos para tener esta preferencia pueden ser: que haya dos equipos de desarrolladores, uno para cada paquete; o que se quiera publicar versiones, hacer tests, u otro tipo de tarea sobre cada paquete por separado. La herramienta que se utiliza en este trabajo se llama Lerna\cite{lerna}. Este software está específicamente diseñado para gestionar \textit{monorepos} de proyectos de Node.js. Entre las ventajas que proporciona se encuentran:
+
+\begin{itemize}
+  \item Gestión de tareas locales.
+  \item Cacheo local de salidas de comandos, con posibilidad de dicha caché sea compartida entre entornos, por ejemplo, con agentes de CI.
+  \item Detección de paquetes afectados por cambios en el código.
+  \item Análisis de la estructura del proyecto.
+\end{itemize}
+
+Por los beneficios anteriormente comentados, y más, es por lo que se ha elegido esta herramienta para gestionar el \textit{monorepo}.
+
+En cuanto a las tecnologías que se utilizan en la aplicación, ya se ha mencionado Typescript como lenguaje principal. Este lenguaje permite tener un sistema tipado, lo cual puede ser útil para detectar muchos errores comunes mediante el análisis estático en tiempo de construcción. Esto reduce las posibilidades de errores en tiempo de ejecución.
+
+El \textit{backend} está completamente desarrollado utilizando dicho lenguaje. Su funcionalidad es proporcionar una API REST que el \textit{frontend} pueda utilizar para realizar cambios en la base de datos. Se usa MongoDB\cite{mongodb} como base de datos debido a que es fácil de gestionar y porque solo se almacena información sobre animales, sin ningún tipo de relación entre ellos, en una única tabla o documento.
+
+El \textit{frontend} se ha implementado utilizando Vue.js\cite{vue}, un \textit{framework} que permite construir interfaces web mediante componentes reactivos. Se ha escogido este frente a otras opciones debido a su facilidad de uso sin conocimiento previo. Tiene una API intuitiva, por lo que no tiene una gran curva de apendizaje. Además, el propio \textit{framework} está construido utilizando Typescript, por lo que tiene compatibilidad de primera clase con este lenguaje.
+
+\subsection*{Módulos de Dagger}
+
+Se integran también en el repositorio los módulos de Dagger de CI y de CD. Estos módulos se incluyen en el \textit{monorepo} para facilitar la referencia a los paquetes que constituyen la aplicación de prueba. Además, tiene sentido que vivan en el mismo lugar una aplicación y las herramientas que permiten su evolución, como son cualquier tipo de software que realice las funciones de CI y de CD.
+
+Ambos módulos se realizan utilizando el SDK del lenguaje Go que proporciona Dagger. Se ha escogido este lenguaje debido al conocimiento previo que ya se tenía de este. Además, es el lenguaje en el que está implementado el propio Dagger.
+
+Uno de los módulos se encarga del ciclo de CI, es decir, de realizar los tests de la aplicación, del \textit{linting} o análisis del código en sí, y dela publicación de imágenes de Docker y paquetes NPM. Está organizado de manera que se pueden gestionar cada uno de los paquetes de la aplicación de manera independiente. Esto también es posible gracias al uso de Lerna, que ya se ha comentado anteriormente.
+
+El segundo de los módulos, el de CD, realiza la tarea de publicación de los recursos de Kubernetes, los cuales son posteriormente obtenidos por ArgoCD para su despliegue completo. Esto se consigue haciendo uso de los repositorios \texttt{helm-repository} y \texttt{state}, en los cuales se almacenan las Charts de Helm y los valores que pueblan dichas Charts, respectivamente.
+
+Se detalla más profundamente su implementación en el capítulo \ref{chap:dagger}.
+
+\subsection*{Creación y configuración de los \textit{clusters}}
+\label{subsec:clusters}
+
+La fase final del ciclo de una aplicación es el despliegue. En este trabajo se levantan tres \textit{clusters} de KinD de manera local. Estos son los lugares en los que se despliega la aplicación. Generalmente se tienen diferentes \textit{clusters} con el fin de probar la aplicación en entornos distintos antes de desplegarla en el principal, que sería el de producción. El hecho de crearlos todos localmente hace que sean más sencillas las pruebas relacionadas con el despliegue. En equipos de desarrollo reales, los entornos de producción se encuentran en la nube. Sin embargo, sí que se pueden llegar a tener entornos locales para realizar pruebas de la aplicación.
+
+Los \textit{clusters} que se utilizan son los siguientes:
+
+\begin{itemize}
+  \item \texttt{dev}.
+
+    Se trata del \textit{cluster} de desarrollo. En este se despliega la aplicación en el momento en el que se añade una nueva funcionalidad a la aplicación, ya sea en el \textit{frontend} o en el \textit{backend}. Esto implica, en términos de GitHub:
+
+    \begin{enumerate}
+      \item Crear una \textit{Pull Request} (PR) en la que se implementa la nueva funcionalidad. Esta debe ser siempre lo más reducida posible, cumpliendo con la filosofía de CI. Esto implica que la intención del equipo de desarrollo debe ser desplegar nuevas funcionalidades o correcciones de errores en producción en el menor tiempo posible. Se puede conseguir esto planeando PRs cortas en cuanto a tiempo de desarrollo, evitando que el equipo tenga demasiado trabajo en progreso y asignando los recursos necesarios para que cada PR se lleve a cabo lo más rápidamente\cite{linear}.
+      \item Implementar la funcionalidad o realizar la corrección pertinente. A medida que se implementa, se puede, y es una buena práctica, ejecutar localmente el ciclo de CI para asegurarnos de que se pasan las pruebas y el \textit{linting} del código. Esta es una de las ventajas principales de utilizar Dagger. El desarrollador puede comprobar de manera local si el código actualizado es capaz de pasar el \textit{pipeline} de CI, lo cual evita tener errores inesperados a la hora de integrar el código en la rama principal.
+      \item Revisar que la tarea que correspondía hacer en dicha PR se ha realizado correctamente.
+      \item Integrar la funcionalidad o corrección en la rama principal del repositorio.
+    \end{enumerate}
+
+    Tras haber terminado todos los pasos anteriores, se ejecuta un \textit{workflow} de GitHub que realiza todo el ciclo de CI y CD. El workflow es el que se ve en el Linting  \ref{lst:workflowcicd}
+
+    \begin{lstlisting}[language=workflows,label=lst:workflowcicd]{Workflow de CI/CD para desplegar en ``dev''}
+name: Dagger CD
+
+on:
+  push:
+    branches: [ main ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+jobs:
+  cicd:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout zoo repository
+        uses: actions/checkout@v4
+        with:
+          path: zoo
+
+      - name: Checkout state repository
+        uses: actions/checkout@v4
+        with:
+          repository: vieites-tfg/state
+          path: state
+          token: ${{ secrets.STATE_REPO }}
+
+      - name: Install Dagger
+        uses: dagger/dagger-for-github@8.0.0
+
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
+      - name: Determine environment
+        id: determine_env
+        run: |
+          cd "${GITHUB_WORKSPACE}/zoo"
+
+          tag=$(git rev-parse --short=8 HEAD) # default
+
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            envi="dev"
+          elif [[ "${{ github.event_name }}" == "release" ]]; then
+            if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+              envi="pre"
+            else
+              envi="pro"
+            fi
+            tag="${{ github.event.release.name }}"
+          else
+            # Workflow dispatch
+            envi="dev"
+          fi
+
+          echo "Determined environment: ${envi}"
+          echo "Determined tag: ${tag}"
+          echo "environment=${envi}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Recreate needed files
+        run: |
+          cd "${GITHUB_WORKSPACE}/zoo"
+
+          # Create .env
+          echo "MONGO_DATABASE=${{ secrets.MONGO_DATABASE }}" > ./.env
+          echo "MONGO_ROOT=${{ secrets.MONGO_ROOT }}" >> ./.env
+          echo "MONGO_ROOT_PASS=${{ secrets.MONGO_ROOT_PASS }}" >> ./.env
+          echo "CR_PAT=${{ secrets.CR_PAT }}" >> ./.env
+          echo "STATE_REPO=${{ secrets.STATE_REPO }}" >> ./.env
+
+          # Create SOPS files
+          mkdir -p sops
+          echo "${{ secrets.SOPS_PRIVATE_KEY }}" > ./sops/age.agekey
+          cat <<EOF > ./sops/.sops.yaml
+          ${{ secrets.SOPS_CONFIG_FILE }}
+          EOF
+
+      - name: Run Dagger CI module
+        run: |
+          set -euo pipefail
+
+          update_state () {
+            local env_path="${GITHUB_WORKSPACE}/state/${{ steps.determine_env.outputs.environment }}"
+            local pkg=$1
+            local tag=$2
+            
+            echo "Updating state for package '${pkg}' with tag '${tag}' in '${env_path}'"
+            
+            yq -i ".${pkg}.image.tag = \"${tag}\"" "${env_path}/${pkg}.yaml"
+
+            cd "${env_path}"
+            git config --global user.name "GitHub Actions Bot"
+            git config --global user.email "dvieitest@gmail.com"
+            git add .
+            git diff --staged --quiet || git commit -m "feat(${pkg}): update image to ${tag}"
+            git push
+
+            cd -
+          }
+
+          cd "${GITHUB_WORKSPACE}/zoo/dagger/ci"
+
+          tag="${{ steps.determine_env.outputs.tag }}"
+
+          dagger call --sec-env=file://../../.env backend publish-image --tag "${tag}"
+          update_state "zoo-backend" "${tag}"
+
+          dagger call --sec-env=file://../../.env frontend publish-image --tag "${tag}"
+          update_state "zoo-frontend" "${tag}"
+
+      - name: Run Dagger CD module
+        run: |
+          cd "${GITHUB_WORKSPACE}/zoo"
+
+          dagger call -m "./dagger/cd" \
+            --socket=/var/run/docker.sock \
+            --kind-svc=tcp://localhost:3000 \
+            --config-file=file://cluster/kind_local.yaml \
+            deploy \
+            --sec-env=file://.env \
+            --env=${{ steps.determine_env.outputs.environment }} \
+            --age-key=file://sops/age.agekey \
+            --sops-config=file://sops/.sops.yaml
+    \end{lstlisting}
+
+\end{itemize}
+
+
+
+% Además, también se encuentran en este repositorio los módulos de Dagger de CI y de CD, y los \textit{scripts} y archivos de configuración necesarios para lanzar en local los \textit{clusters} de KinD que representan cada uno de los entornos en los que se despliega la aplicación. El hecho de que todo lo anterior se encuentre en un mismo repositorio hace mucho más sencilla su gestión.
+
+% Debe describirse como se realiza o Sistema, a división deste en diferentes compoñentes e a comunicación entre eles. Así mesmo, determinarase o equipamento hardware e software necesario, xustificando a súa elección no caso de que non fose un requisito previo. Debe achegarse a un nivel suficiente de detalle que permita comprender a totalidade da estrutura do produto desenvolvido, utilizando no posible representacións gráficas.

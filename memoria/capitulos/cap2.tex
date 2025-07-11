@@ -2,7 +2,7 @@
 
 Antes de empezar a escribir código, se deben entender los conceptos fundamentales que permitirán llevar a cabo este trabajo.
 
-Lo que se intenta mejorar utilizando Dagger es el ciclo completo de CI/CD de una aplicación. Por lo tanto, es fundamental definir los conceptos de \textit{Continuous Integration} y el \textit{Continuous Delivery}. Una vez se comprenda a qué se refieren esos términos, se podrán entender los métodos y tecnologías convencionales que permiten implementar dichos procesos. Será entonces cuando se pueda introducir Dagger, un método innovador para realizar \textit{pipelines}.
+Dagger busca mejorar el ciclo completo de CI/CD de una aplicación. Por lo tanto, es fundamental definir los conceptos de \textit{Continuous Integration} y el \textit{Continuous Delivery}. Una vez se comprenda a qué se refieren esos términos, se podrán entender los métodos y tecnologías convencionales que permiten implementar dichos procesos. Será entonces cuando se pueda introducir Dagger, un herramienta innovadora para realizar \textit{pipelines}.
 
 \section{CI/CD}
 
@@ -27,20 +27,20 @@ Se trata de un conjunto de pasos automatizados, utilizados en el desarrollo de s
   \label{fig:ci}
 \end{figure}
 
-Se basa en la integración de código de manera constante, día a día, en un repositorio compartido por programadores. Cada uno de los programadores realiza cambios en el código y lo integra en el repositorio. Una vez se realizan cambios, estos deben pasar una serie de pruebas para que se incluyan definitivamente en el código fuente de la aplicación (Fig. \ref{fig:ci}).
+Se basa en la integración de código de manera constante, día a día, en un repositorio compartido por programadores. Cada uno de los programadores realiza cambios en el código y lo integra en el repositorio. Una vez se realizan cambios, estos deben pasar una serie de pruebas antes de poder ser incorporados de forma definitiva en el código fuente de la aplicación (Fig. \ref{fig:ci}).
 
-Desde hace años se utiliza un sistema de control de versiones para gestionar el código de cualquier proyecto. Este tipo de herramientas permite a un equipo controlar el estado del código en cada momento, siendo capaces de conocer el historial de los cambios realizados, saber quién ha hecho cada cambio y tener la capacidad de revertir alguna modificación en el caso de ser necesario. La herramienta de control de versiones más utilizada hoy en día, y la que se utiliza en este proyecto, es Git\cite{git}.
+Desde hace años se utilizan sistemas de control de versiones para gestionar el código de cualquier proyecto. Este tipo de herramientas permite a un equipo controlar el estado del código en cada momento, siendo capaces de conocer el historial de los cambios realizados, saber quién ha hecho cada cambio y tener la capacidad de revertir alguna modificación en el caso de ser necesario. La herramienta de control de versiones más utilizada hoy en día, y la que se utiliza en este proyecto, es Git\cite{git}.
 
-La integración de código en un repositorio no se trata simplemente de modificar una porción de un archivo y subirlo. El código debe ser probado antes de incluirlo completamente en el núcleo de la aplicación. Durante el proceso de integración continua, cada vez que se modifica algo de código, se debe:
+La integración de código en un repositorio no se trata simplemente de modificar una porción de un archivo y subirlo. El código debe ser probado antes de intregrarlo completamente en el núcleo de la aplicación. Durante el proceso de integración continua, cada vez que se modifica algo de código, se debe:
 
 \begin{itemize}
   \item Construir la aplicación.
   \item Pasar pruebas de funcionalidad.
-  \item Pasar a través de un análisis del propio código (\textit{linting}).
+  \item Pasar el \textit{linting} del propio código, es decir, verificar que el código cumpla ciertos estándares de estilo.
   \item Reportar cualquier error en el caso de que exista.
 \end{itemize}
 
-Todo lo anterior se debe realizar de manera automatizada, con el fin de integrar el código modificado en el repositorio lo más rápido posible.
+Todo lo anterior se debe realizar de manera automatizada, con el fin de integrar el código modificado en el repositorio lo más rápido posible, evitando en la medida de lo posible la intervención humana.
 
 \subsection*{\textit{Continuous Delivery}}
 
@@ -54,7 +54,7 @@ Tras haber construido la aplicación durante el proceso de integración continua
 
 Esto, evidentemente, tiene como requisito que la aplicación que se está construyendo tenga el despliegue como uno de los pasos en su ciclo de vida, lo cual no tiene por qué ser así. En este trabajo sí que ocurre, ya que la aplicación \textit{dummy} que se construye es una página web, junto con una API y una base de datos.
 
-Es necesario que exista relación entre los desarrolladores y los encargados de desplegar la aplicación. Sin embargo, hoy en día encontramos el rol DevOps\cite{devops} en muchas empresas, lo cual implica que la persona que ocupa este rol debe tener conocimiento tanto del desarrollo de la aplicación como del despliegue de la misma.
+Es necesario que exista relación entre los desarrolladores y los encargados de desplegar la aplicación. Sin embargo, hoy en día encontramos en muchas empresas un conjunto de metodologías conocidas como DevOps\cite{devops}, lo cual implica que ciertos integrantes de un equipo deben tener conocimiento tanto del desarrollo de la aplicación como del despliegue de la misma.
 
 Esta transición a la cultura DevOps permite a los equipos desplegar sus aplicaciones más fácilmente. Además, incluye la necesidad de que el despliegue sea una parte muy importante en el proceso de desarrollo.
 
@@ -66,7 +66,7 @@ Con el despliegue continuo podemos tener \textit{feedback} más rápido por part
 
 Basándose en la filosofía DevOps, mencionada antes, que abarca tanto el ciclo de CI como el de CD, existen un conjunto de prácticas en las que se utiliza Git como fuente de verdad para la gestión de la infraestructura y las aplicaciones. Esto es conocido como GitOps. Utilizar Git como la única fuente de información permite gestionar de manera consistente la infraestructura de las aplicaciones. Los cambios en un repositorio hacen que se ejecuten \textit{workflows}, o secuencias de acciones de CI/CD que implementan los cambios en el entorno correspondiente.
 
-La herramienta que realiza estas prácticas de GitOps, y que se utiliza en este trabajo, es ArgoCD. Argo es una herramienta que, como su nombre indica, facilida la entrega continua. Está diseañada específicamente para Kubernetes. Automatiza el despliegue de las aplicaciones, superevisando repositorios de Git para aplicar los cambios que se realizan en ellos automáticamente en el \textit{cluster}. Su uso permite no tener que realizar actualizaciones manuales en entornos de producción, y hace que el entorno siempre esté sincronizado con el código definido en el repositorio.
+La herramienta que realiza estas prácticas de GitOps, y que se utiliza en este trabajo, es ArgoCD. Argo es una herramienta que, como su nombre indica, facilida la entrega continua. Está diseñada específicamente para Kubernetes. Automatiza el despliegue de las aplicaciones, superevisando repositorios de Git para aplicar los cambios que se realizan en ellos automáticamente en el \textit{cluster}. Su uso permite no tener que realizar actualizaciones manuales en entornos de producción, y hace que el entorno siempre esté sincronizado con el código definido en el repositorio. Esto se consigue gracias al proceso de reconciliación que realiza Argo cada vez que detecta cambios en el repositorio que se le ha indicado.
 
 \section{Ecosistema de herramientas}
 
@@ -111,7 +111,7 @@ Un ejemplo muy típico de compilación de un programa escrito en \texttt{C} ser�
 
 \subsubsection*{Just}
 
-En este trabajo se utiliza una herramienta de construcción más nueva y polivalente llamada \texttt{just}\cite{just}. Este software tiene la misma finalidad que \texttt{make}, ejecutar comandos específicos de un proyecto. Pero este incluye muchas más funcionalidades, entre las cuales destacan:
+En este trabajo se utiliza una herramienta de construcción más moderna y polivalente llamada \texttt{just}\cite{just}. Este software tiene la misma finalidad que \texttt{make}, ejecutar comandos específicos de un proyecto. Pero este incluye muchas más funcionalidades, entre las cuales destacan:
 
 \begin{itemize}
   \item Poder pasar parámetros a las ``recetas'' (las ``reglas'' en \texttt{make}).
@@ -301,7 +301,7 @@ Los valores de las variables de entorno, los indicados como \texttt{\$\{variable
 
 Docker Compose no es una plataforma de producción, se utiliza únicamente con el fin de desarrollar localmente, y es muy útil en el caso de querer hacer pruebas rápidas de una aplicación sencilla. Se puede tomar como un precursor conceptual a la orquestación más compleja que realiza Kubernetes\ref{subsec:k8shelm}.
 
-\subsection*{Kubernetes \& Helm}
+\subsection*{Kubernetes, Helm \& KinD}
 \label{subsec:k8shelm}
 
 El proyecto Kubernetes nació un año después que Docker. Es una herramienta de software que permite orquestar contenedores. Permite gestionar el ciclo de vida de las aplicaciones en contenedores que viven en un \textit{cluster}. Entre sus características principales destacan:
@@ -392,6 +392,22 @@ spec:
                   number: {{ .Values.service.port }}
 \end{lstlisting}
 
+Para desplegar una aplicación de Kubernetes es necesario tener un \textit{cluster} preparado para soportar este tipo de recursos. Un \textit{cluster} de Kubernetes es un conjunto de máquinas o nodos que trabajan juntos con el fin de ejecutar y gestionar aplicaciones que corren dentro de contenedores. Para crear los \textit{clusters} en los que se desplega la aplicación se utiliza KinD\cite{kind}.
+
+KinD (\textit{Kubernetes in Docker}) permite crear \textit{clusters} de Kubernetes de manera local. Se utiliza esta herramienta debido a su sencillo uso. Simplemente utilizando el comando que se muestra en el Listing \ref{lst:kindcc} se puede construir un \textit{cluster} en el que desplegar cualquier aplicación de Kubernetes.
+
+\begin{lstlisting}[language=bash,label=lst:kindcc]{Comando para crear un cluster con KinD}
+kind create cluster
+\end{lstlisting}
+
+Para gestionar los propios recursos de Kubernetes que existen dentro del \textit{cluster} se utiliza la herramienta \texttt{kubectl}\cite{kubectl}. Se trata de un CLI oficial de Kubernetes que permite comunicarse con el controlador principal del \textit{cluster}, utilizando la API de Kubernetes. Un ejemplo de uso se pueden observar en el Listing \ref{lst:kubectl}
+
+\begin{lstlisting}[language=bash,label=lst:kubectl]{Aplicar la configuración de ArgoCD con kubectl}
+kubectl apply -f "argo/argo_dev.yaml" --context kind-dev
+\end{lstlisting}
+
+El uso de estas dos herramientas se ve más en detalle en la sección \ref{subsec:clusters}.
+
 \section{Dagger}
 
 \begin{figure}
@@ -402,7 +418,7 @@ spec:
 
 Dagger es el pilar fundamental de este trabajo. Se trata de un kit de desarrollo de software que permite a los desarrolladores crear \textit{pipelines} CI/CD, y ejecutarlos en cualquier sitio.
 
-La principal idea de los creadores de Dagger siempre ha sido poder crear \textit{pipelines} portables, que no sea necesario implementarlos de nuevo cada cierto tiempo debido a cambios en el entorno de desarrollo o de pruebas. Esta portabilidad se consigue utilizando cualquier \textit{runtime} de Docker para ejecutar las funciones que forman parte del SDK\cite{sdk} de Dagger, así como las que definen los propios desarrolladores. Además, desde el principio se ha evitado el uso de archivos YAML, que está siendo el lenguaje de configuración más utilizado por parte de la mayoría de aplicaciones.
+La principal idea de los creadores de Dagger siempre ha sido poder crear \textit{pipelines} portables, que no sea necesario implementarlos de nuevo cada cierto tiempo debido a cambios en el entorno de desarrollo o de pruebas. Esta portabilidad se consigue permitiendo a los desarrolladores utilizar cualquier \textit{runtime} de OCI (\textit{Open Container Initiative}\cite{oci}) para ejecutar las funciones que forman parte del SDK\cite{sdk} de Dagger, así como las que definen los propios desarrolladores. Además, desde el principio se ha evitado el uso de archivos YAML, que está siendo el lenguaje de configuración más utilizado por parte de la mayoría de aplicaciones.
 
 \subsubsection*{CUE}
 

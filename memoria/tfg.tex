@@ -94,7 +94,30 @@
   moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}}
 }
 
-% \includeonly{capitulos/introducion}
+\lstdefinelanguage{workflows}{
+  % Palabras clave principales de GitHub Actions
+  keywords={
+    name, on, jobs, runs-on, container, services, id,
+    steps, uses, run, with, permissions, push,
+  },
+  keywordstyle=\color{blue}\bfseries,
+  identifierstyle=\color{black},
+  % Comentarios en YAML con '#'
+  comment=[l]{\#},
+  commentstyle=\color{gray}\ttfamily,
+  % Cadenas tal como en docker-compose
+  stringstyle=\color{\greencolor}\ttfamily,
+  morestring=[b]',
+  morestring=[b]",
+  % Resaltar expresiones entre {{ ... }} de posibles plantillas
+  moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}},
+  % Si quieres resaltar valores booleanos y números:
+  morekeywords={true,false,null},
+  keywordstyle=[2]\color{blue},
+  sensitive=true,
+}
+
+% \includeonly{capitulos/cap2}
 
 \begin{document}
 \include{capitulos/titulo}
