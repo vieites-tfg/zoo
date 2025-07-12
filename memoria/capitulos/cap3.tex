@@ -28,8 +28,8 @@ Entre los repositorios creados se pueden encontrar:
 En la figura~\ref{fig:ghorg} se muestra un diagrama de la disposición de los repositorios y la relación entre ellos.
 
 \begin{figure}
-  \centerline{\includegraphics[width=15cm]{figuras/vieites-tfg}}
-  \caption{Diagrama del la organización de GitHub}
+  \centerline{\includegraphics[width=14cm]{figuras/vieites-tfg}}
+  \caption{Diagrama del la organización de GitHub. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
   \label{fig:ghorg}
 \end{figure}
 
@@ -38,6 +38,12 @@ En la figura~\ref{fig:ghorg} se muestra un diagrama de la disposición de los re
 Como se ha comentado anteriormente, el repositorio \texttt{zoo} está estructurado como un \textit{monorepo}. Un \textit{monorepo} es un repositorio con diferentes proyectos, los cuales se encuentran interrelacionados de una manera bien definida. A lo largo de esta sección se justifica la elección de este tipo de estructura, a la vez que se explica cómo están implementados las diferentes piezas de software.
 
 \subsection*{Aplicación de prueba}
+
+\begin{figure}
+  \centerline{\includegraphics[width=15cm]{figuras/app}}
+  \caption{Comunicación entre paquetes de la aplicación. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
+  \label{fig:app}
+\end{figure}
 
 La primera razón para escoger este tipo de estructura es el hecho de querer crear una aplicación relativamente pequeña, una página web que consta de un \textit{frontend} y un \textit{backend} (se hará referencia a estos como ``paquetes'' a partir de ahora). Por lo tanto, se hace más sencillo gestionar estos dos paquetes si viven juntos en un único repositorio.
 
@@ -60,6 +66,8 @@ El \textit{backend} está completamente desarrollado utilizando dicho lenguaje. 
 
 El \textit{frontend} se ha implementado utilizando Vue.js\cite{vue}, un \textit{framework} que permite construir interfaces web mediante componentes reactivos. Se ha escogido este frente a otras opciones debido a su facilidad de uso sin conocimiento previo. Tiene una API intuitiva, por lo que no tiene una gran curva de apendizaje. Además, el propio \textit{framework} está construido utilizando Typescript, por lo que tiene compatibilidad de primera clase con este lenguaje.
 
+En la figura \ref{fig:app} se puede ver un diagrama que muestra cómo es la comunicación entre los paquetes de la aplicación, y con la base de datos, junto con las tecnologías que se utiliza en cada uno de ellos.
+
 \subsection*{Módulos de Dagger}
 
 Se integran también en el repositorio los módulos de Dagger de CI y de CD. Estos módulos se incluyen en el \textit{monorepo} para facilitar la referencia a los paquetes que constituyen la aplicación de prueba. Además, tiene sentido que vivan en el mismo lugar una aplicación y las herramientas que permiten su evolución, como son cualquier tipo de software que realice las funciones de CI y de CD.
@@ -77,27 +85,7 @@ Se detalla más profundamente su implementación en el capítulo \ref{chap:dagge
 
 La fase final del ciclo de una aplicación es el despliegue. En este trabajo se levantan tres \textit{clusters} de KinD de manera local. Estos son los lugares en los que se despliega la aplicación. Generalmente se tienen diferentes \textit{clusters} con el fin de probar la aplicación en entornos distintos antes de desplegarla en el principal, que sería el de producción. El hecho de crearlos todos localmente hace que sean más sencillas las pruebas relacionadas con el despliegue. En equipos de desarrollo reales, los entornos de producción se encuentran en la nube. Sin embargo, sí que se pueden llegar a tener entornos locales para realizar pruebas de la aplicación.
 
-Los \textit{clusters} se crean con el \textit{script} que se muestra en el Listing \ref{lst:create-clusters}. Se han puesto comentarios en vez de código algunas partes para reducir su tamaño, a modo de pseudocódigo. Estos son los pasos que se siguen para crear cada uno de los \textit{clusters}:
-
-\begin{enumerate}
-  \item Se indica el banner que va a tener cada uno de los \textit{clusters} (líneas 5-9).
-  \item Se indica el contexto actual (línea 11), lo cual identifica cada \textit{cluster}. Esto es necesario a la hora de ejecutar comandos con \texttt{kubectl}, para asegurarse de que se está ejecutando cada comando sobre el \textit{cluster} que se precisa.
-  \item Se crea el \textit{cluster} con su configuración específica (línea 13). Se puede ver el archivo de configuración del \textit{cluster} de \texttt{dev} en el Listing \ref{lst:conf-cluster}. Los archivos de los demás entornos son iguales a este, solo difieren en los puertos que se utilizan.
-  \item Se instala el controlador de Ingress (líneas 15-16), lo cual permitirá acceder a la aplicación a través de una URL customizada desde el exterior.
-  \item Se crea el \textit{namespace} en el que se va a instalar la instancia de ArgoCD (línea 18).
-  \item Se crea un secreto en el que se almacena el valor de la clave de cifrado de los secretos de Kubernetes (líneas 20-22). El proceso de creación de cifrado y descifrado se explica en
-    \begin{bclogo}[logo=\bcattention]{Important!}
-      CITAR APARTADO EN EL QUE SE HABLA DE SOPS
-    \end{bclogo}
-  \item Se instala la Chart de Helm de Argo y se espera a que esté disponible (líneas 24-29). A la Chart se le pasan una serie de valores, de los cuales se habla en \ref{subsec:secretos}. Una vez instalado, se podrá acceder a ArgoCD de manera local. Para ello será necesario crear un ``túnel'' de un puerto libre local al puerto 443 del servicio principal de Argo. Esto se explica también en el
-    \begin{bclogo}[logo=\bcattention]{Important!}
-      CITAR MANUAL DE USUARIO
-    \end{bclogo}
-  \item Se aplica la configuración específica de Argo para el entorno que se está creando (líneas 31-33). Se puede ver la configuración para Argo en el entorno de \texttt{dev} en el Listing \ref{lst:conf-argo}. Lo más importante de esta configuración se encuentra en las líneas 9-11, en las cuales se indica el repositorio (\texttt{repoURL}), la ruta desde la raíz (el directorio \texttt{dev}) y la rama (\texttt{targetRevision}) de donde Argo debe obtener los archivos que definen recursos que se van a desplegar.
-  \item Se modifica el ConfigMap de Argo para que muestre el banner en la interfaz (línea 35).
-  \item Se comprueba la contraseña inicial que tiene el usuario \texttt{admin} y se muestra por pantalla (líneas 37-39). Estas son las credenciales que hay que utilizar para poder hacer \textit{log in} en la interfaz de Argo. Por lo tanto, se muestran directamente por pantalla a medida que se van creando los \textit{clusters} y tras la creación de todos ellos (línea 42).
-
-\end{enumerate}
+Los \textit{clusters} se crean con el \textit{script} que se muestra en el Listing \ref{lst:create-clusters}. Este \textit{script} está escrito para funcionar en sistemas UNIX, en Bash, por lo que es un requisito utilizar un sistema operativo como MacOS o una distribución de Linux. No funcionará en un sistema operativo Windows. Se han puesto comentarios en vez de código algunas partes para reducir su tamaño, a modo de pseudocódigo. Estos son los pasos que se siguen para crear cada uno de los \textit{clusters}:
 
 \begin{lstlisting}[language=bash,label=lst:create-clusters]{Script de creación de los clusters}
 # Variables globales
@@ -144,6 +132,10 @@ done
 printf "${PASSWORDS}"
 \end{lstlisting}
 
+\begin{enumerate}
+  \item Se indica el banner que va a tener cada uno de los \textit{clusters} (líneas 5-9).
+  \item Se indica el contexto actual (línea 11), lo cual identifica cada \textit{cluster}. Esto es necesario a la hora de ejecutar comandos con \texttt{kubectl}, para asegurarse de que se está ejecutando cada comando sobre el \textit{cluster} que se precisa.
+  \item Se crea el \textit{cluster} con su configuración específica (línea 13). Se puede ver el archivo de configuración del \textit{cluster} de \texttt{dev} en el Listing \ref{lst:conf-cluster}. Los archivos de los demás entornos son iguales a este, solo difieren en los puertos que se utilizan.
 \begin{lstlisting}[language=helm,label=lst:conf-cluster]{Configuración del cluster de dev}
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -166,7 +158,17 @@ nodes:
     hostPort: 8443
     protocol: TCP
 \end{lstlisting}
-
+  \item Se instala el controlador de Ingress (líneas 15-16), lo cual permitirá acceder a la aplicación a través de una URL customizada desde el exterior.
+  \item Se crea el \textit{namespace} en el que se va a instalar la instancia de ArgoCD (línea 18).
+  \item Se crea un secreto en el que se almacena el valor de la clave de cifrado de los secretos de Kubernetes (líneas 20-22). El proceso de creación de cifrado y descifrado se explica en
+    \begin{bclogo}[logo=\bcattention]{Important!}
+      CITAR APARTADO EN EL QUE SE HABLA DE SOPS
+    \end{bclogo}
+  \item Se instala la Chart de Helm de Argo y se espera a que esté disponible (líneas 24-29). A la Chart se le pasan una serie de valores, de los cuales se habla en \ref{subsec:secretos}. Una vez instalado, se podrá acceder a ArgoCD de manera local. Para ello será necesario crear un ``túnel'' de un puerto libre local al puerto 443 del servicio principal de Argo. Esto se explica también en el
+    \begin{bclogo}[logo=\bcattention]{Important!}
+      CITAR MANUAL DE USUARIO
+    \end{bclogo}
+  \item Se aplica la configuración específica de Argo para el entorno que se está creando (líneas 31-33). Se puede ver la configuración para Argo en el entorno de \texttt{dev} en el Listing \ref{lst:conf-argo}. Lo más importante de esta configuración se encuentra en las líneas 9-11, en las cuales se indica el repositorio (\texttt{repoURL}), la ruta desde la raíz (el directorio \texttt{dev}) y la rama (\texttt{targetRevision}) de donde Argo debe obtener los archivos que definen recursos que se van a desplegar.
 \begin{lstlisting}[language=helm,label=lst:conf-argo]{Configuración de Argo en dev}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -189,6 +191,17 @@ spec:
     syncOptions:
       - CreateNamespace=true
 \end{lstlisting}
+  \item Se modifica el ConfigMap de Argo para que muestre el banner en la interfaz (línea 35).
+  \item Se comprueba la contraseña inicial que tiene el usuario \texttt{admin} y se muestra por pantalla (líneas 37-39). Estas son las credenciales que hay que utilizar para poder hacer \textit{log in} en la interfaz de Argo. Por lo tanto, se muestran directamente por pantalla a medida que se van creando los \textit{clusters} y tras la creación de todos ellos (línea 42).
+\end{enumerate}
+
+En la figura \ref{fig:clusters} se puede observar cómo se sincroniza ArgoCD, en cada uno de los \textit{clusters}, con el repositorio de estado. Argo reacciona cada vez que se realizan cambios en el directorio que le corresponde, dentro de la rama de despliegue del repositorio \texttt{state}. En ese momento, obtiene de nuevo todos los archivos de definición de los recursos y se sincroniza con el estado deseado.
+
+\begin{figure}
+  \centerline{\includegraphics[width=15cm]{figuras/clusters}}
+  \caption{Clusters y comunicación con el repositorio de estado. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
+  \label{fig:clusters}
+\end{figure}
 
 \subsection*{Gestión de secretos}
 \label{subsec:secretos}
@@ -317,6 +330,14 @@ repoServer:
 
 Los archivos: \texttt{kustomization.yaml}, \texttt{secret\_generator.yaml}, \texttt{secrets.yaml} y \texttt{non-secrets.yaml}; todos ellos son los ficheros que se disponen en la rama de despliegue \texttt{deploy} del repositorio \texttt{state}. Por lo tanto, son los archivos que ArgoCD obtiene y utiliza para desplegar toda la aplicación en los distintos entornos.
 
+En la figura \ref{fig:secrets} se puede ver el ciclo completo de encriptado y desencriptado de secretos
+
+\begin{figure}
+  \centerline{\includegraphics[width=13.5cm]{figuras/secrets}}
+  \caption{Clusters y comunicación con el repositorio de estado. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
+  \label{fig:secrets}
+\end{figure}
+
 \subsection*{Función de cada \textit{cluster} y promoción de entornos}
 
 A continuación se explica para qué se utiliza cada \textit{cluster} y cuál es el proceso de despliegue de la aplicación en cada uno de los entornos.
@@ -334,51 +355,6 @@ A continuación se explica para qué se utiliza cada \textit{cluster} y cuál es
     \end{enumerate}
 
     Tras haber terminado todos los pasos anteriores, se ejecuta un \textit{workflow} de GitHub que realiza todo el ciclo de CI y CD, independientemente del entorno en el que se vaya a desplegar. El workflow es el que se ve en el Listing \ref{lst:workflowcicd}. En este se realizan los siguientes pasos:
-
-    \begin{enumerate}
-      \item Se clonan los repositorios necesarios (líneas 12-15).
-      \item Se instala Dagger (líneas 17-18).
-      \item Se determina el entorno y la \textit{tag} que se le pondrá a la imagen de Docker de los paquetes de la aplicación (\textit{backend} y \textit{frontend}) (líneas 20-29). Esta \textit{tag} es diferente para cada entorno. En el entorno de \texttt{dev} se trata de los ocho primeros caracteres del último \textit{commit} que se ha realizado. De esta manera se sabe a ciencia cierta el código que conforma la aplicación en dicha imagen, y facilita la detección de errores. El entorno es \texttt{dev} siempre que el evento que haya disparado el \textit{workflow} sea un \textit{push} de la PR a la rama principal, en este caso \texttt{main}.
-      \item Se recrean los archivos necesarios con las variables almacenadas en GitHub (líneas 31-39). Se proporcionan estos archivos y datos en los manuales de usuario
-        \begin{bclogo}[logo=\bcattention]{Important!}
-          CITAR MANUALES DE USUARIO
-        \end{bclogo}
-        para su testeo en local.
-      \item Se ejecuta el ciclo de CI para ambos paquetes de la aplicación y se publica cada una de las imágenes, indicando la \textit{tag} que se ha determinado previamente (líneas 51-57). Además, es necesario actualizar los valores de las \textit{tags} en el repositorio de estado, el cual tiene un campo específico para indicar este dato (líneas 45-49).
-        \begin{bclogo}[logo=\bcattention]{Important!}
-          CITAR APARTADO EN EL QUE SE HABLA DE STATE
-        \end{bclogo}
-      \item Se ejecuta el ciclo de CD, aportando los parámetros necesarios, entre los que se encuentran los archivos que se han construido previamente (líneas 59-69).
-    \end{enumerate}
-
-    Finalmente, la instancia de ArgoCD instalada en el entorno se sincroniza con el repositorio, obtiene los recursos de Kubernetes que se han almacenado en este y despliega la aplicación.
-
-  \item \texttt{pre}
-
-    Este es el entorno de pre-producción. Este tipo de entornos están diseñados para simular el entorno de producción real, y funciona como prueba final previa a la publicación de una aplicación de manera pública. En el caso de este trabajo, como ya se ha comentado, todos los entornos son idénticos, pero en equipos y entornos reales, cada uno de ellos tiene características distintas.
-
-    Diferencias con respecto al entorno de \texttt{dev}:
-
-    \begin{itemize}
-      \item Se publica la imagen y los recursos en este entorno siempre que el evento que lanza el \textit{workflow} sea la creación de una \textit{prerelease}.
-      \item La \textit{tag} que se utiliza es la que se le pone al nombre de la \textit{prerelease}. Esta debería tener formato SemVer\cite{semver} con una coletilla \textit{snapshot} (e.j. \texttt{1.2.3-snapshot}. Se utiliza esta coletilla con el fin de dar a entender que dicha imagen es una copia o ``captura'' de lo que sería la versión final de la imagen, la que se publicaría en el entorno de producción.
-    \end{itemize}
-
-    Los pasos que se realizan en el \textit{workflow} son los mismos, solo cambian los elementos que se acaban de indicar.
-
-  \item \texttt{pro}
-
-    Finalmente, el entorno de producción. Aquí es donde se despliega la aplicación de manera abierta a los usuarios. Como se lleva insistiendo a lo largo de este capítulo, lo normal es que estos entornos se encuentren en la nube. Para facilidad de pruebas y debido a que no es la finalidad de este trabajo, se ha decidido crear todos los \textit{clusters} de forma local.
-
-    Cambios en este entorno con respecto a los anteriores:
-
-    \begin{itemize}
-      \item Se despliega la aplicación en él cuando el evento que lanza el \textit{workflow} no es una \textit{prerelease}, sino una \textit{release}.
-      \item Al igual que en \texttt{pre}, la \textit{tag} sigue el formato SemVer, pero en este caso sin la coletilla que se usaba antes (e.j. \texttt{1.2.3}).
-    \end{itemize}
-
-\end{itemize}
-
 
 \begin{lstlisting}[language=workflows,label=lst:workflowcicd]{Workflow de CI/CD}
 on:
@@ -451,6 +427,58 @@ jobs:
             --age-key=file://sops/age.agekey \
             --sops-config=file://sops/.sops.yaml
 \end{lstlisting}
+
+    \begin{enumerate}
+      \item Se clonan los repositorios necesarios (líneas 12-15).
+      \item Se instala Dagger (líneas 17-18).
+      \item Se determina el entorno y la \textit{tag} que se le pondrá a la imagen de Docker de los paquetes de la aplicación (\textit{backend} y \textit{frontend}) (líneas 20-29). Esta \textit{tag} es diferente para cada entorno. En el entorno de \texttt{dev} se trata de los ocho primeros caracteres del último \textit{commit} que se ha realizado. De esta manera se sabe a ciencia cierta el código que conforma la aplicación en dicha imagen, y facilita la detección de errores. El entorno es \texttt{dev} siempre que el evento que haya disparado el \textit{workflow} sea un \textit{push} de la PR a la rama principal, en este caso \texttt{main}.
+      \item Se recrean los archivos necesarios con las variables almacenadas en GitHub (líneas 31-39). Se proporcionan estos archivos y datos en los manuales de usuario
+        \begin{bclogo}[logo=\bcattention]{Important!}
+          CITAR MANUALES DE USUARIO
+        \end{bclogo}
+        para su testeo en local.
+      \item Se ejecuta el ciclo de CI para ambos paquetes de la aplicación y se publica cada una de las imágenes, indicando la \textit{tag} que se ha determinado previamente (líneas 51-57). Además, es necesario actualizar los valores de las \textit{tags} en el repositorio de estado, el cual tiene un campo específico para indicar este dato (líneas 45-49).
+        \begin{bclogo}[logo=\bcattention]{Important!}
+          CITAR APARTADO EN EL QUE SE HABLA DE STATE
+        \end{bclogo}
+      \item Se ejecuta el ciclo de CD, aportando los parámetros necesarios, entre los que se encuentran los archivos que se han construido previamente (líneas 59-69).
+    \end{enumerate}
+
+    Finalmente, la instancia de ArgoCD instalada en el entorno se sincroniza con el repositorio, obtiene los recursos de Kubernetes que se han almacenado en este y despliega la aplicación.
+
+  \item \texttt{pre}
+
+    Este es el entorno de pre-producción. Este tipo de entornos están diseñados para simular el entorno de producción real, y funciona como prueba final previa a la publicación de una aplicación de manera pública. En el caso de este trabajo, como ya se ha comentado, todos los entornos son idénticos, pero en equipos y entornos reales, cada uno de ellos tiene características distintas.
+
+    Diferencias con respecto al entorno de \texttt{dev}:
+
+    \begin{itemize}
+      \item Se publica la imagen y los recursos en este entorno siempre que el evento que lanza el \textit{workflow} sea la creación de una \textit{prerelease}.
+      \item La \textit{tag} que se utiliza es la que se le pone al nombre de la \textit{prerelease}. Esta debería tener formato SemVer\cite{semver} con una coletilla \textit{snapshot} (e.j. \texttt{1.2.3-snapshot}. Se utiliza esta coletilla con el fin de dar a entender que dicha imagen es una copia o ``captura'' de lo que sería la versión final de la imagen, la que se publicaría en el entorno de producción.
+    \end{itemize}
+
+    Los pasos que se realizan en el \textit{workflow} son los mismos, solo cambian los elementos que se acaban de indicar.
+
+  \item \texttt{pro}
+
+    Finalmente, el entorno de producción. Aquí es donde se despliega la aplicación de manera abierta a los usuarios. Como se lleva insistiendo a lo largo de este capítulo, lo normal es que estos entornos se encuentren en la nube. Para facilidad de pruebas y debido a que no es la finalidad de este trabajo, se ha decidido crear todos los \textit{clusters} de forma local.
+
+    Cambios en este entorno con respecto a los anteriores:
+
+    \begin{itemize}
+      \item Se despliega la aplicación en él cuando el evento que lanza el \textit{workflow} no es una \textit{prerelease}, sino una \textit{release}.
+      \item Al igual que en \texttt{pre}, la \textit{tag} sigue el formato SemVer, pero en este caso sin la coletilla que se usaba antes (e.j. \texttt{1.2.3}).
+    \end{itemize}
+
+\end{itemize}
+
+En la figura \ref{fig:promotion} se muestra cómo el \textit{workflow} escucha los diferentes eventos que hacen que se ejecute el ciclo de CI/CD. Dependiendo del evento que ocurre, se va a utilizar una \textit{tag} diferente y se va a desplegar entorno correspondiente (\texttt{env}).
+
+\begin{figure}[h]
+  \centerline{\includegraphics[width=13cm]{figuras/promotion}}
+  \caption{Descripción del proceso de promoción de entornos. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
+  \label{fig:promotion}
+\end{figure}
 
 % Además, también se encuentran en este repositorio los módulos de Dagger de CI y de CD, y los \textit{scripts} y archivos de configuración necesarios para lanzar en local los \textit{clusters} de KinD que representan cada uno de los entornos en los que se despliega la aplicación. El hecho de que todo lo anterior se encuentre en un mismo repositorio hace mucho más sencilla su gestión.
 
