@@ -160,10 +160,7 @@ nodes:
 \end{lstlisting}
   \item Se instala el controlador de Ingress (líneas 15-16), lo cual permitirá acceder a la aplicación a través de una URL customizada desde el exterior.
   \item Se crea el \textit{namespace} en el que se va a instalar la instancia de ArgoCD (línea 18).
-  \item Se crea un secreto en el que se almacena el valor de la clave de cifrado de los secretos de Kubernetes (líneas 20-22). El proceso de creación de cifrado y descifrado se explica en
-    \begin{bclogo}[logo=\bcattention]{Important!}
-      CITAR APARTADO EN EL QUE SE HABLA DE SOPS
-    \end{bclogo}
+  \item Se crea un secreto en el que se almacena el valor de la clave de cifrado de los secretos de Kubernetes (líneas 20-22). El proceso de creación de cifrado y descifrado se explica en \ref{subsec:secretos}.
   \item Se instala la Chart de Helm de Argo y se espera a que esté disponible (líneas 24-29). A la Chart se le pasan una serie de valores, de los cuales se habla en \ref{subsec:secretos}. Una vez instalado, se podrá acceder a ArgoCD de manera local. Para ello será necesario crear un ``túnel'' de un puerto libre local al puerto 443 del servicio principal de Argo. Esto se explica también en el
     \begin{bclogo}[logo=\bcattention]{Important!}
       CITAR MANUAL DE USUARIO
@@ -339,6 +336,7 @@ En la figura \ref{fig:secrets} se puede ver el ciclo completo de encriptado y de
 \end{figure}
 
 \subsection*{Función de cada \textit{cluster} y promoción de entornos}
+\label{subsec:clusters}
 
 A continuación se explica para qué se utiliza cada \textit{cluster} y cuál es el proceso de despliegue de la aplicación en cada uno de los entornos.
 
@@ -437,10 +435,7 @@ jobs:
           CITAR MANUALES DE USUARIO
         \end{bclogo}
         para su testeo en local.
-      \item Se ejecuta el ciclo de CI para ambos paquetes de la aplicación y se publica cada una de las imágenes, indicando la \textit{tag} que se ha determinado previamente (líneas 51-57). Además, es necesario actualizar los valores de las \textit{tags} en el repositorio de estado, el cual tiene un campo específico para indicar este dato (líneas 45-49).
-        \begin{bclogo}[logo=\bcattention]{Important!}
-          CITAR APARTADO EN EL QUE SE HABLA DE STATE
-        \end{bclogo}
+      \item Se ejecuta el ciclo de CI para ambos paquetes de la aplicación y se publica cada una de las imágenes, indicando la \textit{tag} que se ha determinado previamente (líneas 51-57). Además, es necesario actualizar los valores de las \textit{tags} en el repositorio de estado, el cual tiene un campo específico para indicar este dato (líneas 45-49). Más información en \ref{subsec:state}.
       \item Se ejecuta el ciclo de CD, aportando los parámetros necesarios, entre los que se encuentran los archivos que se han construido previamente (líneas 59-69).
     \end{enumerate}
 
@@ -480,6 +475,172 @@ En la figura \ref{fig:promotion} se muestra cómo el \textit{workflow} escucha l
   \label{fig:promotion}
 \end{figure}
 
-% Además, también se encuentran en este repositorio los módulos de Dagger de CI y de CD, y los \textit{scripts} y archivos de configuración necesarios para lanzar en local los \textit{clusters} de KinD que representan cada uno de los entornos en los que se despliega la aplicación. El hecho de que todo lo anterior se encuentre en un mismo repositorio hace mucho más sencilla su gestión.
+\subsection*{helm-repository}
 
-% Debe describirse como se realiza o Sistema, a división deste en diferentes compoñentes e a comunicación entre eles. Así mesmo, determinarase o equipamento hardware e software necesario, xustificando a súa elección no caso de que non fose un requisito previo. Debe achegarse a un nivel suficiente de detalle que permita comprender a totalidade da estrutura do produto desenvolvido, utilizando no posible representacións gráficas.
+Es una práctica habitual tener un repositorio con todas las Charts de Helm que utiliza el equipo de desarrollo. Esto permite tener un lugar centralizado para que los desarrolladores compartan y los usuarios encuentren aplicaciones para desplegar en Kubernetes.
+
+Este repositorio tiene como finalidad lo que se acaba de comentar, funcionar como el lugar en el que se almacena la Chart de Helm de la aplicación de prueba.
+
+La figura 
+\begin{bclogo}[logo=\bcattention]{Important!}
+  CITAR FIGURA DE DIAGRAMA DE LAS CHARTS
+\end{bclogo}
+muestra que se ha creado una Chart \textit{umbrella} llamada \texttt{zoo}. Una Chart de este tipo funciona como una agrupación de más \texttt{subcharts} que están interrelacionadas. Normalmente se utiliza este método para gestionar despliegues de aplicaciones complejas en Kubernetes.
+La definición de la Chart \texttt{zoo} se puede ver en el Listing \ref{lst:umbrella}. En esta se indican las dependencias (\textit{subcharts}) que agrupa la Chart. Entre estas se encuentran las Charts propias de la aplicación, \texttt{zoo-frontend} y \texttt{zoo-backend}. Además, se puede ver que se utiliza una Chart ya definida en un repositorio conocido como Bitnami\cite{bitnami}. De este repositorio se obtiene la Chart de MongoDB. De esta manera, se utiliza una Chart ya implementada y desarrollada por expertos, proporcionando muchas opciones de configuración y garantizando mucha más seguridad de lo que se tendría en el caso de crear una Chart de Mongo propia para la aplicación.
+
+\begin{lstlisting}[language=helm,label=lst:umbrella]{Definición de la Chart umbrella de la aplicación}
+apiVersion: v2
+name: zoo
+description: Umbrella chart to deploy frontend, backend and mongo
+version: 0.0.7
+appVersion: "0.0.0"
+dependencies:
+  - name: zoo-frontend
+    version: 0.0.0
+    repository: file://charts/zoo-frontend
+  - name: zoo-backend
+    version: 0.0.0
+    repository: file://charts/zoo-backend
+  - name: mongodb
+    repository: https://charts.bitnami.com/bitnami
+    version: 15.0.0
+    condition: mongo.internal.enabled
+\end{lstlisting}
+
+También se puede observar en la figura 
+\begin{bclogo}[logo=\bcattention]{Important!}
+  CITAR FIGURA DE DIAGRAMA DE LAS CHARTS
+\end{bclogo}
+los recursos que se crean para cada una de las \textit{subcharts} de la aplicación. Para más detalle en cuanto a su funcionamiento, ver la sección \ref{subsec:k8shelm}.
+
+El proceso de desarrolo de la Chart comienza con la propia creación de esta. Tras realizar pruebas de construcción de la aplicación, se construye un archivo comprimido con el comando que se muestra en el Listing \ref{lst:compression}. De esta manera se obtiene un archivo \texttt{.tgz} con toda la definición de la Chart de la aplicación. Posteriormente, se almacena el archivo comprimido en un directorio \texttt{temp}.
+
+\begin{lstlisting}[language=bash,label=lst:compression]{Generación de un archivo comprimido de la Chart}
+helm pachage zoo
+\end{lstlisting}
+
+Por último, se publica la Chart a través de GitHub Pages. Esto consiste gracias a un \textit{workflow} que existe en el repositorio, el cual se ve en el Listing \ref{lst:ghpages} (se han comentado las acciones que se realizan en cada paso para reducir su tamaño). El \textit{workflow} se lanza únicamente cuando existe un directorio \texttt{temp} con archivos en su interior (líneas 10-11). Este realiza los comandos necesarios para actualizar el archivo \texttt{index.yaml}, el cual define las diferentes versiones de la Chart y la URL pública donde se pueden descargar. Además, actualiza las ramas principal y \texttt{gh-pages}, siendo esta última en la que se puede encontrar el archivo índice ya mencionado.
+
+\begin{lstlisting}[language=workflows,label=lst:ghpages]{Workflow de publicación de la Chart en GH Pages}
+name: Release Helm Charts
+
+concurrency: release-helm
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'temp/**'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - % Clona la rama principal del repositorio en "src/"
+
+      - % Clona la rama "gh-pages" del repositorio en "dest/"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4.3.0
+
+      - name: Update New Files and push to main branch
+        shell: bash
+        working-directory: src
+        run: |
+          % Se genera o actualiza el "index.yaml" con la URL
+          % donde se van a alojar las diferentes versione de la
+          % Chart
+
+          % Se guarda el .tgz del directorio "temp/" con la Chart
+          % en la rama de "gh-pages", el "index.yaml" en la raiz
+          % de la misma rama y se suben los cambios la rama
+          % principal
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push New Files
+        shell: bash
+        working-directory: dest
+        run: |
+          % Se guardan los cambios en la rama "gh-pages",
+          % realizando finalmente la publicacion de la version
+          % de la Chart
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+\end{lstlisting}
+
+\subsection*{state}
+\label{subsec:state}
+
+El repositorio de estado funciona como única fuente de verdad. Aquí se definen  los valores que pueblan la Chart de la aplicación. Se utiliza una herramienta llamada \texttt{helmfile}\cite{helmfile}. Esta permite integrar Charts de Helm y valores, aunque estos se encuentren en lugares diferentes.
+
+Se puede ver el archivo de configuración de \texttt{helmfile} en el Listing \ref{lst:helmfile}. Los archivos del apartado de \texttt{environments} indican el \textit{namespace} y la versión de la Chart que se va a utilizar. Todos los valores que se indican en el apartado de \texttt{releases} dependen del entorno que se ha elegido para desplegar. Los valores de las líneas 19-22 son aquellos que no dependen del entorno en el que se quiere desplegar, mientras que los de las líneas 23-27 sí que dependen del entorno, y se almacenan en un directorio dedicado a cada uno de ellos. En estos últimos valores se indica, por ejemplo, la \textit{tag} a utilizar de las imágenes de Docker.
+
+\begin{lstlisting}[language=helmfile,label=lst:helmfile]{Archivo de configuración de helmfile}
+  repositories:
+  - name: helm-repository
+    url: https://raw.githubusercontent.com/vieites-tfg/helm-repository/gh-pages/
+
+environments:
+  dev:
+    values:
+      - ./dev.yaml
+  # ... otros entornos
+
+---
+
+releases:
+  - name: zoo-{{ .Environment.Name }}
+    namespace: {{ .Environment.Name }}
+    chart: helm-repository/zoo
+    version: {{ .Values.version }}
+    values:
+      - zoo-frontend.yaml
+      - zoo-backend.yaml
+      - mongodb.yaml
+      - global.yaml
+      - {{ .Environment.Name }}/zoo-frontend.yaml
+      - {{ .Environment.Name }}/zoo-backend.yaml
+      - {{ .Environment.Name }}/mongodb.yaml
+      - {{ .Environment.Name }}/global.yaml
+      - global:
+          ghcrSecret:
+            enabled: true
+            password: {{ requiredEnv "CR_PAT" | quote }}
+      - zoo-backend:
+          mongo:
+            root:
+              user: {{ requiredEnv "MONGO_ROOT" | quote }}
+              password: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
+      - mongodb:
+          auth:
+            rootUser: {{ requiredEnv "MONGO_ROOT" | quote }}
+            rootPassword: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
+\end{lstlisting}
+
+Un ejemplo de archivo de valores se puede observar en el Listing \ref{lst:values}. Como se ha comentado, el valor de la \textit{tag} se ve indicado en la línea 3, con el formato que se ha mencionado en la sección \ref{subsec:clusters}.
+
+\begin{lstlisting}[label=lst:values]{Archivo de valores de zoo-backend en dev}
+zoo-backend:
+  image:
+    tag: "69ab8a1e"
+  mongo:
+    service:
+      name: "zoo-dev-mongodb"
+  ingress:
+    hostTemplate: "api-zoo-dev.example.com"
+\end{lstlisting}
+
+En la sección
+\begin{bclogo}[logo=\bcattention]{Important!}
+  CITAR SECCIÓN DE DAGGER CD
+\end{bclogo}
+se explica cómo se especifica el entorno y, por lo tanto, los valores que se van a utilizar para poblar la Chart de la aplicación. También se puede encontrar más información en los manuales de usuario
+\begin{bclogo}[logo=\bcattention]{Important!}
+  CITAR MANUALES DE USUARIO
+\end{bclogo}

@@ -71,7 +71,8 @@
   alsoletter={.,/},
   keywords={
     apiVersion, metadata, name, namespace, annotations,
-    spec, status, data, port, number,
+    spec, status, data, port, number, appVersion,
+    dependencies, version, repository, condition,
     replicas, selector, matchLabels, template, strategy, type,
     containers, initContainers, image, imagePullPolicy, command, args,
     ports, containerPort, hostPort, protocol, name,
@@ -81,7 +82,7 @@
     volumes, persistentVolumeClaim, claimName, secretName, configMap,
     restartPolicy, service, clusterIP, loadBalancerIP,
     externalIPs, sessionAffinity, servicePort, tls, stringData,
-    rules, host, http, paths, path, pathType, backend, serviceName,
+    rules, host, http, paths, path, pathType, serviceName,
     Values, Release, Chart, Files, Capabilities, Template,
     include, tpl, toYaml, fromYaml, nindent, quote, required,
     networking, nodes, apiServerPort, extraPortMappings, role, project,
@@ -89,7 +90,7 @@
     prune, selfHeal, syncOptions, server, creation_rules, path_regex,
     unencrypted_regex, generators, config.kubernetes.io/function, exec,
     files, configs, cm, kustomize.buildOptions, ui.bannerpermanent, repoServer,
-    emptyDir
+    emptyDir, description
   },
   keywordstyle=\color{blue}\bfseries,
   identifierstyle=\color{black},
@@ -104,33 +105,52 @@
     {secret:}{{{\textcolor{blue}{secret:}}}}7
     {age:}{{{\textcolor{blue}{age:}}}}4
     {image:}{{{\textcolor{blue}{image:}}}}6
+    {backend:}{{{\textcolor{blue}{backend:}}}}8
   }
 }
 
 \lstdefinelanguage{workflows}{
-  % Palabras clave principales de GitHub Actions
   alsoletter={-},
   keywords={
     name, on, jobs, runs-on, container, services, id,
     steps, uses, run, with, permissions, push, release,
-    workflow_dispatch,
+    workflow_dispatch, shell, working-directory, concurrency
   },
   keywordstyle=\color{blue}\bfseries,
   identifierstyle=\color{black},
-  % Comentarios en YAML con '#'
   comment=[l]{\#},
   commentstyle=\color{gray}\ttfamily,
-  % Cadenas tal como en docker-compose
   stringstyle=\color{\greencolor}\ttfamily,
   morestring=[b]',
   morestring=[b]",
-  % Resaltar expresiones entre {{ ... }} de posibles plantillas
   moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}},
-  % Si quieres resaltar valores booleanos y números:
   morekeywords={true,false,null},
   keywordstyle=[2]\color{blue},
   sensitive=true,
+  literate={
+    {env:}{{{\textcolor{blue}{env:}}}}4
+  }
 }
+
+\lstdefinelanguage{helmfile}{
+  alsoletter={-,.},
+  keywords={
+    repositories, environments, releases, namespaces, values,
+    name, url, chart, version, namespace,
+  },
+  keywordstyle=\color{blue}\bfseries,
+  sensitive=true,
+  identifierstyle=\color{black},
+  comment=[l]{\#},
+  commentstyle=\color{gray}\ttfamily,
+  stringstyle=\color{\greencolor}\ttfamily,
+  morestring=[b]',
+  morestring=[b]",
+  moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}},
+  morekeywords={requiredEnv, quote, .Values, .Environment.Name},
+  keywordstyle=[2]\color{purple}\bfseries
+}
+
 
 % \includeonly{capitulos/cap2}
 
