@@ -39,12 +39,6 @@ Como se ha comentado anteriormente, el repositorio \texttt{zoo} está estructura
 
 \subsection*{Aplicación de prueba}
 
-\begin{figure}
-  \centerline{\includegraphics[width=15cm]{figuras/app}}
-  \caption{Comunicación entre paquetes de la aplicación. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
-  \label{fig:app}
-\end{figure}
-
 La primera razón para escoger este tipo de estructura es el hecho de querer crear una aplicación relativamente pequeña, una página web que consta de un \textit{frontend} y un \textit{backend} (se hará referencia a estos como ``paquetes'' a partir de ahora). Por lo tanto, se hace más sencillo gestionar estos dos paquetes si viven juntos en un único repositorio.
 
 Otra ventaja de utilizar un \textit{monorepo} tiene que ver con el software utilizado para crear los paquetes de la aplicación de prueba. Ambos se implementan utilizando Node.js, en lenguaje Typescript\cite{ts}. Los paquetes tienen dependencias propias, y se puede dar el caso de que ambos utilicen una o varias dependencias iguales. Usar un \textit{monorepo} permite tener esas dependencias en un mismo lugar, evitando su duplicado. Con esto se consigue reducir el tiempo de construcción de los paquetes.
@@ -53,7 +47,7 @@ Sin embargo, es necesaria una herramienta que permita manejar los paquetes de ma
 
 \begin{itemize}
   \item Gestión de tareas locales.
-  \item Cacheo local de salidas de comandos, con posibilidad de dicha caché sea compartida entre entornos, por ejemplo, con agentes de CI.
+  \item Cacheo local de salidas de comandos, con posibilidad de que dicha caché sea compartida entre entornos, por ejemplo, con agentes de CI.
   \item Detección de paquetes afectados por cambios en el código.
   \item Análisis de la estructura del proyecto.
 \end{itemize}
@@ -68,24 +62,30 @@ El \textit{frontend} se ha implementado utilizando Vue.js\cite{vue}, un \textit{
 
 En la figura \ref{fig:app} se puede ver un diagrama que muestra cómo es la comunicación entre los paquetes de la aplicación, y con la base de datos, junto con las tecnologías que se utiliza en cada uno de ellos.
 
+\begin{figure}
+  \centerline{\includegraphics[width=15cm]{figuras/app}}
+  \caption{Comunicación entre paquetes de la aplicación. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
+  \label{fig:app}
+\end{figure}
+
 \subsection*{Módulos de Dagger}
 
-Se integran también en el repositorio los módulos de Dagger de CI y de CD. Estos módulos se incluyen en el \textit{monorepo} para facilitar la referencia a los paquetes que constituyen la aplicación de prueba. Además, tiene sentido que vivan en el mismo lugar una aplicación y las herramientas que permiten su evolución, como son cualquier tipo de software que realice las funciones de CI y de CD.
+Se integran también en el repositorio los módulos de Dagger de CI y de CD. Estos módulos se incluyen en el \textit{monorepo} para facilitar la referencia a los paquetes que constituyen la aplicación de prueba. Además, tiene sentido que vivan en el mismo lugar una aplicación y las herramientas que permiten su evolución, como son cualquier tipo de \textit{software} que realice las funciones de CI y de CD.
 
 Ambos módulos se realizan utilizando el SDK del lenguaje Go que proporciona Dagger. Se ha escogido este lenguaje debido al conocimiento previo que ya se tenía de este. Además, es el lenguaje en el que está implementado el propio Dagger.
 
-Uno de los módulos se encarga del ciclo de CI, es decir, de realizar los tests de la aplicación, del \textit{linting} o análisis del código en sí, y dela publicación de imágenes de Docker y paquetes NPM. Está organizado de manera que se pueden gestionar cada uno de los paquetes de la aplicación de manera independiente. Esto también es posible gracias al uso de Lerna, que ya se ha comentado anteriormente.
+Uno de los módulos se encarga del ciclo de CI, es decir, de realizar los tests de la aplicación, del \textit{linting} o análisis del código en sí, y de la publicación de imágenes de Docker y paquetes NPM. Está organizado de manera que se pueden gestionar cada uno de los paquetes de la aplicación de manera independiente. Esto también es posible gracias al uso de Lerna, que ya se ha comentado anteriormente.
 
 El segundo de los módulos, el de CD, realiza la tarea de publicación de los recursos de Kubernetes, los cuales son posteriormente obtenidos por ArgoCD para su despliegue completo. Esto se consigue haciendo uso de los repositorios \texttt{helm-repository} y \texttt{state}, en los cuales se almacenan las Charts de Helm y los valores que pueblan dichas Charts, respectivamente.
 
-Se detalla más profundamente su implementación en el capítulo \ref{chap:dagger}.
+Se detalla más profundamente la implementación de los módulos de Dagger en el capítulo \ref{chap:dagger}.
 
 \subsection*{Creación y configuración de los \textit{clusters}}
 \label{subsec:clusters}
 
 La fase final del ciclo de una aplicación es el despliegue. En este trabajo se levantan tres \textit{clusters} de KinD de manera local. Estos son los lugares en los que se despliega la aplicación. Generalmente se tienen diferentes \textit{clusters} con el fin de probar la aplicación en entornos distintos antes de desplegarla en el principal, que sería el de producción. El hecho de crearlos todos localmente hace que sean más sencillas las pruebas relacionadas con el despliegue. En equipos de desarrollo reales, los entornos de producción se encuentran en la nube. Sin embargo, sí que se pueden llegar a tener entornos locales para realizar pruebas de la aplicación.
 
-Los \textit{clusters} se crean con el \textit{script} que se muestra en el Listing \ref{lst:create-clusters}. Este \textit{script} está escrito para funcionar en sistemas UNIX, en Bash, por lo que es un requisito utilizar un sistema operativo como MacOS o una distribución de Linux. No funcionará en un sistema operativo Windows. Se han puesto comentarios en vez de código algunas partes para reducir su tamaño, a modo de pseudocódigo. Estos son los pasos que se siguen para crear cada uno de los \textit{clusters}:
+Los \textit{clusters} se crean con el \textit{script} que se muestra en el Listing \ref{lst:create-clusters} (se han puesto comentarios en vez de código algunas partes para reducir su tamaño, a modo de pseudocódigo). Este \textit{script} está escrito para funcionar en sistemas UNIX, en Bash, por lo que es un requisito utilizar un sistema operativo como MacOS o una distribución de Linux para probar el \textit{script}. No funcionará en un sistema operativo Windows. Estos son los pasos que se siguen para crear cada uno de los \textit{clusters}:
 
 \begin{lstlisting}[language=bash,label=lst:create-clusters]{Script de creación de los clusters}
 # Variables globales
@@ -133,7 +133,7 @@ printf "${PASSWORDS}"
 \end{lstlisting}
 
 \begin{enumerate}
-  \item Se indica el banner que va a tener cada uno de los \textit{clusters} (líneas 5-9).
+  \item Se indica el banner que va a tener cada uno de los \textit{clusters} (líneas 5-9). El banner se muestra en la parte superior de la interfaz de Argo.
   \item Se indica el contexto actual (línea 11), lo cual identifica cada \textit{cluster}. Esto es necesario a la hora de ejecutar comandos con \texttt{kubectl}, para asegurarse de que se está ejecutando cada comando sobre el \textit{cluster} que se precisa.
   \item Se crea el \textit{cluster} con su configuración específica (línea 13). Se puede ver el archivo de configuración del \textit{cluster} de \texttt{dev} en el Listing \ref{lst:conf-cluster}. Los archivos de los demás entornos son iguales a este, solo difieren en los puertos que se utilizan.
 \begin{lstlisting}[language=helm,label=lst:conf-cluster]{Configuración del cluster de dev}
@@ -165,7 +165,7 @@ nodes:
     \begin{bclogo}[logo=\bcattention]{Important!}
       CITAR MANUAL DE USUARIO
     \end{bclogo}
-  \item Se aplica la configuración específica de Argo para el entorno que se está creando (líneas 31-33). Se puede ver la configuración para Argo en el entorno de \texttt{dev} en el Listing \ref{lst:conf-argo}. Lo más importante de esta configuración se encuentra en las líneas 9-11, en las cuales se indica el repositorio (\texttt{repoURL}), la ruta desde la raíz (el directorio \texttt{dev}) y la rama (\texttt{targetRevision}) de donde Argo debe obtener los archivos que definen recursos que se van a desplegar.
+  \item Se aplica la configuración específica de Argo para el entorno que se está creando (líneas 31-33). Se puede ver la configuración para Argo en el entorno de \texttt{dev} en el Listing \ref{lst:conf-argo}. Lo más importante de esta configuración se encuentra en las líneas 9-11, en las cuales se indica el repositorio (\texttt{repoURL}), la ruta desde la raíz (el directorio \texttt{dev}) y la rama (\texttt{targetRevision}) de donde Argo debe obtener los archivos que definen los recursos que se van a desplegar.
 \begin{lstlisting}[language=helm,label=lst:conf-argo]{Configuración de Argo en dev}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -203,7 +203,7 @@ En la figura \ref{fig:clusters} se puede observar cómo se sincroniza ArgoCD, en
 \subsection*{Gestión de secretos}
 \label{subsec:secretos}
 
-La aplicación de prueba consta de una base de datos, la cual tiene usuario y contraseña. Este es un ejemplo de datos que es necesario almacenar como un secreto o Secret de Kubernetes. Debido a que se está utilizando un método \textit{pull}\cite{pull} de despliegue de la aplicación; es decir, la herramienta que realiza el despliegue, ArgoCD, tira (hace \textit{pull}) del repositorio que le indicamos como objetivo; es necesario almacenar en el repositorio los secretos encriptados previamente. Esto es una buena práctica para evitar que se filtren sin querer los datos al exterior, aunque el repositorio sea privado.
+La aplicación de prueba consta de una base de datos, la cual tiene usuario y contraseña. Este es un ejemplo de datos que es necesario almacenar como un secreto o Secret de Kubernetes. Debido a que se está utilizando un método \textit{pull}\cite{pull} de despliegue de la aplicación; es decir, la herramienta que realiza el despliegue, ArgoCD, ``tira'' (hace \textit{pull}) del repositorio que le indicamos como objetivo; es necesario almacenar en el repositorio los secretos encriptados previamente. Esto es una buena práctica para evitar que se filtren sin querer los datos al exterior, aunque el repositorio sea privado.
 
 Para encriptar los secretos se utilizan dos herramientas:
 
@@ -275,8 +275,8 @@ Esto se consigue con los valores que muestran en la línea 26 del Listing \ref{l
 
 \begin{itemize}
   \item Indicar las \textit{flags} que tiene que utilizar Argo a la hora de ejecutar comandos con \texttt{kustomize} (líneas 1-4).
-  \item Crear variables de entorno que informan (de arriba a abajo, respectivamente) el directorio raíz de archivos de configuración del sistema y la ruta en la que se puede encontrar la clave privada de \texttt{age} (líneas 6-11).
-  \item Construir dos volúmenes, uno para almacenar los binarios de \texttt{kustomize} y \texttt{ksops}, y otro para la clave privada que se ha introducido en el \textit{cluster} en las líneas 20-22 del Listing \ref{lst:create-clusters} (líneas 13-18).
+  \item Crear variables de entorno (líneas 6-11) que guardan información sobre (de arriba a abajo, respectivamente) el directorio raíz de archivos de configuración del sistema y la ruta en la que se puede encontrar la clave privada de \texttt{age}.
+  \item Construir dos volúmenes (líneas 13-18), uno para almacenar los binarios de \texttt{kustomize} y \texttt{ksops}, y otro para la clave privada que se ha introducido en el \textit{cluster} en las líneas 20-22 del Listing \ref{lst:create-clusters}.
   \item Instalar los binarios de \texttt{kustomize} y \texttt{ksops} en el volumen \texttt{custom-tools} creado previamente (líneas 20-21).
   \item Permitir a Argo acceder a los binarios y a la clave, montando los volúmenes que contienen estos elementos dentro del servidor principal de Argo (líneas 33-41).
 \end{itemize}
@@ -352,7 +352,7 @@ A continuación se explica para qué se utiliza cada \textit{cluster} y cuál es
       \item Integrar la funcionalidad o corrección en la rama principal del repositorio.
     \end{enumerate}
 
-    Tras haber terminado todos los pasos anteriores, se ejecuta un \textit{workflow} de GitHub que realiza todo el ciclo de CI y CD, independientemente del entorno en el que se vaya a desplegar. El workflow es el que se ve en el Listing \ref{lst:workflowcicd}. En este se realizan los siguientes pasos:
+    Tras haber terminado todos los pasos anteriores, se ejecuta un \textit{workflow} de GitHub que realiza todo el ciclo de CI y CD, independientemente del entorno en el que se vaya a desplegar. El \textit{workflow} es el que se ve en el Listing \ref{lst:workflowcicd}. En este se realizan los siguientes pasos:
 
 \begin{lstlisting}[language=workflows,label=lst:workflowcicd]{Workflow de CI/CD}
 on:
@@ -377,8 +377,9 @@ jobs:
       - name: Determine environment
         id: env_tag
         run: |
-          % Determina el entorno en el que se despliega, teniendo
-          % en cuenta el *trigger* que ha lanzado el workflow:
+          % Determina el entorno en el que se despliega,
+          % teniendo en cuenta el *trigger* que ha lanzado
+          % el workflow:
           %   - *push*    -> main
           %   - *release* -> *release* o *pre-release*
 
@@ -387,8 +388,8 @@ jobs:
 
       - name: Recreate needed files
         run: |
-          % Recrea el archivo .env para tenerlo disponible en
-          % "zoo"
+          % Recrea el archivo .env para tenerlo disponible
+          % en "zoo"
           echo "CR_PAT=${{ secrets.CR_PAT }}" >> ./.env
           % .... se incluyen todas las variables
 
@@ -400,9 +401,9 @@ jobs:
           tag=${{ steps.env_tag.outputs.tag }} 
 
           update_state () {
-            % Actualiza el valor en "state" de la *tag* de la
-            % imagen para que se despliegue la que se acaba de
-            % publicar
+            % Actualiza el valor en "state" de la *tag* de
+            % la imagen para que se despliegue la que se
+            % acaba de publicar
           }
 
           dagger call --sec-env=file://.env backend \
@@ -449,7 +450,7 @@ jobs:
 
     \begin{itemize}
       \item Se publica la imagen y los recursos en este entorno siempre que el evento que lanza el \textit{workflow} sea la creación de una \textit{prerelease}.
-      \item La \textit{tag} que se utiliza es la que se le pone al nombre de la \textit{prerelease}. Esta debería tener formato SemVer\cite{semver} con una coletilla \textit{snapshot} (e.j. \texttt{1.2.3-snapshot}. Se utiliza esta coletilla con el fin de dar a entender que dicha imagen es una copia o ``captura'' de lo que sería la versión final de la imagen, la que se publicaría en el entorno de producción.
+      \item La \textit{tag} que se utiliza es la que se le pone al nombre de la \textit{prerelease}. Esta debería tener formato SemVer\cite{semver} con una coletilla ``\texttt{snapshot}'' (e.j. \texttt{1.2.3-snapshot}). Se utiliza esta coletilla con el fin de dar a entender que dicha imagen es una copia o ``captura'' de lo que sería la versión final de la imagen, la que se publicaría en el entorno de producción.
     \end{itemize}
 
     Los pasos que se realizan en el \textit{workflow} son los mismos, solo cambian los elementos que se acaban de indicar.
@@ -469,7 +470,7 @@ jobs:
 
 En la figura \ref{fig:promotion} se muestra cómo el \textit{workflow} escucha los diferentes eventos que hacen que se ejecute el ciclo de CI/CD. Dependiendo del evento que ocurre, se va a utilizar una \textit{tag} diferente y se va a desplegar entorno correspondiente (\texttt{env}).
 
-\begin{figure}[h]
+\begin{figure}[t]
   \centerline{\includegraphics[width=13cm]{figuras/promotion}}
   \caption{Descripción del proceso de promoción de entornos. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
   \label{fig:promotion}
@@ -481,12 +482,14 @@ Es una práctica habitual tener un repositorio con todas las Charts de Helm que 
 
 Este repositorio tiene como finalidad lo que se acaba de comentar, funcionar como el lugar en el que se almacena la Chart de Helm de la aplicación de prueba.
 
-La figura 
-\begin{bclogo}[logo=\bcattention]{Important!}
-  CITAR FIGURA DE DIAGRAMA DE LAS CHARTS
-\end{bclogo}
-muestra que se ha creado una Chart \textit{umbrella} llamada \texttt{zoo}. Una Chart de este tipo funciona como una agrupación de más \texttt{subcharts} que están interrelacionadas. Normalmente se utiliza este método para gestionar despliegues de aplicaciones complejas en Kubernetes.
+La figura \ref{fig:helm-repository} muestra que se ha creado una Chart \textit{umbrella} llamada \texttt{zoo}. Una Chart de este tipo funciona como una agrupación de más \texttt{subcharts} que están interrelacionadas. Normalmente se utiliza este método para gestionar despliegues de aplicaciones complejas en Kubernetes.
 La definición de la Chart \texttt{zoo} se puede ver en el Listing \ref{lst:umbrella}. En esta se indican las dependencias (\textit{subcharts}) que agrupa la Chart. Entre estas se encuentran las Charts propias de la aplicación, \texttt{zoo-frontend} y \texttt{zoo-backend}. Además, se puede ver que se utiliza una Chart ya definida en un repositorio conocido como Bitnami\cite{bitnami}. De este repositorio se obtiene la Chart de MongoDB. De esta manera, se utiliza una Chart ya implementada y desarrollada por expertos, proporcionando muchas opciones de configuración y garantizando mucha más seguridad de lo que se tendría en el caso de crear una Chart de Mongo propia para la aplicación.
+
+\begin{figure}
+  \centerline{\includegraphics[width=13cm]{figuras/helm-repository}}
+  \caption{Diagrama de organización de las Charts de la aplicación. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
+  \label{fig:helm-repository}
+\end{figure}
 
 \begin{lstlisting}[language=helm,label=lst:umbrella]{Definición de la Chart umbrella de la aplicación}
 apiVersion: v2
@@ -507,11 +510,7 @@ dependencies:
     condition: mongo.internal.enabled
 \end{lstlisting}
 
-También se puede observar en la figura 
-\begin{bclogo}[logo=\bcattention]{Important!}
-  CITAR FIGURA DE DIAGRAMA DE LAS CHARTS
-\end{bclogo}
-los recursos que se crean para cada una de las \textit{subcharts} de la aplicación. Para más detalle en cuanto a su funcionamiento, ver la sección \ref{subsec:k8shelm}.
+También se puede observar en la figura \ref{fig:helm-repository} los recursos que se crean para cada una de las \textit{subcharts} de la aplicación. Para más detalle en cuanto a su funcionamiento, ver la sección \ref{subsec:k8shelm}.
 
 El proceso de desarrolo de la Chart comienza con la propia creación de esta. Tras realizar pruebas de construcción de la aplicación, se construye un archivo comprimido con el comando que se muestra en el Listing \ref{lst:compression}. De esta manera se obtiene un archivo \texttt{.tgz} con toda la definición de la Chart de la aplicación. Posteriormente, se almacena el archivo comprimido en un directorio \texttt{temp}.
 
@@ -577,7 +576,13 @@ jobs:
 \subsection*{state}
 \label{subsec:state}
 
-El repositorio de estado funciona como única fuente de verdad. Aquí se definen  los valores que pueblan la Chart de la aplicación. Se utiliza una herramienta llamada \texttt{helmfile}\cite{helmfile}. Esta permite integrar Charts de Helm y valores, aunque estos se encuentren en lugares diferentes.
+El repositorio de estado funciona como única fuente de verdad. Aquí se definen  los valores que pueblan la Chart de la aplicación. Se utiliza una herramienta llamada \texttt{helmfile}\cite{helmfile}. Esta permite integrar Charts de Helm y valores, aunque estos se encuentren en lugares diferentes. En la figura \ref{fig:state} se muestra la estructura del repositorio de estado, incluyendo la rama principal y la rama de despliegue.
+
+\begin{figure}[t]
+  \centerline{\includegraphics[width=12cm]{figuras/state}}
+  \caption{Diagrama de la estructura del repositorio de estado. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
+  \label{fig:state}
+\end{figure}
 
 Se puede ver el archivo de configuración de \texttt{helmfile} en el Listing \ref{lst:helmfile}. Los archivos del apartado de \texttt{environments} indican el \textit{namespace} y la versión de la Chart que se va a utilizar. Todos los valores que se indican en el apartado de \texttt{releases} dependen del entorno que se ha elegido para desplegar. Los valores de las líneas 19-22 son aquellos que no dependen del entorno en el que se quiere desplegar, mientras que los de las líneas 23-27 sí que dependen del entorno, y se almacenan en un directorio dedicado a cada uno de ellos. En estos últimos valores se indica, por ejemplo, la \textit{tag} a utilizar de las imágenes de Docker.
 
@@ -640,7 +645,6 @@ En la sección
 \begin{bclogo}[logo=\bcattention]{Important!}
   CITAR SECCIÓN DE DAGGER CD
 \end{bclogo}
-se explica cómo se especifica el entorno y, por lo tanto, los valores que se van a utilizar para poblar la Chart de la aplicación. También se puede encontrar más información en los manuales de usuario
-\begin{bclogo}[logo=\bcattention]{Important!}
-  CITAR MANUALES DE USUARIO
-\end{bclogo}
+se explica cómo se especifica el entorno y, por lo tanto, los valores que se van a utilizar para poblar la Chart de la aplicación.
+
+Este repositorio también es el lugar en el que se almacenan los archivos que definen los recursos que se van a desplegar en cada entorno. En la figura \ref{fig:secrets} se puede ver la estructura que tiene la rama de despliegue del repositorio \textit{state}. Esa misma estructura es la que tienen los directorios correspondientes a todos los entornos en la rama \texttt{deploy}.
