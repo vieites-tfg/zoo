@@ -21,12 +21,6 @@ Se trata de un conjunto de pasos automatizados, utilizados en el desarrollo de s
 \subsection*{\textit{Continuous Integration}}
 \label{subsec:CI}
 
-\begin{figure}
-  \centerline{\includegraphics[width=10cm]{figuras/ci}}
-  \caption{Proceso de integración continua.\cite{img:ci}}
-  \label{fig:ci}
-\end{figure}
-
 Se basa en la integración de código de manera constante, día a día, en un repositorio compartido por programadores. Cada uno de los programadores realiza cambios en el código y lo integra en el repositorio. Una vez se realizan cambios, estos deben pasar una serie de pruebas antes de poder ser incorporados de forma definitiva en el código fuente de la aplicación (Fig. \ref{fig:ci}).
 
 Desde hace años se utilizan sistemas de control de versiones para gestionar el código de cualquier proyecto. Este tipo de herramientas permite a un equipo controlar el estado del código en cada momento, siendo capaces de conocer el historial de los cambios realizados, saber quién ha hecho cada cambio y tener la capacidad de revertir alguna modificación en el caso de ser necesario. La herramienta de control de versiones más utilizada hoy en día, y la que se utiliza en este proyecto, es Git\cite{git}.
@@ -43,14 +37,9 @@ La integración de código en un repositorio no se trata simplemente de modifica
 Todo lo anterior se debe realizar de manera automatizada, con el fin de integrar el código modificado en el repositorio lo más rápido posible, evitando en la medida de lo posible la intervención humana.
 
 \subsection*{\textit{Continuous Delivery}}
+\label{subsec:CD}
 
-\begin{figure}
-  \centerline{\includegraphics[width=17cm]{figuras/cd}}
-  \caption{Proceso de despliegue continuo.\cite{img:cd}}
-  \label{fig:cd}
-\end{figure}
-
-Tras haber construido la aplicación durante el proceso de integración continua, toca desplegar la aplicación. El despliegue automático de nuevas versiones de una aplicación que han pasado el ciclo de CI se conoce como ``despliegue continuo''.
+Tras haber construido la aplicación durante el proceso de integración continua, toca desplegar la aplicación. El despliegue automático de nuevas versiones de una aplicación que han pasado el ciclo de CI se conoce como ``despliegue continuo'' (figura \ref{fig:cd}).
 
 Esto, evidentemente, tiene como requisito que la aplicación que se está construyendo tenga el despliegue como uno de los pasos en su ciclo de vida, lo cual no tiene por qué ser así. En este trabajo sí que ocurre, ya que la aplicación \textit{dummy} que se construye es una página web, junto con una API y una base de datos.
 
@@ -64,9 +53,9 @@ Con el despliegue continuo podemos tener \textit{feedback} más rápido por part
 
 \subsection*{GitOps \& ArgoCD}
 
-Basándose en la filosofía DevOps, mencionada antes, que abarca tanto el ciclo de CI como el de CD, existen un conjunto de prácticas en las que se utiliza Git como fuente de verdad para la gestión de la infraestructura y las aplicaciones. Esto es conocido como GitOps. Utilizar Git como la única fuente de información permite gestionar de manera consistente la infraestructura de las aplicaciones. Los cambios en un repositorio hacen que se ejecuten \textit{workflows}, o secuencias de acciones de CI/CD que implementan los cambios en el entorno correspondiente.
+Basándose en la filosofía DevOps, mencionada antes, que abarca tanto el ciclo de CI como el de CD, existen un conjunto de prácticas en las que se utiliza Git como fuente de verdad para la gestión de la infraestructura y las aplicaciones. Esto es conocido como GitOps\cite{gitops}. Utilizar Git como la única fuente de información permite gestionar de manera consistente la infraestructura de las aplicaciones. Los cambios en un repositorio hacen que se ejecuten \textit{workflows}, o secuencias de acciones de CI/CD que implementan los cambios en el entorno correspondiente.
 
-La herramienta que realiza estas prácticas de GitOps, y que se utiliza en este trabajo, es ArgoCD. Argo es una herramienta que, como su nombre indica, facilida la entrega continua. Está diseñada específicamente para Kubernetes. Automatiza el despliegue de las aplicaciones, superevisando repositorios de Git para aplicar los cambios que se realizan en ellos automáticamente en el \textit{cluster}. Su uso permite no tener que realizar actualizaciones manuales en entornos de producción, y hace que el entorno siempre esté sincronizado con el código definido en el repositorio. Esto se consigue gracias al proceso de reconciliación que realiza Argo cada vez que detecta cambios en el repositorio que se le ha indicado.
+La herramienta que realiza estas prácticas de GitOps, y que se utiliza en este trabajo, es ArgoCD\cite{argocd}. Argo es una herramienta que, como su nombre indica, facilita el despliegue continuo. Supervisa repositorios de Git para aplicar los cambios que se realizan en ellos automáticamente en el \textit{cluster} (\ref{tech:argocd}).
 
 \section{Ecosistema de herramientas}
 
@@ -77,229 +66,34 @@ Un \textit{pipeline} moderno se compone de diferentes tipos de herramientas, cad
 Como cabe esperar, los pasos mencionados en \ref{subsec:CI}, que forman parte de la integración continua, van a depender del tipo de aplicación que se esté construyendo, y de las tecnologías que se estén utilizando. Además, esta secuencia de acciones pueden incluir unos pocos comandos en trabajos o proyectos sencillos, o necesitar varios \textit{scripts} complejos en el caso de aplicaciones más avanzadas. Por lo tanto, es necesario tener una herramienta de construcción que permita realizar los pasos mencionados anteriormente, sin la necesidad de memorizar cada uno de los comandos o \textit{scripts} que hay que ejecutar.
 
 \subsubsection*{Make}
+\label{subsec:make}
 
 Para ello existe \texttt{make}\cite{make}, una aplicación de línea de comandos que permite definir bloques de comandos o reglas, aportando a cada bloque un nombre u objetivo que se pretende obtener ejecutando dicha regla. Se suele crear un archivo llamado \texttt{Makefile} para definir todas las reglas que se precisen.
-
-\begin{lstlisting}[language=make,label=lst:make]{Makefile para compilación de un programa en C}
-# Compiler
-CC = gcc
-
-# Compiler options
-CFLAGS = -Wall -g
-
-# Final executable name
-TARGET = my_program
-
-# The object files (.o) needed by the program
-# Make infers automatically that .o depends on the corresponding .c
-OBJS = main.o hello.o
-
-# --- Rules ---
-
-# The first rule is the one executed by default with "make"
-# It declares that to create the TARGET, it needs the OBJS
-$(TARGET): $(OBJS)
-  $(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-
-# ".PHONY" tells Make that "clean" is not a file
-.PHONY: clean
-clean:
-  rm -f $(TARGET) $(OBJS)
-\end{lstlisting}
 
 Un ejemplo muy típico de compilación de un programa escrito en \texttt{C} sería el que se puede observar en el Listing \ref{lst:make}.
 
 \subsubsection*{Just}
+\label{subsec:just}
 
-En este trabajo se utiliza una herramienta de construcción más moderna y polivalente llamada \texttt{just}\cite{just}. Este software tiene la misma finalidad que \texttt{make}, ejecutar comandos específicos de un proyecto. Pero este incluye muchas más funcionalidades, entre las cuales destacan:
+En este trabajo se utiliza una herramienta de construcción más moderna y polivalente llamada \texttt{just}\cite{just}. Este software tiene la misma finalidad que \texttt{make}, ejecutar comandos específicos de un proyecto. Pero este incluye muchas más funcionalidades (\ref{tech:just}).
 
-\begin{itemize}
-  \item Poder pasar parámetros a las ``recetas'' (las ``reglas'' en \texttt{make}).
-  \item Crear aliases para las recetas.
-  \item Cargar archivos \texttt{.env}.
-  \item Poder definir recetas como scripts en el lenguaje que se prefiera, simplemente añadiendo el \textit{shebang}\cite{shebang} correspondiente.
-  \item Ser capaz de ser invocado desde cualquier subdirectorio.
-\end{itemize}
-
-\begin{lstlisting}[language=make,label=lst:just]{Extracto de justfile utilizado en el proyecto}
-# --- ALIASES ---
-# Defines shortcuts (aliases) for longer commands.
-alias dv := down_vol
-
-# --- DEFAULT RECIPE ---
-# This is the recipe that runs if you just type 'just' in the
-# terminal.
-# By default, it invokes the 'just -l' recipe, which lists all
-# available recipes.
-# The '_' prefix indicates that it is a helper recipe, not
-# intended to be called directly by the user.
-_default:
-  just -l
-
-# --- INTERNAL (PRIVATE) RECIPES ---
-_build_zoo_base:
-  #!/usr/bin/env bash
-  if [[ "$(docker images -f reference=zoo-base | wc -l | xargs)" != "2" ]]
-  then
-    docker build --target base -t zoo-base .
-  fi
-
-# Accepts two parameters: 'entrypoint' and 'command'.
-_run entrypoint command:
-  # '@' at the beginning of a command line prevents 'just' from
-  # printing the command before executing it.
-  @just _build_zoo_base
-  docker run --rm -w /app -v $PWD:/app --env-file .env --entrypoint={{entrypoint}} zoo-base {{command}}
-
-# --- PUBLIC RECIPES ---
-init:
-  @just _run "yarn" "install"
-
-down_vol:
-  docker compose down -v
-\end{lstlisting}
-
-Como se puede comprobar en el Listing \ref{lst:just}, el archivo de configuración de \texttt{just}, en este caso nombrado habitualmente \texttt{justfile}, tiene una estructura similar a la de un \texttt{Makefile}. La diferencia principal es que los nombres de las recetas no hacen referencia a un archivo objetivo que se supone que se debe crear al ejecutar el bloque de comandos, sino que se trata simplemente del nombre de la receta. Como se puede comprobar, se hace uso de comandos y sintaxis propios de sistemas UNIX (por ejemplo, Bash), por lo que se trata de un requisito de software contar con un entorno UNIX o compatible (Linux, macOS, WSL, etc.) para su correcta ejecución.
+En \ref{lst:just} se puede ver que se hace uso de comandos y sintaxis propios de sistemas UNIX (por ejemplo, Bash), por lo que se trata de un requisito de software contar con un entorno UNIX o compatible (Linux, macOS, WSL, etc.) para su correcta ejecución.
 
 \subsubsection*{Docker}
+\label{subsec:docker}
 
-Docker\cite{docker} es una herramienta que permite empaquetar aplicaciones, creando imágenes con las dependencias necesarias  para que la aplicación se lance sin problemas. Las imágenes generadas se pueden ejecutar, creando contenedores, que son entornos completamente aislados del contexto de la máquina en la que han levantado. Estos contenedores son muy ligeros en cuanto a espacio y uso de recursos, ya que almacenan únicamente lo necesario para correr el software que queremos desplegar.
+Docker\cite{docker} es una herramienta que permite empaquetar aplicaciones, creando imágenes con las dependencias necesarias para que la aplicación se lance sin problemas. Las imágenes generadas se pueden ejecutar, creando contenedores, que son entornos completamente aislados del contexto de la máquina en la que han levantado. Estos contenedores son muy ligeros en cuanto a espacio y uso de recursos, ya que almacenan únicamente lo necesario para correr el software que queremos desplegar (\ref{tech:docker}).
 
 La mayor ventaja que proporciona el empaquetado de aplicaciones con Docker, es la portabilidad. Aunque hay que tener en cuenta la arquitectura de la máquina, las imágenes se pueden lanzar en cualquier entorno con Docker instalado, lo cual evita el conocido problema de: ``En mi máquina funciona''.
-
-\begin{lstlisting}[language=Dockerfile,label=lst:dockerfile]{Extracto de Dockerfile utilizado en el proyecto}
-# Base
-
-FROM node:20 AS base
-
-WORKDIR /app
-
-COPY package.json lerna.json yarn.lock* ./
-
-COPY packages packages/
-
-RUN yarn install
-
-RUN yarn global add lerna@8.2.1
-
-RUN yarn global add @vercel/ncc
-
-# Frontend build stage
-
-FROM base AS frontend-build
-
-WORKDIR /app
-
-RUN lerna run --scope @vieites-tfg/zoo-frontend build 
-
-# Frontend
-
-FROM nginx:alpine AS frontend
-
-WORKDIR /usr/share/nginx/html
-
-COPY --from=frontend-build /app/packages/frontend/dist .
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
-\end{lstlisting}
-
-El proceso más habitual a la hora de construir una imagen de Docker es definir un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{multi-stage builds}, distintos estados de la construcción. Esto permite construir imágenes de Docker más pequeñas y optimizadas separando el proceso de construcción en distintas fases.
-
-Una vez definido el \texttt{Dockerfile}, se puede construir y ejecutar la imagen con la secuencia de comandos del Listing \ref{lst:dockerbuildrun}
-
-\begin{lstlisting}[language=bash,label=lst:dockerbuildrun]{Construir y correr una imagen de Docker}
-docker build -t my-image .
-
-docker run --rm -d -p 8080:80 my-image
-\end{lstlisting}
-
-El comando de la línea 1 construye la imagen que se define en el \texttt{Dockerfile} del directorio de trabajo actual (\texttt{.}), con el nombre \texttt{my-image}. Con el siguiente comando se ejecuta la imagen. Las \textit{flags} indican:
-
-\begin{itemize}
-  \item \texttt{--rm}
-
-    Se eliminará el contenedor creado al finalizar su ejecución.
-
-  \item \texttt{-d}
-
-    El contenedor correrá en \textit{background}.
-
-  \item \texttt{-p 8080:80}
-
-    Se mapea el puerto 8080 de la máquina local al puerto 80 del contenedor.
-\end{itemize}
 
 \subsection*{Plataformas de despliegue}
 
 \subsubsection*{Docker Compose}
+\label{subsec:docker-compose}
 
-Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''\cite{docker-compose}. Esta permite simular entornos con múltiples contenedores para desarrollar localmente.
+Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''\cite{docker-compose}. Esta permite simular entornos con múltiples contenedores para desarrollar localmente (\ref{tech:docker-compose}).
 
-\begin{lstlisting}[language=docker-compose,label=lst:dockercompose]{docker-compose.yaml usado en el proyecto}
-services:
-  zoo-frontend:
-    image: ghcr.io/vieites-tfg/zoo-frontend
-    container_name: zoo-frontend
-    hostname: zoo-frontend
-    ports:
-      - "8080:80"
-    depends_on:
-      - zoo-backend
-    environment:
-      NODE_ENV: production
-      YARN_CACHE_FOLDER: .cache
-
-  zoo-backend:
-    image: ghcr.io/vieites-tfg/zoo-backend
-    container_name: zoo-backend
-    hostname: zoo-backend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - mongodb
-    environment:
-      NODE_ENV: production
-      YARN_CACHE_FOLDER: .cache
-      MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT:-27017}/${MONGO_DATABASE}?authSource=admin"
-
-  mongodb:
-    image: mongo:7.0
-    container_name: zoo-mongo
-    hostname: mongodb
-    environment:
-      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASS}
-    ports:
-      - "${MONGO_PORT_HOST:-27017}:${MONGO_PORT:-27017}"
-    volumes:
-      - ./mongo-init/:/docker-entrypoint-initdb.d/
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
-\end{lstlisting}
-
-En el archivo que se muestra en el Listing \ref{lst:dockercompose}, se puede observar cómo se configura el despliegue de tres servicios diferentes. Cada uno de los servicios se construye a partir de una imagen de Docker. Las imágenes correspondientes al frontend y al backend de la aplicación (\texttt{zoo-frontend} y \texttt{zoo-backend}, respectivamente) se generan y almacenan en un registro de GitHub al finalizar el ciclo de CI. Una vez publicadas, se pueden descargar indicando en el campo \texttt{image} el registro en el que están almacenadas junto con su nombre, como se puede ver en las líneas 4 y 16.
-
-Simplemente, utilizando el comando del Listing \ref{lst:dcup}:
-
-\begin{itemize}
-  \item Se levantan los tres servicios.
-  \item Se les pasarán las variables de entorno indicadas.
-  \item Se podrá acceder a ellos a través de los puertos establecidos, siendo el primer número el puerto local y el segundo el puerto del contenedor (\texttt{<local>:<contenedor>}).
-  \item Se compartirán los volúmenes mencionados.
-\end{itemize}
-
-\begin{lstlisting}[language=bash,label=lst:dcup]{Despliegue con Docker Compose}
-docker compose up
-\end{lstlisting}
-
-Los valores de las variables de entorno, los indicados como \texttt{\$\{variable\}}, se obtienen de un archivo \texttt{.env}, el cual debe estar presente en el mismo directo que el archivo de configuración. En otro caso, es posible indicar la ruta al archivo mediante el campo \texttt{env\_file}, dentro de cada uno de los servicios configurados.
-
-Docker Compose no es una plataforma de producción, se utiliza únicamente con el fin de desarrollar localmente, y es muy útil en el caso de querer hacer pruebas rápidas de una aplicación sencilla. Se puede tomar como un precursor conceptual a la orquestación más compleja que realiza Kubernetes\ref{subsec:k8shelm}.
+Docker Compose no es una plataforma de producción, se utiliza únicamente con el fin de desarrollar localmente, y es muy útil en el caso de querer hacer pruebas rápidas de una aplicación sencilla. Se puede tomar como un precursor conceptual a la orquestación más compleja que realiza Kubernetes.
 
 \subsection*{Kubernetes, Helm \& KinD}
 \label{subsec:k8shelm}
@@ -320,77 +114,9 @@ El proyecto Kubernetes nació un año después que Docker. Es una herramienta de
     Se exponen los contenedores entre ellos y/o a Internet. Además, permite distribuir el tráfico de red, evitando así sobrecargas.
 \end{itemize}
 
-\begin{figure}
-  \centerline{\includegraphics[width=10cm]{figuras/k8s}}
-  \caption{Arquitectura de Kubernetes.\cite{img:k8s}}
-  \label{fig:k8s}
-\end{figure}
+Más información en \ref{tech:k8s}.
 
-Un \textit{cluster} de Kubernetes se compone de dos tipos principales de servidores (``nodos''):
-
-\begin{itemize}
-  \item El \textit{Control Plane}.
-
-    Toma todas las decisiones. Se encarga de que todo el sistema funcione como debe.
-
-  \item Los nodos de trabajo.
-
-    Donde realmente se ejecutan las aplicaciones. Reciben órdenes del \textit{Control Plane}. Puede y suele haber más de un nodo de trabajo en un \textit{cluster}.
-\end{itemize}
-
-Kubernetes te permite definir diferentes elementos en archivos \texttt{YAML}. Estos archivos describen el estado que deseamos que tenga el sistema en todo momento. Kubernetes se encarga de procesar estos archivos e intentar hacer que el estado real del sistema sea igual al estado deseado.
-
-Entre los elementos que se pueden construir se encuentran los siguientes:
-
-\begin{itemize}
-  \item Pod.
-
-    Es la unidad más pequeña que se puede crear. Puede tener uno o más contenedores, pero lo normal es que tenga solo uno. Su función es encapsular y ejecutar la aplicación que le corresponda, que se indica mediante una imagen de Docker.
-  \item Deployment.
-
-    Se trata de un controlador de Pods. Normalmente se utiliza este tipo de elementos en vez de crear Pods directamente. Esto es porque le puedes indicar la cantidad de Pods (réplicas) que deseas que haya en todo momento en el sistema, y el \textit{deployment} lo hace por ti.
-  \item Service.
-
-    Debido a que los Pods son efímeros, es decir, se crean y se destruyen constantemente, cambiando así su dirección IP; es necesario tener un elemento que funcione como punto fijo de acceso a un Pod. Para eso sirve un Service. Estos proporcionan un nombre y una IP únicos y fijos para los Pods.
-  \item Ingress.
-
-    Es un elemento más avanzado que un Service. Permite gestionar el acceso desde Internet, dirigiendo las peticiones hacia los servicios correctos dentro del \textit{cluster}.
-
-  \item ConfigMap.
-
-    Este elemento está diseñado para almacenar valores no sensibles. Se definen en formato clave-valor. Permite separar la configuración de una aplicación de su código.
-
-  \item Secret.
-
-    Es muy similar a un ConfigMap, pero está diseñado para almacenar y gestionar información sensible. Su función es guardar datos que no se deberían mostrar a simple vista en la configuración de una aplicación, como contraseñas o \textit{tokens} de autenticación.
-\end{itemize}
-
-Complementando a Kubernetes tenemos Helm, que se trata de un gestor de paquetes para Kubernetes. Su propósito es ayudar a instalar y administrar el ciclo de vida de las aplicaciones de Kubernetes. Además, las Helm Charts son formatos de archivos YAML que te permiten definir los objetos de Kubernetes de una manera dinámica. Esto te permite definir aplicaciones mucho más complejas.
-
-\begin{figure}
-  \centerline{\includegraphics[width=10cm]{figuras/helm}}
-  \caption{Arquitectura de Helm.\cite{img:helm}}
-  \label{fig:helm}
-\end{figure}
-
-\begin{lstlisting}[language=helm]{Ejemplo de objeto Ingress utilizado en este proyecto.}
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ .Release.Name }}-{{ .Chart.Name }}-ingress
-spec:
-  rules:
-    - host: {{ tpl .Values.ingress.hostTemplate . }}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Release.Name }}-{{ .Chart.Name }}-svc
-                port:
-                  number: {{ .Values.service.port }}
-\end{lstlisting}
+Complementando a Kubernetes tenemos Helm (figura \ref{fig:helm}), que se trata de un gestor de paquetes para Kubernetes. Su propósito es ayudar a instalar y administrar el ciclo de vida de las aplicaciones de Kubernetes. Además, las Helm Charts son formatos de archivos YAML que te permiten definir los objetos de Kubernetes de una manera dinámica. Esto te permite definir aplicaciones mucho más complejas .
 
 Para desplegar una aplicación de Kubernetes es necesario tener un \textit{cluster} preparado para soportar este tipo de recursos. Un \textit{cluster} de Kubernetes es un conjunto de máquinas o nodos que trabajan juntos con el fin de ejecutar y gestionar aplicaciones que corren dentro de contenedores. Para crear los \textit{clusters} en los que se desplega la aplicación se utiliza KinD\cite{kind}.
 
@@ -421,29 +147,9 @@ Dagger es el pilar fundamental de este trabajo. Se trata de un kit de desarrollo
 La principal idea de los creadores de Dagger siempre ha sido poder crear \textit{pipelines} portables, que no sea necesario implementarlos de nuevo cada cierto tiempo debido a cambios en el entorno de desarrollo o de pruebas. Esta portabilidad se consigue permitiendo a los desarrolladores utilizar cualquier \textit{runtime} de OCI (\textit{Open Container Initiative}\cite{oci}) para ejecutar las funciones que forman parte del SDK\cite{sdk} de Dagger, así como las que definen los propios desarrolladores. Además, desde el principio se ha evitado el uso de archivos YAML, que está siendo el lenguaje de configuración más utilizado por parte de la mayoría de aplicaciones.
 
 \subsubsection*{CUE}
+\label{subsec:cue}
 
 Dagger comenzó utilizando un lenguaje de configuración muy potente llamado CUE\cite{cue}. Este se podría ver como una extensión de JSON, pero con más funcionalidades. Todo lo escrito en JSON se puede traducir a CUE, pero no al revés. En el Listing \ref{lst:cue} se puede ver un ejemplo de código de Dagger en el que se utiliza CUE para lanzar un ``plan''. En él se descarga la imagen de Docker de Alpine y se almacena en un registro levantado en la máquina local.
-
-\begin{lstlisting}[language=go,label=lst:cue]{Código de Dagger con CUE}
-package main
-
-import (
-    "dagger.io/dagger"
-    "universe.dagger.io/docker"
-)
-
-dagger.#Plan & {
-    actions: {
-        pull: docker.#Pull & {
-            source: "alpine"
-        }
-        push: docker.#Push & {
-            image: pull.output
-            dest:  "localhost:5042/alpine"
-        }
-    }
-}
-\end{lstlisting}
 
 Esta es la primera vez que se pueden ejecutar \textit{pipelines} definidas de manera programática, ejecutadas sobre un \textit{runtime} de Docker, y de manera relativamente funcional. Además, se puede ejecutar toda la secuencia de acciones de manera local, permitiendo realizar pruebas y buscar errores sin necesidad de hacer uso de otras herramientas de CI como GitHub Actions.
 
@@ -458,62 +164,9 @@ Además, Dagger hace un uso exhaustivo de la caché. Todas las acciones son cach
 Dependiendo del tipo de aplicación y, evidentemente, de la conexión a Internet, esto puede tardar desde unos segundos hasta varios minutos. Pero con Dagger solo ocurre una vez. La primera vez. Gracias a la caché, todas las acciones repetitivas, como la instalación de dependencias o la compilación de la aplicación, se almacenan en la caché, ahorrando así mucho tiempo a la hora de realizar pruebas de cualquier tipo. Mientras tanto, con otras herramientas se tendría que esperar siempre la misma cantidad de tiempo para cada una de las veces que se quiere lanzar el \textit{pipeline}. Y, además, muchas veces ni siquiera serda de manera local, habría que depender de aplicaciones que pueden fallar o no estar disponibles en algún momento.
 
 \subsubsection*{CI/CD como código}
+\label{subsec:cicd-code}
 
-Dagger a querido ir más allá pensando que los desarrolladores deberían ser capaces de crear sus \textit{pipelines} de la misma manera que crean sus aplicaciones, escribiendo código. Es así como el SDK de Go\cite{go} para Dagger, el cual se utiliza en este trabajo. Go es un lenguaje de programación con muchos casos de uso. Desde la creación de servicios de red y en la nube, hasta aplicaciones CLI y desarrollo web. Es conocido también por su simplicidad en cuanto a sintaxis y por tener una librería estándar muy completa, aportando muchas de las herramientas necesarias para realizar proyectos comunes. Además, facilita la implementación de programación concurrente, gracias a las \textit{goroutines}, similares a los hilos de ejecución de un sistema operativo, pero mucho más ligeros. En el Listing \ref{lst:daggergo} se puede observar un ejemplo de código\cite{daggergo} utilizando el SDK de Go.
-
-\begin{lstlisting}[language=go,label=lst:daggergo]{Primeros ejemplos del SDK de Go de Dagger.}
-package main
-
-import (
-  "context"
-  "fmt"
-  "os"
-
-  "dagger.io/dagger"
-)
-
-func main() {
-  err := doCi()
-  if err != nil {
-    fmt.Println(err)
-  }
-}
-
-func doCi() error {
-  ctx := context.Background()
-
-  // create a Dagger client
-  client, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stdout))
-  if err != nil {
-    return err
-  }
-  defer client.Close()
-
-  src := client.Host().Directory(".") // get the projects source directory
-
-  yarn := client.Container().From("yarnpkg/node-yarn"). // initialize new container from yarn image
-  WithDirectory("/src", src).WithWorkdir("/src"). // mount source directory to /src
-  WithExec([]string{"yarn", "test"}) // execute yarn test command
-
-  // get test output
-  test, err := yarn.Stdout(ctx)
-  if err != nil {
-    return err
-  }
-  // print output to console
-  fmt.Println(test)
-
-  // execute build command and get build output
-  build, err := yarn.WithExec([]string{"yarn", "build"}).Stdout(ctx)
-  if err != nil {
-    return err
-  }
-  // print output to console
-  fmt.Println(build)
-
-  return nil
-}
-\end{lstlisting}
+Dagger a querido ir más allá pensando que los desarrolladores deberían ser capaces de crear sus \textit{pipelines} de la misma manera que crean sus aplicaciones, escribiendo código. Es así como el SDK de Go\cite{go} para Dagger, el cual se utiliza en este trabajo. Go es un lenguaje de programación con muchos casos de uso. Desde la creación de servicios de red y en la nube, hasta aplicaciones CLI y desarrollo web. Es conocido también por su simplicidad en cuanto a sintaxis y por tener una librería estándar muy completa, aportando muchas de las herramientas necesarias para realizar proyectos comunes. Además, facilita la implementación de programación concurrente, gracias a las \textit{goroutines}, similares a los hilos de ejecución de un sistema operativo, pero mucho más ligeros. En el Listing \ref{lst:daggergo} se puede observar un ejemplo de código utilizando el SDK de Go.
 
 Todo lo anterior hace de Go una elección excelente para empezar la lista de lenguajes de programación sobre los que el equipo de Dagger implementaría su propio SDK, que hasta el día de hoy incluyen: Java, PHP, Node y Python. 
 
@@ -533,36 +186,6 @@ Se puede ver su funcionamiento en la Figura \ref{fig:graphql}. El SDK de cada un
 
 Entonces, tras varias mejoras y nuevas versiones, el equipo de Dagger implementó las ``funciones de Dagger''. Estas funciones son el componente principal de Dagger hoy en día. Cada una de las operaciones principales de Dagger se pueden llamar a través de una función, utilizando una API. Además, estas se pueden encadenar, generando \textit{pipelines} dinámicas en una sola llamada. De esta manera, se puede decir finalmente que gracias a Dagger podemos programar nuestros ciclos CI/CD, en el lenguaje que queramos, dentro de los que están disponibles.
 
-\begin{lstlisting}[language=go,label=lst:daggerfunctions]{Extracto de funciones de Dagger de este trabajo}
-// Builds the frontend package, generating only one executable
-// file and returns the container.
-func (m *Frontend) Build(ctx context.Context) *dagger.Container {
-  build := m.Base.
-    WithWorkdir("/app").
-    WithExec([]string{"lerna", "run", "--scope", "@vieites-tfg/zoo-frontend", "build"})
-
-  return build
-}
-
-// Based on the build stage, gets the executable file and creates
-// a ready to run container with Nginx and the port 80 exported.
-func (m *Frontend) Ctr(ctx context.Context) *dagger.Container {
-  build := m.Build(ctx)
-
-  dist := build.Directory("/app/packages/frontend/dist")
-
-  ctr := dag.
-    Container().
-    From("nginx:alpine").
-    WithWorkdir("/usr/share/nginx/html").
-    WithDirectory(".", dist).
-    WithExposedPort(80).
-    WithEntrypoint([]string{"nginx", "-g", "daemon off;"})
-
-  return ctr
-}
-\end{lstlisting}
-
 La existencia de las funciones de Dagger permite la creación de módulos, un conjunto de funciones que toman una entrada y producen una salida en concreto. Los módulos creados por la comunidad se pueden encontrar en el Daggerverse\cite{daggerverse}. Este es el lugar en el que se comparten módulos de Dagger, los cuales se pueden utilizar en el caso de que alguno sea necesario para el \textit{pipeline} que se quiera crear.
 
 \subsubsection*{CLI}
@@ -573,11 +196,7 @@ Otra funcionalidad que tiene Dagger es su CLI\cite{cli} (\textit{Command-Line In
 dagger call --sec-env=file//../../.env backend service up --ports 3000:3000
 \end{lstlisting}
 
-De esta manera (Listing \ref{lst:callbackend}) es como se ejecutan las funciones que se definen en los módulos creados en este trabajo. Toda la documentación al respecto se puede encontrar en
-\begin{bclogo}[logo=\bcattention]{Important!}
-  CITAR APÉNDICE
-\end{bclogo}
-
+De esta manera (Listing \ref{lst:callbackend}) es como se ejecutan las funciones que se definen en los módulos creados en este trabajo. Toda la documentación al respecto se puede encontrar en \ref{chap:usuario}
 
 \subsubsection*{Resumen}
 

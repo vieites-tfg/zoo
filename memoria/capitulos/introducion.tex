@@ -31,21 +31,13 @@ Para lograr los objetivos principales es necesario llevar a cabo varios pasos:
 
 \begin{itemize}
   \item Creación de un \textit{monorepo}\cite{monorepo} en GitHub.
+  \item Diseño y creación de una aplicación de prueba. Esta consistirá en una página web de gestión de un zoo, la cual realizará peticiones a una API REST que estará conectada a una base de datos.
+  \item Implementación de un \textit{pipeline} CI/CD con y sin Dagger.
+  \item Entorno orquestado por Kubernetes\cite{kubernetes}, configurado a través de una Chart de Helm\cite{helm}.
 
-    Todo el código principal se almacenará en un mismo repositorio. De esta manera se evitarán complicaciones debido a la gestión de dependencias de cada una de las partes de la aplicación. Permitirá controlar todo el código fuente de una manera más sencilla al tratarse de un proyecto relativamente pequeño.
-  \item Diseño y creación de una aplicación \textit{dummy}.
+    % La fase final del \textit{pipeline} de Dagger no despliega la aplicación, sino que actualiza la configuración en un repositorio de estado. El despliegue sigue un modelo GitOps\cite{gitops} gestionado por ArgoCD\cite{argocd}, el cual se encarga de detectar los cambios en el repositorio de estado y actualizar los \textit{clusters} en consecuencia.
 
-    Es necesario una aplicación sobre la que realizar los ciclos de CI/CD. Esta consistirá en una página web (frontend) de gestión de un zoo, la cual realizará peticiones a una API REST (backend) que estará conectada a una base de datos.
-  \item Implementación de un \textit{pipeline} CI/CD.
-
-    Se creará un módulo de Dagger para cada uno de los procesos (CI y CD). El módulo de CI permitirá desde compilar la aplicación, hasta publicar las imágenes de Docker y los paquetes NPM tanto del frontend como del backend. Por otro lado, el módulo de CD será el encargado de utilizar esas imágenes que se han publicado previamente y desplegar la aplicación en el entorno correspondiente.
-  \item Entorno orquestado.
-
-    El ciclo de CD termina en un entorno orquestado por Kubernetes\cite{kubernetes}, configurado a través de una \textit{chart} de Helm\cite{helm}. La fase final del \textit{pipeline} de Dagger no despliega la aplicación, sino que actualiza la configuración en un repositorio de estado. El despliegue sigue un modelo GitOps\cite{gitops} gestionado por ArgoCD\cite{argocd}, el cual se encarga de detectar los cambios en el repositorio de estado y actualizar los \textit{clusters} en consecuencia.
-
-  \item Análisis comparativo
-
-    Finalmente, se realiza un análisis de las ventajas que ofrece Dagger frente a métodos convencionales.
+  \item Análisis comparativo de las ventajas que ofrece Dagger frente a métodos convencionales.
 \end{itemize}
 
 \section{Relación de la documentación}
