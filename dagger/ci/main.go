@@ -5,7 +5,7 @@ import (
 	"dagger/dagger/internal/dagger"
 )
 
-type Dagger struct {
+type Ci struct {
 	// This is the '.env' file with the environment variables needed to launch the application.
 	// +required
 	SecEnv  *dagger.Secret
@@ -13,14 +13,14 @@ type Dagger struct {
 	secrets secrets
 }
 
-func New(secEnv *dagger.Secret) *Dagger {
-	return &Dagger{
+func New(secEnv *dagger.Secret) *Ci {
+	return &Ci{
 		SecEnv: secEnv,
 	}
 }
 
 // Builds the base image from the Dockerfile.
-func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) (*dagger.Container, error) {
+func (m *Ci) Base(ctx context.Context, src *dagger.Directory) (*dagger.Container, error) {
 	ctr := dag.
 		Container().
 		From("node:20").
@@ -29,6 +29,7 @@ func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) (*dagger.Conta
 		WithFile("lerna.json", src.File("lerna.json")).
 		WithFile("yarn.lock", src.File("yarn.lock")).
 		WithDirectory("packages", src.Directory("packages")).
+		WithDirectory(".git", src.Directory(".git")).
 		WithExec([]string{"yarn", "install"}).
 		WithExec([]string{"yarn", "global", "add", "lerna@8.2.1"}).
 		WithExec([]string{"yarn", "global", "add", "@vercel/ncc"})
@@ -37,7 +38,7 @@ func (m *Dagger) Base(ctx context.Context, src *dagger.Directory) (*dagger.Conta
 }
 
 // Init configures the content with the .env environment variables
-func (m *Dagger) Init(
+func (m *Ci) Init(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
@@ -61,7 +62,7 @@ func (m *Dagger) Init(
 }
 
 // Functions related to the backend package.
-func (m *Dagger) Backend(
+func (m *Ci) Backend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
@@ -88,7 +89,7 @@ func (m *Dagger) Backend(
 }
 
 // Functions related to the backend package.
-func (m *Dagger) Frontend(
+func (m *Ci) Frontend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
@@ -109,7 +110,8 @@ func (m *Dagger) Frontend(
 	}, nil
 }
 
-func (m *Dagger) Endtoend(
+// Runs the linter and the tests for both the frontend and the backend.
+func (m *Ci) Endtoend(
 	ctx context.Context,
 	// +defaultPath="/"
 	src *dagger.Directory,
@@ -119,17 +121,35 @@ func (m *Dagger) Endtoend(
 		return "", err
 	}
 
+	front, err := m.Frontend(ctx, src)
+	if err != nil {
+		return "", err
+	}
+
+	// Linter
+	_, err = back.Lint(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = front.Lint(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	// Backend tests
+	_, err = back.Test(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	// Frontend tests
 	backSvc, err := back.Service(ctx, src)
 	if err != nil {
 		return "", err
 	}
 
 	backendSvc, err := backSvc.Start(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	front, err := m.Frontend(ctx, src)
 	if err != nil {
 		return "", err
 	}

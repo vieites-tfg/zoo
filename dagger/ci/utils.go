@@ -53,45 +53,16 @@ func parseEnvFile(content string) map[string]string {
 	return envVars
 }
 
-func getVersion(ctx context.Context, ctr *dagger.Container, pkg string) (string, error) {
-	return ctr.
-		WithWorkdir(fmt.Sprintf("/app/packages/%s", pkg)).
-		WithExec([]string{"node", "-p", "require('./package.json').version"}).
-		Stdout(ctx)
-}
-
-func getTags(ctx context.Context, base *dagger.Container, pkg string) ([]string, error) {
-	version, err := getVersion(ctx, base, pkg)
-	if err != nil {
-		return nil, err
-	}
-
-	return []string{"latest", strings.TrimSpace(version)}, nil
-}
-
 func PublishImage(
 	ctx context.Context,
-	base *dagger.Container,
 	image *dagger.Container,
 	pkg string,
 	sec *dagger.Secret,
-) ([]string, error) {
-	tags, err := getTags(ctx, base, pkg)
-	if err != nil {
-		return tags, err
-	}
-
-	var out []string
-	for _, t := range tags {
-		imageRef, err := image.WithRegistryAuth("ghcr.io", "vieitesss", sec).
-			Publish(ctx, fmt.Sprintf("ghcr.io/vieites-tfg/zoo-%s:%s", pkg, t))
-		if err != nil {
-			return out, err
-		}
-		out = append(out, imageRef)
-	}
-
-	return out, nil
+	tag string,
+) (string, error) {
+	return image.
+		WithRegistryAuth("ghcr.io", "vieitesss", sec).
+		Publish(ctx, fmt.Sprintf("ghcr.io/vieites-tfg/zoo-%s:%s", pkg, tag))
 }
 
 func Lint(ctx context.Context, base *dagger.Container, pkg string) (string, error) {

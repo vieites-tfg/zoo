@@ -1,7 +1,8 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+name: dev
 networking:
-  apiServerPort: 3000
+  apiServerPort: 6443
 nodes:
 - role: control-plane
   kubeadmConfigPatches:
@@ -13,4 +14,7 @@ nodes:
   extraPortMappings:
   - containerPort: 80
     hostPort: 8080
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 8443
     protocol: TCP
