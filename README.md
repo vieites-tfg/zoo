@@ -2,7 +2,7 @@
 
 ## Repositorios
 
-Este trabajo se compone de tres repositorios bien diferenciados y con su protia funcionalidad. Todos ellos se pueden encontrar en esta organización, `vieites-tfg`.
+Este trabajo se compone de tres repositorios bien diferenciados y con su propia funcionalidad. Todos ellos se pueden encontrar en esta organización, `vieites-tfg`.
 
 - `zoo`: Este repositorio. Es el principal del trabajo. En él se encuentra todo el código fuente, desde la aplicación *dummy* hasta la implementación de los módulos de Dagger. Es el único necesario para probar las diferentes funcionalidades.
 - `helm-repository`: Alberga las Chart de Helm que describen el despliegue de la aplicación *dummy* en Kubernetes.
@@ -80,7 +80,7 @@ A continuación se indica el software junto con las versiones utilizadas para el
 
 > [!note]
 > **No** se ha probado en un sistema operativo Windows, por lo que no se asegura su funcionamiento en este.
-> Sí se ha probado en MacOS y distrybuciones Linux.
+> Sí se ha probado en MacOS y distribuciones Linux.
 
 | **Software** | **Version** | **Docs** |
 |---|---|---|

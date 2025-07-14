@@ -1,4 +1,133 @@
 \chapter{Manuales de usuario}
 \label{chap:usuario}
+%
+Este trabajo se compone de tres repositorios bien diferenciados y con su propia funcionalidad. Todos ellos se pueden encontrar en esta organización, \href{https://github.com/vieites-tfg}{vieites-tfg}.
 
-Incluirán toda a información precisa para aquelas persoas que utilicen o Sistema: instalación, utilización, configuración, mensaxes de erro, etc. A documentación do usuario debe ser autocontida, é dicir, para o seu entendemento o usuario final non debe precisar da lectura doutro manual técnico.
+\begin{itemize}
+  \item \texttt{zoo}: Es el repositorio principal del trabajo. En él se encuentra todo el código fuente, desde la aplicación de prueba hasta la implementación de los módulos de Dagger. Es el único necesario para probar las diferentes funcionalidades.
+  \item \texttt{helm-repository}: Alberga las Chart de Helm que describen el despliegue de la aplicación de prueba en Kubernetes.
+  \item \texttt{state}: En él se almacenan los valores de las Charts de Helm correspondientes a cada uno de los entornos en los que se puede desplegar la aplicación. Funciona como única fuente de verdad. También es el lugar de donde ArgoCD obtiene los recursos de Kubernetes, con el fin de ser desplegados.
+\end{itemize}
+
+Cada uno de los repositorios tiene su propio \texttt{README}. Consultar los demás para más información.
+
+\section{zoo}
+
+\subsection*{Estructura general del repositorio}
+
+\begin{lstlisting}[language=bash,label=lst:zoo-structure]{Estructura principal del repositorio ``zoo''}
+argo
+|- argo_dev.yaml
+|- argo_pre.yaml
+|- argo_pro.yaml
+|- values.yaml
+cluster
+|- kind_dev.yaml
+|- kind_local.yaml
+|- kind_pre.yaml
+|- kind_pro.yaml
+dagger
+|- cd
+|- ci
+docker-compose.yml
+Dockerfile
+example.env
+mongo-init
+|- init-zoo.js
+packages
+|- backend
+|- frontend
+scripts
+|- create_envs.sh
+|- image.sh
+|- push_package.sh
+sops
+|- .sops.yaml
+|- age.agekey
+\end{lstlisting}
+
+
+Este repositorio funciona como un monorepo, lo cual indica que todo el código fuente se encuentra en este único lugar.
+
+\subsubsection*{Aplicación de prueba}
+
+Consta de un \textit{frontend} y un \textit{backend}, ambos creados con Typescript, y utilizando Vue para el \textit{frontend}. Se gestiona utilizando una herramienta de gestión de \textit{monorepos} llamada Lerna. En la raíz del repositorio se pueden encontrar archivos de configuración de Lerna y Node.js. El código correspondiente al \textit{frontend} y al \textit{backend} se incluyen en el directorio \texttt{packages}. El \textit{backend} se conecta a una base de datos de animales de un zoo, y proporciona una API REST que el \textit{frontend} consume, con el fin de poder realizar acciones CRUD sobre la base de datos.
+
+\subsubsection*{Dagger}
+
+En el directorio \texttt{dagger} se encuentran las implementaciones de los módulos correspondientes a los flujos de CI y CD. Estos se pueden ejecutar localmente teniendo Dagger y Docker instalados. Se utilizan en el \textit{workflow} de GitHub encargado de realizar todo el flujo de testeo, publicación y despliegue.
+
+\subsubsection*{Otros}
+
+También se pueden encontrar varios ejecutables en el directorio de \texttt{scripts}, de los cuales \texttt{create\_envs.sh} es el más interesante. Este permite levantar los \textit{clusters} en local para probar el despliegue de la aplicación en los tres entornos posibles: \texttt{dev}, \texttt{pre} y \texttt{pro}.
+
+En todos los \textit{clusters} se instala ArgoCD, aplicación creada específicamente para Kubernetes y que utiliza el método \textit{pull}, siguiendo la filisofía GitOps, leyendo los recursos a desplegar del repositorio de estado (\texttt{state}) mencionado anteriormente. Este tiene una rama \texttt{deploy}, en la que se suben los archivos necesarios para que Argo lea y despliegue la aplicación.
+
+Se configuran los \textit{clusters} y las propias instancias de Argo de manera diferente para cada uno de los clusters. Estas configuraciones se pueden encontrar en los directorios \texttt{cluster} y \texttt{argo}.
+
+Además, este trabajo tiene una memoria asociada, en la cual se pueden encontrar unas claves privada y pública, junto con otros \textit{tokens}, necesarias para poder probar la implementación. Estas claves y \textit{tokens} tienen varios propósitos:
+
+\begin{itemize}
+  \item Claves privada y pública: Se utilizan para encriptar y desencriptar los secretos (\texttt{Secrets}) de Kubernetes.
+  \item \texttt{tokens}: Un \texttt{CR\_PAT}, que permite acceder al Container Registry de GitHub, donde se encuentran las imágenes de Docker de la aplicación; y un \texttt{STATE\_REPO}, necesario para poder actualizar el repositorio de estado y actualizar los recursos que se van a desplegar.
+\end{itemize}
+
+\subsection*{Prueba mínima}
+
+Aquí se describen los requisitos de \textit{software} y pasos a seguir para probar de la manera más simple la aplicación. Con esta prueba se comprobará que se pueden obtener los recursos de Kubernetes y levantar la aplicación en los diferentes entornos, pudiendo visualizar todos estos recursos en ArgoCD.
+
+Los elementos que van a influir en esta prueba serán: los \textit{clusters} junto con sus configuraciones y las de ArgoCD, y el repositorio de estado, en el cual ya debería haber recursos preparados para desplegar.
+
+\subsubsection*{Requisitos software}
+
+A continuación, en el cuadro \ref{table:software} se indica el software junto con las versiones utilizadas para el desarrollo del proyecto.
+
+Es necesario tener en cuenta que \textit{no} se ha probado en un sistema operativo Windows, por lo que no se asegura su funcionamiento en este. Sí se ha probado en MacOS y distribuciones Linux.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|l|}
+    \hline
+    \textit{Software} & \textit{Version} \\ \hline
+    \href{https://git-scm.com/book/en/v2/Getting-Started-Installing-Git}{Git} & 2.48.1 \\ \hline
+    \href{https://github.com/casey/just?tab=readme-ov-file#installation}{Just} & 1.39.0 \\ \hline
+    \href{https://docs.docker.com/desktop/}{Docker} & 27.5.1 \\ \hline
+    \href{https://kubernetes.io/docs/tasks/tools/#kubectl}{Kubectl} & 1.33 \\ \hline
+    \href{https://kubernetes.io/docs/tasks/tools/#kind}{Kind} & 0.27.0 \\ \hline
+    \href{https://helm.sh/docs/intro/install/}{Helm} & 3.17.3 \\ \hline
+  \end{tabular}
+  \caption{Software y versiones utilizadas durante el desarrollo}
+  \label{table:software}
+\end{table}
+
+
+
+
+\begin{lstlisting}[language=bash,label=lst:env-file]{Archivo de secretos .env}
+# Se ha divido en dos STATE_REPO, pero es un solo string
+MONGO_DATABASE=zoo
+MONGO_ROOT=carer
+MONGO_ROOT_PASS=carerpass
+CR_PAT=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
+STATE_REPO=github_pat_11AOOYJPI0kFqDJhfeNXeO_mqIU7LFD5b3 # sigue
+aPCjva4OJc1FoU4VazLelsjhuyyCbsxTKGDLECUGEMzuyySO
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash,label=lst:env-file]{Archivo de secretos .secrets.yaml, para pruebas con act}
+# Se han divido en dos STATE_REPO, age y SOPS_PRIVATE_KEY,
+# pero son un solo string
+MONGO_DATABASE: zoo
+MONGO_ROOT: carer
+MONGO_ROOT_PASS: carerpass
+CR_PAT: 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
+STATE_REPO: github_pat_11AOOYJPI0kFqDJhfeNXeO_mqIU7LFD5b # sigue
+3aPCjva4OJc1FoU4VazLelsjhuyyCbsxTKGDLECUGEMzuyySO
+SOPS_CONFIG_FILE: |
+  creation_rules:
+      - path_regex: ".*\\\\.ya?ml$"
+        unencrypted_regex: "^(apiVersion|metadata|kind|type)$"
+        age: age15peyc7pedj8gjqwnarat6s3u87wy4j5xtf7t96v # sigue
+        uj74m3l9xq5ys0r4sag
+SOPS_PRIVATE_KEY: AGE-SECRET-KEY-1CTS4S4QNNZ9N9YXXM288LS # sigue
+E9VKPJ220E57ZHC4558WMZ8LG2QWKQFFER8C
+\end{lstlisting}
