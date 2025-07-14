@@ -1,8 +1,11 @@
 node_modules/
 dist/
+sops/
 local_packages/
+.github/events
 
 .cache
+.secrets.yaml
 .env
 .DS_Store
 
