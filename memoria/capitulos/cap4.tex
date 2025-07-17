@@ -1,16 +1,14 @@
 \chapter{Implementación del \textit{pipeline} con Dagger}
 \label{chap:dagger}
 
-En este capítulo se explica cómo ha sido la implementación del \textit{pipeline} con Dagger. Desde los primeros pasos, sin utilizar Dagger, hasta el ciclo completo final, completamente integrado con esta herramienta. Se pretende comprobar que el uso de Dagger permite dar a los desarrolladores más flexibilidad a la hora de crear los \textit{pipelines} de CI y CD para sus aplicaciones, sin depender de tener un sistema operativo o configuración en concreto para la ejecución de estos.
+Este capítulo describe la implementación del \textit{pipeline} con Dagger. Se parte de una versión inicial sin la herramienta, y se llega a un ciclo completo, plenamente integrado con esta herramienta. El objetivo es demostrar que Dagger aporta mayor flexibilidad a los desarrolladores para construir \textit{pipelines} de CI y CD, sin depender de tener un entorno de desarrollo ni de una configuración específica para ejecutarlos.
 
 \section{CI}
 \label{sec:dagger-ci}
 
-Tras realizar una primera aproximación de la aplicación de prueba, el siguiente paso consiste en realizar el ciclo de CI. Aunque se podría haber hecho, no se comenzó la implementación de este ciclo directamente con Dagger.
+Tras realizar una primera aproximación de la aplicación de prueba, el siguiente paso consiste en realizar el ciclo de CI. En este ciclo se realizan los tests de la aplicación, el \textit{linting} del código y la publicación de imágenes de Docker y de paquetes NPM. Al principio se comenzó a implementar el ciclo completo sin el uso de Dagger. Se utilizó un \texttt{justfile} con los comandos necesarios para realizar tanto los tests como el \textit{linting} de los paquetes de la aplicación, y se crearon dos \textit{scripts}: uno para la publicación de imágenes y otro para la publicación de paquetes NPM. Además, se crea un Dockerfile para poder realizar las pruebas \textit{end-to-end} del \textit{frontend} con Cypress\cite{cypress}.
 
-En este ciclo se realizan los tests de la aplicación, el \textit{linting} del código y la publicación de imágenes de Docker y de paquetes NPM. Al principio se comenzó a implementar el ciclo completo sin el uso de Dagger. Se utilizó un \texttt{justfile} con los comandos necesarios para realizar tanto los tests como el \textit{linting} de los paquetes de la aplicación, y se crearon dos \textit{scripts}: uno para la publicación de imágenes y otro para la publicación de paquetes NPM. Además, se crea un Dockerfile para poder realizar las pruebas \textit{end-to-end} del \textit{frontend} con Cypress\cite{cypress}.
-
-La desventaja con respecto al Dagger es evidente: \textit{scripts} y comandos que ``funcionan en mi máquina''. Siguiendo esta práctica, sería necesario que todo el equipo de desarrollo utilizara el mismo sistema operativo, y aún así, no se garantizaría el funcionamiento del ciclo de CI, debido a posibles configuraciones que cada desarrollador haya hecho a su sistema que pueda diferir de las configuraciones de los demás. Con este método, los desarrolladores no tienen margen de maniobra en cuanto al sistema que deben utilizar.
+La desventaja con respecto al Dagger es evidente: \textit{scripts} y comandos que ``funcionan en mi máquina''. Siguiendo esta práctica, sería necesario que todo el equipo de desarrollo utilizara el mismo entorno de desarrollo, y aún así, no se garantizaría el funcionamiento del ciclo de CI, debido a posibles configuraciones que cada desarrollador haya hecho a su sistema que pueda diferir de las configuraciones de los demás. Con este método, los desarrolladores no tienen margen de maniobra en cuanto al sistema que deben utilizar.
 
 Ahora se explica el diseño e implementación con Dagger del mismo ciclo de CI.
 
@@ -95,7 +93,7 @@ Aquí es donde realmente se ve la potencia de Dagger. Todo se programa en un len
 
 \section{CD}
 
-El ciclo de CD involucra: creación y publicación de imágenes de Docker y paquetes NPM, construcción de los recursos de Kubernetes y publicación de estos en el repositorio de estado.
+El ciclo de CD involucra: la construcción de los recursos de Kubernetes, el encriptado de los secretos y la publicación de todos los manifiestos necesarios en el repositorio de estado.
 
 Para comenzar con este ciclo, se crearon un par de \textit{scripts}, uno que permitía construir las imágenes de Docker y su publicación y otro que facilitaba la publicación de los paquetes NPM. Esto tiene las desventajas ya comentadas, son \textit{scripts} que se ejecutan de manera local y que, por lo tanto, dependen del entorno en el que se ejecutan. En el caso de cambiar de entorno de desarrollo, sería necesario crear nuevos \textit{scripts} o acomodarlos al nuevo entorno. Esto solo trae problemas innecesarios a los desarrolladores, que se tienen que centrar en solucinar estos inconvenientes, externos a la finalidad del desarrollo de la aplicación en sí.
 

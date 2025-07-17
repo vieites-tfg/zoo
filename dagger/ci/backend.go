@@ -40,8 +40,6 @@ func (m *Backend) Ctr(ctx context.Context) *dagger.Container {
 		Container().From("node:20-alpine").
 		WithExposedPort(3000).
 		WithEnvVariable("NODE_ENV", "production").
-		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
-		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
 		WithWorkdir("/app").
 		WithFile("/app/package.json", pkgJson).
 		WithFile("/app/index.js", compiled).

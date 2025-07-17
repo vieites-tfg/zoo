@@ -30,6 +30,8 @@ func (m *Ci) Base(ctx context.Context, src *dagger.Directory) (*dagger.Container
 		WithFile("yarn.lock", src.File("yarn.lock")).
 		WithDirectory("packages", src.Directory("packages")).
 		WithDirectory(".git", src.Directory(".git")).
+		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
+		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
 		WithExec([]string{"yarn", "install"}).
 		WithExec([]string{"yarn", "global", "add", "lerna@8.2.1"}).
 		WithExec([]string{"yarn", "global", "add", "@vercel/ncc"})
@@ -162,6 +164,8 @@ func (m *Ci) Endtoend(
 	test := Cypress(src).
 		WithServiceBinding("zoo-frontend", frontendSvc).
 		WithServiceBinding("zoo-backend", backendSvc).
+		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
+		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
 		WithEnvVariable("BASE_URL", "http://zoo-frontend").
 		WithExec([]string{"yarn", "run", "e2e"})
 
