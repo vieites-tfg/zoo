@@ -2,13 +2,13 @@
 
 Antes de empezar a escribir código, se deben entender los conceptos fundamentales que permitirán llevar a cabo este trabajo.
 
-Dagger busca mejorar el ciclo completo de CI/CD de una aplicación. Por lo tanto, es fundamental definir los conceptos de \textit{Continuous Integration} y el \textit{Continuous Delivery}. Una vez se comprenda a qué se refieren esos términos, se podrán entender los métodos y tecnologías convencionales que permiten implementar dichos procesos. Será entonces cuando se pueda introducir Dagger, un herramienta innovadora para realizar \textit{pipelines}.
+Dagger busca mejorar el desarrollo de un ciclo completo de CI/CD de una aplicación. Por lo tanto, es fundamental definir los conceptos de \textit{Continuous Integration} y el \textit{Continuous Delivery}. Una vez se comprenda a qué se refieren esos términos, se podrán entender los métodos y tecnologías convencionales que permiten implementar dichos procesos. Será entonces cuando se pueda introducir Dagger, un herramienta innovadora para implementar \textit{pipelines}.
 
 \section{CI/CD}
 
-CI/CD son las siglas de \textit{Continuous Integration}/\textit{Continuous Delivery}, o en casos más específicos, este último también se puede conocer como \textit{Continuous Deployment}.
+CI/CD son las siglas de \textit{Continuous Integration}/\textit{Continuous Delivery} o, en casos más específicos, este último también se puede conocer como \textit{Continuous Deployment}.
 
-Se trata de un conjunto de pasos automatizados, utilizados en el desarrollo de software para llevar el código desde su implementación inicial hasta el despliegue de la aplicación. Estos pasos incluyen:
+Se trata de un conjunto de pasos automatizados, utilizados en el desarrollo de \textit{software} para llevar el código desde su implementación inicial hasta el despliegue de la aplicación. Estos pasos incluyen:
 
 \begin{itemize}
   \item Integración de cambios en el código.
@@ -36,30 +36,42 @@ La integración de código en un repositorio no se trata simplemente de modifica
 
 Todo lo anterior se debe realizar de manera automatizada, con el fin de integrar el código modificado en el repositorio lo más rápido posible, evitando en la medida de lo posible la intervención humana.
 
+\begin{figure}
+  \centerline{\includegraphics[width=10cm]{figuras/ci}}
+  \caption{Proceso de integración continua.\cite{img:ci}.}
+  \label{fig:ci}
+\end{figure}
+
 \subsection*{\textit{Continuous Delivery}}
 \label{subsec:CD}
 
 Tras haber construido la aplicación durante el proceso de integración continua, toca desplegar la aplicación. El despliegue automático de nuevas versiones de una aplicación que han pasado el ciclo de CI se conoce como ``despliegue continuo'' (figura \ref{fig:cd}).
 
-Esto, evidentemente, tiene como requisito que la aplicación que se está construyendo tenga el despliegue como uno de los pasos en su ciclo de vida, lo cual no tiene por qué ser así. En este trabajo sí que ocurre, ya que la aplicación \textit{dummy} que se construye es una página web, junto con una API y una base de datos.
+Esto tiene como requisito que la aplicación que se está construyendo tenga el despliegue como uno de los pasos en su ciclo de vida, lo cual no tiene por qué ser así. En este trabajo sí que ocurre, ya que la aplicación de prueba que se construye es una página web, junto con una API y una base de datos.
 
 Es necesario que exista relación entre los desarrolladores y los encargados de desplegar la aplicación. Sin embargo, hoy en día encontramos en muchas empresas un conjunto de metodologías conocidas como DevOps\cite{devops}, lo cual implica que ciertos integrantes de un equipo deben tener conocimiento tanto del desarrollo de la aplicación como del despliegue de la misma.
 
 Esta transición a la cultura DevOps permite a los equipos desplegar sus aplicaciones más fácilmente. Además, incluye la necesidad de que el despliegue sea una parte muy importante en el proceso de desarrollo.
 
-Al igual que en la integración continua, en este ciclo también es necesario automatizar el proceso despliegue de una aplicación. Esto siempre va a disminuir la posibilidad de error humano.
+Al igual que en la integración continua, en este ciclo también es necesario automatizar el proceso despliegue de una aplicación. Esto permitirá disminuir la posibilidad de error humano.
 
-Con el despliegue continuo podemos tener \textit{feedback} más rápido por parte del usuario, lo que permitirá mejorar y corregir errores más rápidamente. Además, se despliegan con más frecuencia cambios realizados en la aplicación, por lo que los errores en producción son menos probables y, en el caso de que los haya, más fáciles de corregir. Esto es gracias también a llevar un historial de los cambios mediante una herramienta de control de versiones como Git.
+Con el despliegue continuo podemos tener \textit{feedback} más rápido por parte del usuario, lo que permitirá mejorar y corregir errores más rápidamente. Además, se despliegan con más frecuencia cambios realizados en la aplicación, por lo que los errores en producción son menos probables y, en el caso de que los haya, más fáciles de corregir. Esto también es gracias a llevar un historial de los cambios mediante una herramienta de control de versiones como Git.
+
+\begin{figure}
+  \centerline{\includegraphics[width=17cm]{figuras/cd}}
+  \caption{Proceso de despliegue continuo.\cite{img:cd}.}
+  \label{fig:cd}
+\end{figure}
 
 \subsection*{GitOps \& ArgoCD}
 
-Basándose en la filosofía DevOps, mencionada antes, que abarca tanto el ciclo de CI como el de CD, existen un conjunto de prácticas en las que se utiliza Git como fuente de verdad para la gestión de la infraestructura y las aplicaciones. Esto es conocido como GitOps\cite{gitops}. Utilizar Git como la única fuente de información permite gestionar de manera consistente la infraestructura de las aplicaciones. Los cambios en un repositorio hacen que se ejecuten \textit{workflows}, o secuencias de acciones de CI/CD que implementan los cambios en el entorno correspondiente.
+Basándose en la filosofía DevOps, mencionada antes, que abarca tanto el ciclo de CI como el de CD, existen un conjunto de prácticas en las que se utiliza Git como fuente de verdad para la gestión de la infraestructura y las aplicaciones. Esto es conocido como GitOps\cite{gitops}. Utilizar Git como la única fuente de información permite gestionar de manera consistente la infraestructura de las aplicaciones. Realizar cambios en un repositorio produce la ejecución de \textit{workflows} o secuencias de acciones de CI/CD, los cuales reflejan en el entorno de despliegue correspondiente los cambios que se han llevado a cabo.
 
-La herramienta que realiza estas prácticas de GitOps, y que se utiliza en este trabajo, es ArgoCD\cite{argocd}. Argo es una herramienta que, como su nombre indica, facilita el despliegue continuo. Supervisa repositorios de Git para aplicar los cambios que se realizan en ellos automáticamente en el \textit{cluster} (\ref{tech:argocd}).
+La herramienta que realiza estas prácticas de GitOps, y que se utiliza en este trabajo, es ArgoCD\cite{argocd}. ArgoCD es una herramienta que, como su nombre indica, facilita el despliegue continuo. Supervisa repositorios de Git para aplicar los cambios que se realizan en ellos automáticamente en el \textit{cluster} (\ref{tech:argocd}).
 
 \section{Ecosistema de herramientas}
 
-Un \textit{pipeline} moderno se compone de diferentes tipos de herramientas, cada una con sus características y finalidades. Se pueden agrupar en los ciclos que se han indicado anteriormente, CI y CD. El grupo de herramientas de CI facilitan la construcción y empaquetado de la aplicación que se va a construir, mientras que las de CD permiten la aplicación empaquetada previamente.
+Un \textit{pipeline} moderno se compone de diferentes tipos de herramientas, cada una con sus características y finalidades. Se pueden agrupar en los ciclos que se han indicado anteriormente, CI y CD. El grupo de herramientas de CI facilitan la construcción y empaquetado de la aplicación que se va a construir, mientras que las de CD permiten desplegar la aplicación empaquetada previamente.
 
 \subsection*{Herramientas de construcción y empaquetado}
 
@@ -79,26 +91,64 @@ En este trabajo se utiliza una herramienta de construcción más moderna y poliv
 
 En \ref{lst:just} se puede ver que se hace uso de comandos y sintaxis propios de sistemas UNIX (por ejemplo, Bash), por lo que se trata de un requisito de software contar con un entorno UNIX o compatible (Linux, macOS, WSL, etc.) para su correcta ejecución.
 
+\begin{lstlisting}[language=make,label=lst:just]{Extracto de justfile utilizado en el proyecto}
+# --- ALIASES ---
+# Defines shortcuts (aliases) for longer commands.
+alias dv := down_vol
+
+# --- DEFAULT RECIPE ---
+# This is the recipe that runs if you just type 'just' in the
+# terminal.
+# By default, it invokes the 'just -l' recipe, which lists all
+# available recipes.
+# The '_' prefix indicates that it is a helper recipe, not
+# intended to be called directly by the user.
+_default:
+  just -l
+
+# --- INTERNAL (PRIVATE) RECIPES ---
+_build_zoo_base:
+  #!/usr/bin/env bash
+  if [[ "$(docker images -f reference=zoo-base | wc -l | xargs)" != "2" ]]
+  then
+    docker build --target base -t zoo-base .
+  fi
+
+# Accepts two parameters: 'entrypoint' and 'command'.
+_run entrypoint command:
+  # '@' at the beginning of a command line prevents 'just' from
+  # printing the command before executing it.
+  @just _build_zoo_base
+  docker run --rm -w /app -v $PWD:/app --env-file .env --entrypoint={{entrypoint}} zoo-base {{command}}
+
+# --- PUBLIC RECIPES ---
+init:
+  @just _run "yarn" "install"
+
+down_vol:
+  docker compose down -v
+\end{lstlisting}
+
 \subsubsection*{Docker}
 \label{subsec:docker}
 
-Docker\cite{docker} es una herramienta que permite empaquetar aplicaciones, creando imágenes con las dependencias necesarias para que la aplicación se lance sin problemas. Las imágenes generadas se pueden ejecutar, creando contenedores, que son entornos completamente aislados del contexto de la máquina en la que han levantado. Estos contenedores son muy ligeros en cuanto a espacio y uso de recursos, ya que almacenan únicamente lo necesario para correr el software que queremos desplegar (\ref{tech:docker}).
+Docker es una herramienta que permite empaquetar aplicaciones, creando imágenes con las dependencias necesarias para que la aplicación se lance sin problemas. Las imágenes generadas se pueden ejecutar, creando contenedores, que son entornos completamente aislados del contexto de la máquina en la que han levantado. Estos contenedores son muy ligeros en cuanto a espacio y uso de recursos, ya que almacenan únicamente lo necesario para correr el \textit{software} que queremos desplegar (\ref{tech:docker}).
 
-La mayor ventaja que proporciona el empaquetado de aplicaciones con Docker, es la portabilidad. Aunque hay que tener en cuenta la arquitectura de la máquina, las imágenes se pueden lanzar en cualquier entorno con Docker instalado, lo cual evita el conocido problema de: ``En mi máquina funciona''.
+La mayor ventaja que proporciona el empaquetado de aplicaciones con Docker es la portabilidad. Aunque hay que tener en cuenta la arquitectura de la máquina, las imágenes se pueden lanzar en cualquier entorno con Docker instalado, lo cual evita el conocido problema de: ``En mi máquina funciona''.
 
 \subsection*{Plataformas de despliegue}
 
 \subsubsection*{Docker Compose}
 \label{subsec:docker-compose}
 
-Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''\cite{docker-compose}. Esta permite simular entornos con múltiples contenedores para desarrollar localmente (\ref{tech:docker-compose}).
+Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''\cite{docker-compose}. Esta permite desplegar entornos con múltiples contenedores para desarrollar localmente (\ref{tech:docker-compose}).
 
-Docker Compose no es una plataforma de producción, se utiliza únicamente con el fin de desarrollar localmente, y es muy útil en el caso de querer hacer pruebas rápidas de una aplicación sencilla. Se puede tomar como un precursor conceptual a la orquestación más compleja que realiza Kubernetes.
+Docker Compose no es una plataforma de producción, se utiliza principalmente con el fin de desarrollar de manera local, y es muy útil en el caso de querer hacer pruebas rápidas de una aplicación sencilla. Se puede tomar como un precursor conceptual a la orquestación más compleja que realiza Kubernetes.
 
 \subsection*{Kubernetes, Helm \& KinD}
 \label{subsec:k8shelm}
 
-El proyecto Kubernetes nació un año después que Docker. Es una herramienta de software que permite orquestar contenedores. Permite gestionar el ciclo de vida de las aplicaciones en contenedores que viven en un \textit{cluster}. Entre sus características principales destacan:
+El proyecto Kubernetes nació un año después que Docker. Es una herramienta de \textit{software} que permite orquestar contenedores. Gestiona el ciclo de vida de las aplicaciones en contenedores que viven en un \textit{cluster}. Entre sus características principales destacan:
 
 \begin{itemize}
   \item Escalado automático.
@@ -116,9 +166,9 @@ El proyecto Kubernetes nació un año después que Docker. Es una herramienta de
 
 Más información en \ref{tech:k8s}.
 
-Complementando a Kubernetes tenemos Helm (figura \ref{fig:helm}), que se trata de un gestor de paquetes para Kubernetes. Su propósito es ayudar a instalar y administrar el ciclo de vida de las aplicaciones de Kubernetes. Además, las Helm Charts son formatos de archivos YAML que te permiten definir los objetos de Kubernetes de una manera dinámica. Esto te permite definir aplicaciones mucho más complejas .
+Complementando a Kubernetes tenemos Helm (figura \ref{fig:helm}), que se trata de un gestor de paquetes para Kubernetes. Su propósito es ayudar a instalar recursos y administrar el ciclo de vida de las aplicaciones de Kubernetes. Además, las Charts de Helm son formatos de archivos YAML que permiten definir los objetos de Kubernetes de una manera dinámica. Esto facilita la definición de aplicaciones mucho más complejas .
 
-Para desplegar una aplicación de Kubernetes es necesario tener un \textit{cluster} preparado para soportar este tipo de recursos. Un \textit{cluster} de Kubernetes es un conjunto de máquinas o nodos que trabajan juntos con el fin de ejecutar y gestionar aplicaciones que corren dentro de contenedores. Para crear los \textit{clusters} en los que se desplega la aplicación se utiliza KinD\cite{kind}.
+Para desplegar una aplicación de Kubernetes es necesario tener un \textit{cluster} preparado para soportar este tipo de recursos. Un \textit{cluster} de Kubernetes es un conjunto de máquinas o nodos que trabajan juntos con el fin de ejecutar y gestionar aplicaciones que corren dentro de contenedores. Para crear los \textit{clusters} en los que se despliega la aplicación se utiliza KinD\cite{kind}.
 
 KinD (\textit{Kubernetes in Docker}) permite crear \textit{clusters} de Kubernetes de manera local. Se utiliza esta herramienta debido a su sencillo uso. Simplemente utilizando el comando que se muestra en el Listing \ref{lst:kindcc} se puede construir un \textit{cluster} en el que desplegar cualquier aplicación de Kubernetes.
 
@@ -142,18 +192,18 @@ El uso de estas dos herramientas se ve más en detalle en la sección \ref{subse
   \label{fig:dagger}
 \end{figure}
 
-Dagger es el pilar fundamental de este trabajo. Se trata de un kit de desarrollo de software que permite a los desarrolladores crear \textit{pipelines} CI/CD, y ejecutarlos en cualquier sitio.
+Dagger es el pilar fundamental de este trabajo. Se trata de un kit de desarrollo de \textit{software} que permite a los desarrolladores crear \textit{pipelines} CI/CD y ejecutarlos en cualquier sitio.
 
-La principal idea de los creadores de Dagger siempre ha sido poder crear \textit{pipelines} portables, que no sea necesario implementarlos de nuevo cada cierto tiempo debido a cambios en el entorno de desarrollo o de pruebas. Esta portabilidad se consigue permitiendo a los desarrolladores utilizar cualquier \textit{runtime} de OCI (\textit{Open Container Initiative}\cite{oci}) para ejecutar las funciones que forman parte del SDK\cite{sdk} de Dagger, así como las que definen los propios desarrolladores. Además, desde el principio se ha evitado el uso de archivos YAML, que está siendo el lenguaje de configuración más utilizado por parte de la mayoría de aplicaciones.
+La principal idea de los creadores de Dagger es poder crear \textit{pipelines} portables, que no sea necesario implementarlos de nuevo cada cierto tiempo debido a cambios en el entorno de desarrollo o de pruebas. Esta portabilidad se consigue permitiendo a los desarrolladores utilizar cualquier \textit{runtime} de OCI para ejecutar las funciones que forman parte del SDK\cite{sdk} de Dagger, así como las que definen los propios desarrolladores. Además, desde el principio se ha evitado el uso de archivos YAML, que está siendo el lenguaje de configuración más utilizado por parte de la mayoría de aplicaciones.
 
 \subsubsection*{CUE}
 \label{subsec:cue}
 
 Dagger comenzó utilizando un lenguaje de configuración muy potente llamado CUE\cite{cue}. Este se podría ver como una extensión de JSON, pero con más funcionalidades. Todo lo escrito en JSON se puede traducir a CUE, pero no al revés. En el Listing \ref{lst:cue} se puede ver un ejemplo de código de Dagger en el que se utiliza CUE para lanzar un ``plan''. En él se descarga la imagen de Docker de Alpine y se almacena en un registro levantado en la máquina local.
 
-Esta es la primera vez que se pueden ejecutar \textit{pipelines} definidas de manera programática, ejecutadas sobre un \textit{runtime} de Docker, y de manera relativamente funcional. Además, se puede ejecutar toda la secuencia de acciones de manera local, permitiendo realizar pruebas y buscar errores sin necesidad de hacer uso de otras herramientas de CI como GitHub Actions.
+Esta es la primera vez que se pueden ejecutar \textit{pipelines} definidas de manera programática, ejecutadas sobre un \textit{runtime} de OCI, y de manera relativamente funcional. Además, se puede ejecutar toda la secuencia de acciones de manera local, permitiendo realizar pruebas y buscar errores sin necesidad de hacer uso de otras herramientas de CI como GitHub Actions\cite{github-actions}.
 
-Además, Dagger hace un uso exhaustivo de la caché. Todas las acciones son cacheadas automáticamente. Esto es una funcionalidad muy útil, ya que va a hacer que un \textit{pipeline} se ejecute hasta un 90\% más rápido, como ha ocurrido en pruebas realizadas en este trabajo, que se comentan más adelante. Si se pone como ejemplo la ejecución de tests sobre una aplicación, la primera vez que se lanza el \textit{pipeline}, este tiene que ejecutarse completamente:
+Además, Dagger hace un uso exhaustivo de la caché. Todas las acciones son cacheadas automáticamente. Esto es una funcionalidad muy útil, ya que va a hacer que un \textit{pipeline} se ejecute en algunos casos un 90\% más rápido, como ha ocurrido en pruebas realizadas en este trabajo, que se comentan más adelante. Si se pone como ejemplo la ejecución de tests sobre una aplicación, la primera vez que se lanza el \textit{pipeline}, este tiene que ejecutarse completamente:
 
 \begin{enumerate}
   \item Instalar las dependencias.
@@ -161,18 +211,66 @@ Además, Dagger hace un uso exhaustivo de la caché. Todas las acciones son cach
   \item Correr los tests.
 \end{enumerate}
 
-Dependiendo del tipo de aplicación y, evidentemente, de la conexión a Internet, esto puede tardar desde unos segundos hasta varios minutos. Pero con Dagger solo ocurre una vez. La primera vez. Gracias a la caché, todas las acciones repetitivas, como la instalación de dependencias o la compilación de la aplicación, se almacenan en la caché, ahorrando así mucho tiempo a la hora de realizar pruebas de cualquier tipo. Mientras tanto, con otras herramientas se tendría que esperar siempre la misma cantidad de tiempo para cada una de las veces que se quiere lanzar el \textit{pipeline}. Y, además, muchas veces ni siquiera serda de manera local, habría que depender de aplicaciones que pueden fallar o no estar disponibles en algún momento.
+Dependiendo del tipo de aplicación y de la conexión a Internet, esto puede tardar desde unos segundos hasta varios minutos. Pero con Dagger solo ocurre una vez. La primera vez. Gracias a la caché, todas las acciones repetitivas, como la instalación de dependencias o la compilación de la aplicación, se almacenan en la caché, ahorrando así mucho tiempo a la hora de realizar pruebas de cualquier tipo. Mientras tanto, con otras herramientas se tendría que esperar siempre la misma cantidad de tiempo para cada una de las veces que se quiere lanzar el \textit{pipeline}. Además, Dagger puede ejecutar estas acciones de manera local, mientras que utilizando métodos convencionales habría que depender de aplicaciones que pueden fallar o no estar disponibles en cierto momento.
 
 \subsubsection*{CI/CD como código}
 \label{subsec:cicd-code}
 
-Dagger a querido ir más allá pensando que los desarrolladores deberían ser capaces de crear sus \textit{pipelines} de la misma manera que crean sus aplicaciones, escribiendo código. Es así como el SDK de Go\cite{go} para Dagger, el cual se utiliza en este trabajo. Go es un lenguaje de programación con muchos casos de uso. Desde la creación de servicios de red y en la nube, hasta aplicaciones CLI y desarrollo web. Es conocido también por su simplicidad en cuanto a sintaxis y por tener una librería estándar muy completa, aportando muchas de las herramientas necesarias para realizar proyectos comunes. Además, facilita la implementación de programación concurrente, gracias a las \textit{goroutines}, similares a los hilos de ejecución de un sistema operativo, pero mucho más ligeros. En el Listing \ref{lst:daggergo} se puede observar un ejemplo de código utilizando el SDK de Go.
+Dagger ha querido ir más allá pensando que los desarrolladores deberían ser capaces de crear sus \textit{pipelines} de la misma manera que crean sus aplicaciones: escribiendo código. Es así como nace el SDK de Go\cite{go} para Dagger, el cual se utiliza en este trabajo. Go es un lenguaje de programación con muchos casos de uso. Desde la creación de servicios de red y en la nube, hasta aplicaciones CLI y desarrollo web. Es conocido también por su simplicidad en cuanto a sintaxis y por tener una librería estándar muy completa, aportando muchas de las herramientas necesarias para realizar proyectos comunes. Además, facilita la implementación de programación concurrente, gracias a las \textit{goroutines}, similares a los hilos de ejecución de un sistema operativo, pero mucho más ligeros. En el Listing \ref{lst:daggergo} se puede observar un ejemplo de código utilizando el SDK de Go.
 
-Todo lo anterior hace de Go una elección excelente para empezar la lista de lenguajes de programación sobre los que el equipo de Dagger implementaría su propio SDK, que hasta el día de hoy incluyen: Java, PHP, Node y Python. 
+\begin{lstlisting}[language=go,label=lst:daggergo]{Ejemplo del SDK de Go de Dagger.}
+package main
+
+import (
+	"context"
+	"dagger/dagger/internal/dagger"
+	"fmt"
+	"strconv"
+)
+
+type Backend struct {
+	Name string
+	Base *dagger.Container
+	Secrets SecMap
+}
+
+func (m *Backend) Build(ctx context.Context) *dagger.Container {
+	build := m.Base.
+		WithWorkdir("/app").
+		WithExec([]string{"lerna", "run", "--scope", "@vieites-tfg/zoo-backend", "build"}).
+		WithExec([]string{"ncc", "build", "./packages/backend/dist/index.js", "-o", "./dist"})
+
+	return build
+}
+
+func (m *Backend) Ctr(ctx context.Context) *dagger.Container {
+	build := m.Build(ctx)
+
+	compiled := build.File("/app/dist/index.js")
+	pkgJson := build.File("/app/packages/backend/package.json")
+
+	dag := dagger.Connect()
+	back := dag.
+		Container().From("node:20-alpine").
+		WithExposedPort(3000).
+		WithEnvVariable("NODE_ENV", "production").
+		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
+		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
+		WithWorkdir("/app").
+		WithFile("/app/package.json", pkgJson).
+		WithFile("/app/index.js", compiled).
+		WithExec([]string{"yarn", "install", "--production"}).
+		WithEntrypoint([]string{"node", "index.js"})
+
+	return back
+}
+\end{lstlisting}
+
+Todo lo anterior hace de Go una elección excelente para empezar la lista de lenguajes de programación sobre los que el equipo de Dagger implementaría su propio SDK, que hasta el día de hoy incluyen: Typescript, Java, PHP, Node y Python. 
 
 \subsubsection*{GraphQL}
 
-Pero, ¿cómo es capaz el equipo de Dagger de desarrollar SDKs específicos para cada lenguaje tan rápidamente? Gracias al uso de GraphQL\cite{graphql}, un lenguaje para manipulación y consulta de datos.
+El equipo de Dagger es capaz de desarrollar SDKs específicos para cada lenguaje tan rápidamente gracias al uso de GraphQL\cite{graphql}, un lenguaje para manipulación y consulta de datos.
 
 \begin{figure}
   \centerline{\includegraphics[width=14cm]{figuras/graphql}}
@@ -184,7 +282,7 @@ Se puede ver su funcionamiento en la Figura \ref{fig:graphql}. El SDK de cada un
 
 \subsubsection*{Dagger \textit{functions}}
 
-Entonces, tras varias mejoras y nuevas versiones, el equipo de Dagger implementó las ``funciones de Dagger''. Estas funciones son el componente principal de Dagger hoy en día. Cada una de las operaciones principales de Dagger se pueden llamar a través de una función, utilizando una API. Además, estas se pueden encadenar, generando \textit{pipelines} dinámicas en una sola llamada. De esta manera, se puede decir finalmente que gracias a Dagger podemos programar nuestros ciclos CI/CD, en el lenguaje que queramos, dentro de los que están disponibles.
+Tras varias mejoras y nuevas versiones, el equipo de Dagger implementa las ``funciones de Dagger''. Estas funciones son el componente principal de Dagger hoy en día. Cada una de las operaciones principales de Dagger se pueden llamar a través de una función, utilizando una API. Además, estas se pueden encadenar, generando \textit{pipelines} dinámicas en una sola llamada. De esta manera, se puede decir  que gracias a Dagger se pueden programar ciclos CI/CD en uno de los lenguajes disponibles, bien conocidos en el sector.
 
 \subsubsection*{Daggerverse}
 
@@ -192,19 +290,19 @@ La existencia de las funciones de Dagger permite la creación de módulos, un co
 
 \subsubsection*{CLI}
 
-Otra funcionalidad que tiene Dagger es su CLI\cite{cli} (\textit{Command-Line Interface}). A través de ella puedes llamar a funciones de módulos de Dagger, tanto de de tu sistema de archivos local como directamente de un repositorio de Git.
+Otra funcionalidad que tiene Dagger es su CLI\cite{cli} (\textit{Command-Line Interface}). A través de ella puedes llamar a funciones de módulos de Dagger, tanto de de tu sistema de archivos local como directamente de un repositorio de Git en el que se encuentre el código fuente de un módulo.
 
-\begin{lstlisting}[language=bash,label=lst:callbackend]{Comando para lanzar el backend del proyecto}
+En el Listing \ref{lst:callbackend} se muestra un ejemplo de ejecución de una de las funciones definidas en un módulo correspondiente a este trabajo. Toda la documentación al respecto se puede encontrar en \ref{chap:usuario}.
+
+\begin{lstlisting}[label=lst:callbackend]{Comando para lanzar el backend del proyecto}
 dagger call --sec-env=file//../../.env backend service up --ports 3000:3000
 \end{lstlisting}
 
-De esta manera (Listing \ref{lst:callbackend}) es como se ejecutan las funciones que se definen en los módulos creados en este trabajo. Toda la documentación al respecto se puede encontrar en \ref{chap:usuario}
-
 \subsubsection*{Resumen}
 
-Dagger es una herramienta revolucionaria que redefine la manera de crear \textit{pipelines} de CI/CD, permitiendo implementarlos como código y evitar que los desarrolladores tengan que lidiar con archivos de configuración estáticos como YAML. Ofrece SDKs en una variedad de lenguajes de programación, tales como Go, Python o Node, que actúan como clientes del motor central de Dagger.
+Dagger es una herramienta revolucionaria que redefine la manera de crear \textit{pipelines} de CI/CD, proporcionando la capacidad de implementar estos \textit{pipelines} programáticamente y evitar que los desarrolladores tengan que lidiar con archivos de configuración estáticos como YAML, o con la creación de diferentes \textit{scripts}. Ofrece SDKs en una variedad de lenguajes de programación, tales como Go, Python o Node, que actúan como clientes del motor central de Dagger.
 
-Una de sus ventajas más significativas es su portabilidad, la cual se consigue al ejecutar todas las operaciones sobre un \textit{runtime} de Docker. De esta manera se garantiza que cualquier \textit{pipeline} definido con Dagger funcione de igual manera sin importar la máquina en la que se ejecuta.
+Una de sus ventajas más significativas es su portabilidad, la cual se consigue al ejecutar todas las operaciones sobre un \textit{runtime} de OCI, como Docker. De esta manera se garantiza que cualquier \textit{pipeline} definido con Dagger funcione de igual manera sin importar la máquina en la que se ejecuta.
 
 Otro de sus pilares es la gestión que hace de la caché. Dagger cachea cada una de las acciones ejecutadas. Gracias a esto, tras la primera ejecución de un \textit{pipeline}, las siguientes ejecuciones son significativamente más rápidas. Así se reducen los tiempos de espera, permitiendo a los desarrolladores trabajar más rápido.
 

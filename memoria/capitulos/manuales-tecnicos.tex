@@ -2,142 +2,127 @@
 
 Todo el código fuente se encuentra en la siguiente organicación de GitHub: \href{https://github.com/vieites-tfg}{vieites-tfg}. En este se puede encontrar tres repositorios y un rengistro de contenedores de GitHub, donde se publican las imágenes y los paquetes NPM de la aplicación.
 
-\begin{figure}[h]
-  \centerline{\includegraphics[width=14cm]{figuras/vieites-tfg}}
-  \caption{Diagrama de la organización de GitHub. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}}
-  \label{fig:ghorg}
-\end{figure}
-
 \section{Descripción de tecnologías}
 \label{sec:tech-desc}
 
+\subsection*{Just}
+\label{tech:just}
+
+Herramienta con la misma funcionalidad que Make, pero con más funcionalidades, entre las cuales destacan:
+
 \begin{itemize}
-  \item Just. \label{tech:just}
-
-    Herramienta con la misma funcionalidad que Make, pero con más funcionalidades, entre las cuales destacan:
-
-    \begin{itemize}
-      \item Poder pasar parámetros a las ``recetas'' (las ``reglas'' en \texttt{make}).
-      \item Crear aliases para las recetas.
-      \item Cargar archivos \texttt{.env}.
-      \item Poder definir recetas como scripts en el lenguaje que se prefiera, simplemente añadiendo el \textit{shebang}\cite{shebang} correspondiente.
-      \item Ser capaz de ser invocado desde cualquier subdirectorio.
-    \end{itemize}
-
-    Como se puede comprobar en el Listing \ref{lst:just}, el archivo de configuración de \texttt{just}, en este caso nombrado habitualmente \texttt{justfile}, tiene una estructura similar a la de un \texttt{Makefile}. La diferencia principal es que los nombres de las recetas no hacen referencia a un archivo objetivo que se supone que se debe crear al ejecutar el bloque de comandos, sino que se trata simplemente del nombre de la receta.
-
-  \item Docker. \label{tech:docker}
-
-    Docker permite empaquetar aplicaciones, creando imágenes con las dependencias necesarias para que la aplicación se lance sin problemas. Las imágenes generadas se pueden ejecutar, creando contenedores, que son entornos completamente aislados del contexto de la máquina en la que han levantado.
-
-    El proceso más habitual a la hora de construir una imagen de Docker es definir un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{multi-stage builds}, distintos estados de la construcción. Esto permite corstruir imágenes de Docker más pequeñas y optimizadas separando el proceso de construcción en distintas fases.
-
-    \begin{lstlisting}[language=bash,label=lst:dockerbuildrun]{Construir y correr una imagen de Docker}
-    docker build -t my-image .
-
-    docker run --rm -d -p 8080:80 my-image
-    \end{lstlisting}
-
-    El comando de la línea 1 construye la imagen que se define en el \texttt{Dockerfile} del directorio de trabajo actual (\texttt{.}), con el nombre \texttt{my-image}. Con el siguiente comando se ejecuta la imagen. Las \textit{flags} indican:
-
-    \begin{itemize}
-      \item \texttt{--rm}
-
-        Se eliminará el contenedor creado al finalizar su ejecución.
-
-      \item \texttt{-d}
-
-        El contenedor correrá en \textit{background}.
-
-      \item \texttt{-p 8080:80}
-
-        Se mapea el puerto 8080 de la máquina local al puerto 80 del contenedor.
-    \end{itemize}
-
-  \item Docker Compose. \label{tech:docker-compose}
-
-    Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''\cite{docker-compose}. Esta permite simular entornos con múltiples contenedores para desarrollar localmente (\ref{sec:tech-desc}).
-
-    En el archivo que se muestra en el Listing \ref{lst:dockercompose}, se puede observar cómo se configura el despliegue de tres servicios diferentes. Cada uno de los servicios se construye a partir de una imagen de Docker. Las imágenes correspondientes al frontend y al backend de la aplicación (\texttt{zoo-frontend} y \texttt{zoo-backend}, respectivamente) se generan y almacenan en un registro de GitHub al finalizar el ciclo de CI. Una vez publicadas, se pueden descargar indicando en el campo \texttt{image} el registro en el que están almacenadas junto con su nombre, como se puede ver en las líneas 4 y 16.
-
-    Simplemente, utilizando el comando del Listing \ref{lst:dcup}:
-
-    \begin{itemize}
-      \item Se levantan los tres servicios.
-      \item Se les pasarán las variables de entorno indicadas.
-      \item Se podrá acceder a ellos a través de los puertos establecidos, siendo el primer número el puerto local y el segundo el puerto del contenedor (\texttt{<local>:<contenedor>}).
-      \item Se compartirán los volúmenes mencionados.
-    \end{itemize}
-
-    \begin{lstlisting}[language=bash,label=lst:dcup]{Despliegue con Docker Compose}
-    docker compose up
-    \end{lstlisting}
-
-    Los valores de las variables de entorno, los indicados como \texttt{\$\{variable\}}, se obtienen de un archivo \texttt{.env}, el cual debe estar presente en el mismo directo que el archivo de configuración. En otro caso, es posible indicar la ruta al archivo mediante el campo \texttt{env\_file}, dentro de cada uno de los servicios configurados.
-
-  \item Kubernetes. \label{tech:k8s}
-
-    Se trata de una herramienta de software que permite orquestar contenedores. Permite gestionar el ciclo de vida de las aplicaciones en contenedores que viven en un \textit{cluster}.
-
-    En la figura \ref{fig:k8s}, se puede observar la estructura de un \textit{cluster} de Kubernetes, el cual se compone de dos tipos principales de servidores (``nodos''):
-
-    \begin{itemize}
-      \item El \textit{Control Plane}.
-
-        Toma todas las decisiones. Se encarga de que todo el sistema funcione como debe.
-
-      \item Los nodos de trabajo.
-
-        Donde realmente se ejecutan las aplicaciones. Reciben órdenes del \textit{Control Plane}. Puede y suele haber más de un nodo de trabajo en un \textit{cluster}.
-    \end{itemize}
-
-    Kubernetes te permite definir diferentes elementos en archivos \texttt{YAML}. Estos archivos describen el estado que deseamos que tenga el sistema en todo momento. Kubernetes se encarga de procesar estos archivos e intentar hacer que el estado real del sistema sea igual al estado deseado.
-
-    Entre los elementos que se pueden construir se encuentran los siguientes:
-
-    \begin{itemize}
-      \item Pod.
-
-        Es la unidad más pequeña que se puede crear. Puede tener uno o más contenedores, pero lo normal es que tenga solo uno. Su función es encapsular y ejecutar la aplicación que le corresponda, que se indica mediante una imagen de Docker.
-      \item Deployment.
-
-        Se trata de un controlador de Pods. Normalmente se utiliza este tipo de elementos en vez de crear Pods directamente. Esto es porque le puedes indicar la cantidad de Pods (réplicas) que deseas que haya en todo momento en el sistema, y el \textit{deployment} lo hace por ti.
-      \item Service.
-
-        Debido a que los Pods son efímeros, es decir, se crean y se destruyen constantemente, cambiando así su dirección IP; es necesario tener un elemento que funcione como punto fijo de acceso a un Pod. Para eso sirve un Service. Estos proporcionan un nombre y una IP únicos y fijos para los Pods.
-      \item Ingress.
-
-        Es un elemento más avanzado que un Service. Permite gestionar el acceso desde Internet, dirigiendo las peticiones hacia los servicios correctos dentro del \textit{cluster}.
-
-      \item ConfigMap.
-
-        Este elemento está diseñado para almacenar valores no sensibles. Se definen en formato clave-valor. Permite separar la configuración de una aplicación de su código.
-
-      \item Secret.
-
-        Es muy similar a un ConfigMap, pero está diseñado para almacenar y gestionar información sensible. Su función es guardar datos que no se deberían mostrar a simple vista en la configuración de una aplicación, como contraseñas o \textit{tokens} de autenticación.
-    \end{itemize}
-
-  \item ArgoCD. \label{tech:argocd}
-
-    Herramienta diseñada específicamente para Kubernetes. Automatiza el despliegue de las aplicaciones, supervisando repositorios de Git para aplicar los cambios que se realizan en ellos automáticamente en el \textit{cluster}. Su uso permite no tener que realizar actualizaciones manuales en entornos de producción, y hace que el entorno siempre esté sincronizado con el código definido en el repositorio. Esto se consigue gracias al proceso de reconciliación que realiza Argo cada vez que detecta cambios en el repositorio que se le ha indicado.
+  \item Poder pasar parámetros a las ``recetas'' (las ``reglas'' en \texttt{make}).
+  \item Crear \textit{aliases} para las recetas.
+  \item Cargar archivos \texttt{.env}.
+  \item Poder definir recetas como \textit{scripts} en el lenguaje que se prefiera, simplemente añadiendo el \textit{shebang}\cite{shebang} correspondiente.
+  \item Ser capaz de ser invocado desde cualquier subdirectorio.
 \end{itemize}
+
+Como se puede comprobar en el Listing \ref{lst:just}, el archivo de configuración de \texttt{just}, en este caso nombrado habitualmente \texttt{justfile}, tiene una estructura similar a la de un \texttt{Makefile}. La diferencia principal es que los nombres de las recetas no hacen referencia a un archivo objetivo que se supone que se debe crear al ejecutar el bloque de comandos, sino que se trata simplemente del nombre de la receta.
+
+\subsection*{Docker}
+\label{tech:docker}
+
+Docker permite empaquetar aplicaciones, creando imágenes con las dependencias necesarias para que la aplicación se lance sin problemas. Las imágenes generadas se pueden ejecutar, creando contenedores, que son entornos completamente aislados del contexto de la máquina en la que han levantado.
+
+El proceso más habitual a la hora de construir una imagen de Docker es definir un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{multi-stage builds}, distintos estados de la construcción. Esto permite corstruir imágenes de Docker más pequeñas y optimizadas separando el proceso de construcción en distintas fases.
+
+\begin{lstlisting}[language=bash,label=lst:dockerbuildrun]{Construir y levantar una imagen de Docker}
+docker build -t my-image .
+
+docker run --rm -d -p 8080:80 my-image
+\end{lstlisting}
+
+El comando de la línea 1 construye la imagen que se define en el \texttt{Dockerfile} del directorio de trabajo actual (\texttt{.}), con el nombre \texttt{my-image}. Con el siguiente comando se ejecuta la imagen. Las \textit{flags} indican:
+
+\begin{itemize}
+  \item \texttt{--rm}
+
+    Se eliminará el contenedor creado al finalizar su ejecución.
+
+  \item \texttt{-d}
+
+    El contenedor correrá en \textit{background}.
+
+  \item \texttt{-p 8080:80}
+
+    Se mapea el puerto 8080 de la máquina local al puerto 80 del contenedor.
+\end{itemize}
+
+\subsection*{Docker Compose}
+\label{tech:docker-compose}
+
+Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''\cite{docker-compose}. Esta permite simular entornos con múltiples contenedores para desarrollar localmente (\ref{sec:tech-desc}).
+
+En el archivo que se muestra en el Listing \ref{lst:dockercompose}, se puede observar cómo se configura el despliegue de tres servicios diferentes. Cada uno de los servicios se construye a partir de una imagen de Docker. Las imágenes correspondientes al \textit{frontend} y al \textit{backend} de la aplicación (\texttt{zoo-frontend} y \texttt{zoo-backend}, respectivamente) se generan y almacenan en un registro de GitHub al finalizar el ciclo de CI. Una vez publicadas, se pueden descargar indicando en el campo \texttt{image} el registro en el que están almacenadas junto con su nombre, como se puede ver en las líneas 3 y 15.
+
+Simplemente, utilizando el comando del Listing \ref{lst:dcup}, y teniendo encuenta el Listing \ref{lst:dockercompose}:
+
+\begin{itemize}
+  \item Se levantan los tres servicios.
+  \item Se les pasarán las variables de entorno indicadas.
+  \item Se podrá acceder a ellos a través de los puertos establecidos en, siendo el primer número el puerto local y el segundo el puerto del contenedor (\texttt{<local>:<contenedor>}).
+  \item Se compartirán los volúmenes mencionados.
+\end{itemize}
+
+\begin{lstlisting}[language=bash,label=lst:dcup]{Despliegue con Docker Compose}
+docker compose up
+\end{lstlisting}
+
+Los valores de las variables de entorno, los indicados como \texttt{\$\{variable\}}, se obtienen de un archivo \texttt{.env}, el cual debe estar presente en el mismo directo que el archivo de configuración. En otro caso, es posible indicar la ruta al archivo mediante el campo \texttt{env\_file}, dentro de cada uno de los servicios configurados.
+
+\subsection*{Kubernetes}
+\label{tech:k8s}
+
+Se trata de una herramienta de \textit{software} que permite orquestar contenedores y el ciclo de vida de las aplicaciones en contenedores que viven en un \textit{cluster}.
+
+En la figura \ref{fig:k8s}, se puede observar la estructura de un \textit{cluster} de Kubernetes, el cual se compone de dos tipos principales de servidores (``nodos''):
+
+\begin{itemize}
+  \item El \textit{Control Plane}.
+
+    Toma todas las decisiones. Se encarga de que todo el sistema funcione como debe.
+
+  \item Los nodos de trabajo.
+
+    Donde realmente se ejecutan las aplicaciones. Reciben órdenes del \textit{Control Plane}. Puede y suele haber más de un nodo de trabajo en un \textit{cluster}.
+\end{itemize}
+
+Kubernetes permite definir diferentes elementos en archivos \texttt{YAML}. Estos archivos describen el estado que deseamos que tenga el sistema en todo momento. Kubernetes se encarga de procesar estos archivos e intentar hacer que el estado real del sistema sea igual al estado deseado.
+
+Entre los elementos que se pueden construir se encuentran los siguientes:
+
+\begin{itemize}
+  \item Pod.
+
+    Es la unidad más pequeña que se puede crear. Puede tener uno o más contenedores, pero lo normal es que tenga solo uno. Su función es encapsular y ejecutar la aplicación que le corresponda, que se indica mediante una imagen de Docker.
+  \item Deployment.
+
+    Se trata de un controlador de Pods. Normalmente se utiliza este tipo de elementos en vez de crear Pods directamente. Esto es porque le puedes indicar la cantidad de Pods (réplicas) que deseas que haya en todo momento en el sistema, y el Deployment lo hace por ti.
+  \item Service.
+
+    Debido a que los Pods son efímeros, es decir, se crean y se destruyen constantemente, cambiando así su dirección IP; es necesario tener un elemento que funcione como punto fijo de acceso a un Pod. Para eso sirve un Service. Estos proporcionan un nombre y una IP únicos y fijos para los Pods.
+  \item Ingress.
+
+    Es un elemento más avanzado que un Service. Permite gestionar el acceso desde Internet, dirigiendo las peticiones hacia los servicios correctos dentro del \textit{cluster}.
+
+  \item ConfigMap.
+
+    Este elemento está diseñado para almacenar valores no sensibles. Se definen en formato clave-valor. Permite separar la configuración de una aplicación de su código.
+
+  \item Secret.
+
+    Es muy similar a un ConfigMap, pero está diseñado para almacenar y gestionar información sensible. Su función es guardar datos que no se deberían mostrar a simple vista en la configuración de una aplicación, como contraseñas o \textit{tokens} de autenticación.
+\end{itemize}
+
+\subsection*{ArgoCD}
+\label{tech:argocd}
+
+Herramienta diseñada específicamente para Kubernetes. Automatiza el despliegue de las aplicaciones, supervisando repositorios de Git para aplicar los cambios que se realizan en ellos automáticamente en el \textit{cluster}. Su uso permite no tener que realizar actualizaciones manuales en entornos de producción, y hace que el entorno siempre esté sincronizado con el código definido en el repositorio. Esto se consigue gracias al proceso de reconciliación que realiza ArgoCD cada vez que detecta cambios en el repositorio que se le ha indicado.
 
 \clearpage
 
 \section{Figuras}
-
-\begin{figure}[h]
-  \centerline{\includegraphics[width=10cm]{figuras/ci}}
-  \caption{Proceso de integración continua.\cite{img:ci}. Referenciado en \ref{subsec:CI}.}
-  \label{fig:ci}
-\end{figure}
-
-\begin{figure}[h]
-  \centerline{\includegraphics[width=17cm]{figuras/cd}}
-  \caption{Proceso de despliegue continuo.\cite{img:cd}. Referenciado en \ref{subsec:CD}.}
-  \label{fig:cd}
-\end{figure}
 
 \begin{figure}[h]
   \centerline{\includegraphics[width=10cm]{figuras/k8s}}
@@ -152,39 +137,9 @@ Todo el código fuente se encuentra en la siguiente organicación de GitHub: \hr
 \end{figure}
 
 \begin{figure}[h]
-  \centerline{\includegraphics[width=15cm]{figuras/clusters}}
-  \caption{Clusters y comunicación con el repositorio de estado. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}. Referenciado en \ref{subsec:clusters}.}
-  \label{fig:clusters}
-\end{figure}
-
-\begin{figure}[h]
   \centerline{\includegraphics[width=13.5cm]{figuras/secrets}}
-  \caption{Encriptado y desencriptado de secretos. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}. Referenciado en \ref{sec:secrets}, \ref{subsec:secretos} y \ref{subsec:state}.}
+  \caption{Encriptado y desencriptado de secretos. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}. Referenciado en \ref{sec:secrets} y \ref{subsec:state}.}
   \label{fig:secrets}
-\end{figure}
-
-\begin{figure}[h]
-  \centerline{\includegraphics[width=13cm]{figuras/promotion}}
-  \caption{Descripción del proceso de promoción de entornos. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}. Referenciado en \ref{subsec:cluster-func} y \ref{sec:promotion}.}
-  \label{fig:promotion}
-\end{figure}
-
-\begin{figure}[h]
-  \centerline{\includegraphics[width=13cm]{figuras/helm-repository}}
-  \caption{Diagrama de organización de las Charts de la aplicación. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}. Referenciado en \ref{subsec:helm}.}
-  \label{fig:helm-repository}
-\end{figure}
-
-\begin{figure}[h]
-  \centerline{\includegraphics[width=12cm]{figuras/state}}
-  \caption{Diagrama de la estructura del repositorio de estado. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}. Referenciado en \ref{subsec:state}}
-  \label{fig:state}
-\end{figure}
-
-\begin{figure}[h]
-  \centerline{\includegraphics[width=12cm]{figuras/dagger-CI}}
-  \caption{Diagrama del diseño del módulo de CI con Dagger. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}. Referenciado en \ref{sec:dagger-ci}.}
-  \label{fig:dagger-ci}
 \end{figure}
 
 \clearpage
@@ -220,45 +175,6 @@ clean:
   rm -f $(TARGET) $(OBJS)
 \end{lstlisting}
 
-Referenciado en \ref{subsec:just}.
-
-\begin{lstlisting}[language=make,label=lst:just]{Extracto de justfile utilizado en el proyecto}
-# --- ALIASES ---
-# Defines shortcuts (aliases) for longer commands.
-alias dv := down_vol
-
-# --- DEFAULT RECIPE ---
-# This is the recipe that runs if you just type 'just' in the
-# terminal.
-# By default, it invokes the 'just -l' recipe, which lists all
-# available recipes.
-# The '_' prefix indicates that it is a helper recipe, not
-# intended to be called directly by the user.
-_default:
-  just -l
-
-# --- INTERNAL (PRIVATE) RECIPES ---
-_build_zoo_base:
-  #!/usr/bin/env bash
-  if [[ "$(docker images -f reference=zoo-base | wc -l | xargs)" != "2" ]]
-  then
-    docker build --target base -t zoo-base .
-  fi
-
-# Accepts two parameters: 'entrypoint' and 'command'.
-_run entrypoint command:
-  # '@' at the beginning of a command line prevents 'just' from
-  # printing the command before executing it.
-  @just _build_zoo_base
-  docker run --rm -w /app -v $PWD:/app --env-file .env --entrypoint={{entrypoint}} zoo-base {{command}}
-
-# --- PUBLIC RECIPES ---
-init:
-  @just _run "yarn" "install"
-
-down_vol:
-  docker compose down -v
-\end{lstlisting}
 
 Referenciado en \ref{subsec:docker}.
 
@@ -300,7 +216,7 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 \end{lstlisting}
 
-Referenciado en \ref{subsec:docker-compose}.
+Referenciado en \ref{tech:docker-compose}.
 
 \begin{lstlisting}[language=docker-compose,label=lst:dockercompose]{docker-compose.yaml usado en el proyecto}
 services:
@@ -370,102 +286,7 @@ dagger.#Plan & {
 }
 \end{lstlisting}
 
-Referenciado en \ref{subsec:cicd-code}
 
-\begin{lstlisting}[language=go,label=lst:daggergo]{Ejemplo del SDK de Go de Dagger.}
-package main
-
-import (
-	"context"
-	"dagger/dagger/internal/dagger"
-	"fmt"
-	"strconv"
-)
-
-type Backend struct {
-	Name string
-	Base *dagger.Container
-	Secrets SecMap
-}
-
-func (m *Backend) Build(ctx context.Context) *dagger.Container {
-	build := m.Base.
-		WithWorkdir("/app").
-		WithExec([]string{"lerna", "run", "--scope", "@vieites-tfg/zoo-backend", "build"}).
-		WithExec([]string{"ncc", "build", "./packages/backend/dist/index.js", "-o", "./dist"})
-
-	return build
-}
-
-func (m *Backend) Ctr(ctx context.Context) *dagger.Container {
-	build := m.Build(ctx)
-
-	compiled := build.File("/app/dist/index.js")
-	pkgJson := build.File("/app/packages/backend/package.json")
-
-	dag := dagger.Connect()
-	back := dag.
-		Container().From("node:20-alpine").
-		WithExposedPort(3000).
-		WithEnvVariable("NODE_ENV", "production").
-		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
-		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
-		WithWorkdir("/app").
-		WithFile("/app/package.json", pkgJson).
-		WithFile("/app/index.js", compiled).
-		WithExec([]string{"yarn", "install", "--production"}).
-		WithEntrypoint([]string{"node", "index.js"})
-
-	return back
-}
-\end{lstlisting}
-
-Referenciado en \ref{subsec:clusters}.
-
-\begin{lstlisting}[language=bash,label=lst:create-clusters]{Script de creación de los clusters}
-# Variables globales
-# ---
-
-for ENV in "${ENVS[@]}"; do
-  case "${ENV}" in
-    dev)
-      BANNER_TEXT="We are in DEV";;
-    # ... otros entornos
-  esac
-
-  CONTEXT="kind-${ENV}"
-
-  kind create cluster --config "${CLUSTER_DIR}/kind_${ENV}.yaml"
-
-  kubectl apply -f "${INGRESS_MANIFEST}" --context "${CONTEXT}"
-  # Se espera a que se construya
-
-  kubectl create namespace argocd || true
-
-  cat "${SOPS_DIR}/age.agekey" |
-    kubectl create secret generic sops-age -n argocd \
-    --context ${CONTEXT} --from-file=keys.txt=/dev/stdin
-
-  # Se descarga el repositorio de la Chart
-  helm install argocd argo/argo-cd -n argocd \
-    -f argo/values.yaml \
-    # ... otros *flags*
-
-  # Se espera a que se instale la Chart de Argo
-
-  kubectl apply -f "${ARGO_DIR}/argo_${ENV}.yaml" \
-    --context "${CONTEXT}"
-  # Se espera a que se apliquen los cambios
-
-  # Se aplica el banner a la interfaz de Argo
-
-  # Se obtiene la clave inicial del usuario "admin" y se muestra
-  # por pantalla
-  PASSWORDS+="${current_pass}"
-done
-
-printf "${PASSWORDS}"
-\end{lstlisting}
 
 Referenciado en \ref{subsec:clusters}.
 
@@ -494,7 +315,7 @@ nodes:
 
 Referenciado en \ref{subsec:clusters}.
 
-\begin{lstlisting}[language=helm,label=lst:conf-argo]{Configuración de Argo en dev}
+\begin{lstlisting}[language=helm,label=lst:conf-argo]{Configuración de ArgoCD en dev}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -540,50 +361,6 @@ dependencies:
 
 Referenciado en \ref{subsec:state}.
 
-\begin{lstlisting}[language=helmfile,label=lst:helmfile]{Archivo de configuración de helmfile}
-  repositories:
-  - name: helm-repository
-    url: https://raw.githubusercontent.com/vieites-tfg/helm-repository/gh-pages/
-
-environments:
-  dev:
-    values:
-      - ./dev.yaml
-  # ... otros entornos
-
----
-
-releases:
-  - name: zoo-{{ .Environment.Name }}
-    namespace: {{ .Environment.Name }}
-    chart: helm-repository/zoo
-    version: {{ .Values.version }}
-    values:
-      - zoo-frontend.yaml
-      - zoo-backend.yaml
-      - mongodb.yaml
-      - global.yaml
-      - {{ .Environment.Name }}/zoo-frontend.yaml
-      - {{ .Environment.Name }}/zoo-backend.yaml
-      - {{ .Environment.Name }}/mongodb.yaml
-      - {{ .Environment.Name }}/global.yaml
-      - global:
-          ghcrSecret:
-            enabled: true
-            password: {{ requiredEnv "CR_PAT" | quote }}
-      - zoo-backend:
-          mongo:
-            root:
-              user: {{ requiredEnv "MONGO_ROOT" | quote }}
-              password: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
-      - mongodb:
-          auth:
-            rootUser: {{ requiredEnv "MONGO_ROOT" | quote }}
-            rootPassword: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
-\end{lstlisting}
-
-Referenciado en \ref{subsec:state}.
-
 \begin{lstlisting}[label=lst:values]{Archivo de valores de zoo-backend en dev}
 zoo-backend:
   image:
@@ -595,6 +372,7 @@ zoo-backend:
     hostTemplate: "api-zoo-dev.example.com"
 \end{lstlisting}
 
+\clearpage
 
 \section{Gestión de secretos}
 \label{sec:secrets}
@@ -604,11 +382,7 @@ Para encriptar los secretos se utilizan dos herramientas:
 \begin{itemize}
   \item \texttt{age}\cite{age}.
 
-    \texttt{age} es una herramienta creada con Go que permite encriptar y desencriptar archivos. Una vez instalada, es necesario crear unas claves privada y pública. Estas se proporcionan en el manual de usuario
-    \begin{bclogo}[logo=\bcattention]{Important!}
-      CITAR MANUALES DE USUARIO
-    \end{bclogo}
-    para poder probar la aplicación.
+    \texttt{age} es una herramienta creada con Go que permite encriptar y desencriptar archivos. Una vez instalada, es necesario crear unas claves privada y pública. Estas se proporcionan en el manual de usuario \ref{chap:usuario} para poder probar la aplicación.
   \item SOPS\cite{sops}.
 
     SOPS (\textit{Secrets OPerationS}) permite editar archivos encriptados, pero con la capacidad de realizar la encriptación de campos específicos de tipos de archivos como YAML o JSON. Esta herramienta tiene compatibilidad con \texttt{age}, por lo que es un recurso excelente para encriptar recursos de Kubernetes, ya que estos se definen mediante archivos en formato YAML.
@@ -626,7 +400,7 @@ creation_rules:
 
 Con las claves pública y privada, y la configuración de SOPS, se es capaz de encriptar los Secrets de Kubernetes durante el ciclo de CD, en el módulo de Dagger. Los archivos encriptados se suben a la rama de despliegue del repositorio de estado, junto con los demás recursos que definen la aplicación.
 
-Para desencriptar los secretos, ArgoCD necesita información: la clave privada creada con \texttt{age} y las herramientas necesarias para gestionar archivos encriptados con SOPS. La clave se le proporciona durante uno de los pasos de la creación de los \textit{clusters} \ref{subsec:clusters}. Sin embargo, es necesario decirle a Argo cómo utilizarla.
+Para desencriptar los secretos, ArgoCD necesita información: la clave privada creada con \texttt{age} y las herramientas necesarias para gestionar archivos encriptados con SOPS. La clave se le proporciona durante uno de los pasos de la creación de los \textit{clusters} \ref{subsec:clusters}. Sin embargo, es necesario decirle a ArgoCD cómo utilizarla.
 
 Para ello es necesario el uso de otras dos herramientas:
 
@@ -663,16 +437,16 @@ files:
 
 \end{itemize}
 
-Lo único que falta es instalar dentro de Argo estas herramientas, \texttt{kustomize} y \texttt{ksops}, e indicarle dónde se encuentra la clave privada que usará para desencriptar los secretos.
+Lo único que falta es instalar estas herramientas dentro de ArgoCD, \texttt{kustomize} y \texttt{ksops}, e indicarle dónde se encuentra la clave privada que usará para desencriptar los secretos.
 
 Esto se consigue con los valores que muestran en la línea 26 del Listing \ref{lst:create-clusters}. El archivo \texttt{values.yaml} tiene el contenido que se muestra en el Listing \ref{lst:argo-values}. Con estos valores se consigue:
 
 \begin{itemize}
-  \item Indicar las \textit{flags} que tiene que utilizar Argo a la hora de ejecutar comandos con \texttt{kustomize} (líneas 1-4).
+  \item Indicar las \textit{flags} que tiene que utilizar ArgoCD a la hora de ejecutar comandos con \texttt{kustomize} (líneas 1-4).
   \item Crear variables de entorno (líneas 6-11) que guardan información sobre (de arriba a abajo, respectivamente) el directorio raíz de archivos de configuración del sistema y la ruta en la que se puede encontrar la clave privada de \texttt{age}.
   \item Construir dos volúmenes (líneas 13-18), uno para almacenar los binarios de \texttt{kustomize} y \texttt{ksops}, y otro para la clave privada que se ha introducido en el \textit{cluster} en las líneas 20-22 del Listing \ref{lst:create-clusters}.
   \item Instalar los binarios de \texttt{kustomize} y \texttt{ksops} en el volumen \texttt{custom-tools} creado previamente (líneas 20-21).
-  \item Permitir a Argo acceder a los binarios y a la clave, montando los volúmenes que contienen estos elementos dentro del servidor principal de Argo (líneas 33-41).
+  \item Permitir a ArgoCD acceder a los binarios y a la clave, montando los volúmenes que contienen estos elementos dentro del servidor principal de ArgoCD (líneas 33-41).
 \end{itemize}
 
 \begin{lstlisting}[language=helm,label=lst:argo-values]{Valores que pueblan la Chart de ArgoCD}
@@ -740,11 +514,7 @@ Estos son los pasos que se realizan en el \textit{workflow} que realiza el despl
       \item En \texttt{pro} se despliega la aplicación cuando el evento que lanza el \textit{workflow} no es una \textit{prerelease}, sino una \textit{release}. Al igual que en \texttt{pre}, la \textit{tag} sigue el formato SemVer, pero en este caso sin la coletilla que se usaba antes (e.j. \texttt{1.2.3}).
     \end{itemize}
      
-  \item Se recrean los archivos necesarios con las variables almacenadas en GitHub (líneas 31-39). Se proporcionan estos archivos y datos en los manuales de usuario
-    \begin{bclogo}[logo=\bcattention]{Important!}
-      CITAR MANUALES DE USUARIO
-    \end{bclogo}
-    para su testeo en local.
+  \item Se crean los archivos necesarios con las variables almacenadas en GitHub (líneas 31-39). Se proporcionan estos archivos y datos en los manuales de usuario \ref{chap:usuario} para su testeo en local.
   \item Se ejecuta el ciclo de CI para ambos paquetes de la aplicación y se publica cada una de las imágenes, indicando la \textit{tag} que se ha determinado previamente (líneas 51-57). Además, es necesario actualizar los valores de las \textit{tags} en el repositorio de estado, el cual tiene un campo específico para indicar este dato (líneas 45-49). Más información en \ref{subsec:state}.
   \item Se ejecuta el ciclo de CD, aportando los parámetros necesarios, entre los que se encuentran los archivos que se han construido previamente (líneas 59-69).
 \end{enumerate}
@@ -838,7 +608,7 @@ El proceso de desarrollo de la Chart comienza con la propia creación de esta. T
 helm pachage zoo
 \end{lstlisting}
 
-Por último, se publica la Chart a través de GitHub Pages. Esto consiste gracias a un \textit{workflow} que existe en el repositorio, el cual se ve en el Listing \ref{lst:ghpages} (se han comentado las acciones que se realizan en cada paso para reducir su tamaño). El \textit{workflow} se lanza únicamente cuando existe un directorio \texttt{temp} con archivos en su interior (líneas 10-11). Este realiza los comandos necesarios para actualizar el archivo \texttt{index.yaml}, el cual define las diferentes versiones de la Chart y la URL pública donde se pueden descargar. Además, actualiza las ramas principal y \texttt{gh-pages}, siendo esta última en la que se puede encontrar el archivo índice ya mencionado.
+Por último, se publica la Chart a través de GitHub Pages. Esto se consigue gracias a un \textit{workflow} que existe en el repositorio, el cual se ve en el Listing \ref{lst:ghpages} (se han comentado las acciones que se realizan en cada paso para reducir su tamaño). El \textit{workflow} se lanza únicamente cuando existe un directorio \texttt{temp} con archivos en su interior (líneas 10-11). Este realiza los comandos necesarios para actualizar el archivo \texttt{index.yaml}, el cual define las diferentes versiones de la Chart y la URL pública donde se pueden descargar. Además, actualiza las ramas principal y \texttt{gh-pages}, siendo esta última en la que se puede encontrar el archivo índice ya mencionado.
 
 \begin{lstlisting}[language=workflows,label=lst:ghpages]{Workflow de publicación de la Chart en GH Pages}
 name: Release Helm Charts

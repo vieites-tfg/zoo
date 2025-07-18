@@ -59,9 +59,9 @@ En el directorio `dagger` se encuentran las implementaciones de los módulos cor
 
 También se pueden encontrar varios ejecutables en el directorio de `scripts`, de los cuales `create_envs.sh` es el más interesante. Este permite levantar los clusters en local para probar el despliegue de la aplicación en los tres entornos posibles: `dev`, `pre` y `pro`.
 
-En todos los clusters se instala ArgoCD, aplicación creada específicamente para Kubernetes y que utiliza el método *pull*, siguiendo la filisofía GitOps, leyendo los recursos a desplegar del repositorio de estado (`state`) mencionado anteriormente. Este tiene una rama `deploy`, en la que se suben los archivos necesarios para que Argo lea y despliegue la aplicación.
+En todos los clusters se instala ArgoCD, aplicación creada específicamente para Kubernetes y que utiliza el método *pull*, siguiendo la filisofía GitOps, leyendo los recursos a desplegar del repositorio de estado (`state`) mencionado anteriormente. Este tiene una rama `deploy`, en la que se suben los archivos necesarios para que ArgoCD lea y despliegue la aplicación.
 
-Se configuran los clusters y las propias instancias de Argo de manera diferente para cada uno de los clusters. Estas configuraciones se pueden encontrar en los directorios `cluster` y `argo`.
+Se configuran los clusters y las propias instancias de ArgoCD de manera diferente para cada uno de los clusters. Estas configuraciones se pueden encontrar en los directorios `cluster` y `argo`.
 
 Además, este trabajo tiene una memoria asociada, en la cual se pueden encontrar unas claves privada y pública, junto con otros *tokens*, necesarias para poder probar la implementación. Estas claves y *tokens* tienen varios propósitos:
 
@@ -125,15 +125,15 @@ El script anterior:
 
 4. Acceso a los clusters.
 
-A medida que se van creando los clusters, las contraseñas del usuario `admin` de Argo se van mostrando. También se muestran todas al finalizar la ejecución del script.
+A medida que se van creando los clusters, las contraseñas del usuario `admin` de ArgoCD se van mostrando. También se muestran todas al finalizar la ejecución del script.
 
-Para poder acceder a cada uno de los clusters, lo primero que hay que hacer es mapear un puerto local libre al puerto 443 del servidor de Argo. Esto se consigue de la siguiente manera:
+Para poder acceder a cada uno de los clusters, lo primero que hay que hacer es mapear un puerto local libre al puerto 443 del servidor de ArgoCD. Esto se consigue de la siguiente manera:
 
 ```bash
 kubectl port-forward svc/argocd-server -n argocd --context kind-{{cluster}} 8086:443
 ```
 
-En el anterior comando, hay que cambiar `{{cluster}}` por aquel al que se quiera acceder. Se podrá acceder a Argo a través del navegador en `localhost:8086`
+En el anterior comando, hay que cambiar `{{cluster}}` por aquel al que se quiera acceder. Se podrá acceder a ArgoCD a través del navegador en `localhost:8086`
 
 Se pide usuario y contraseña para entrar, que son `admin` y la contraseña de dicho cluster, mostrada en la salida del script que se ha ejecutado antes.
 
@@ -358,7 +358,7 @@ Ahora se puede subir todo al entorno de "dev", simulando un `push` (*trigger* po
 act --secret-file .secrets.yaml
 ```
 
-Una vez terminada la ejecución, si se tiene levantado el cluster de `dev`, se debería poder sincronizar Argo. Para comprobar que se ha actualizado la imagen correctamente, se puede visualizar la *tag* que está en uso en el Deployment del frontend `zoo-dev-frontend`, y buscar el campo `spec.template.spec.containers.image`, en la pestaña de "*Live manifest*". Este campo debería contener la nueva imagen generada.
+Una vez terminada la ejecución, si se tiene levantado el cluster de `dev`, se debería poder sincronizar ArgoCD. Para comprobar que se ha actualizado la imagen correctamente, se puede visualizar la *tag* que está en uso en el Deployment del frontend `zoo-dev-frontend`, y buscar el campo `spec.template.spec.containers.image`, en la pestaña de "*Live manifest*". Este campo debería contener la nueva imagen generada.
 
 También se puede entrar en la propia web, en `zoo-dev.example.com:8080`, para ver el nuevo título.
 

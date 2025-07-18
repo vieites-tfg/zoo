@@ -10,9 +10,9 @@
 
 En este trabajo se pretende demostrar y evaluar la viabilidad, eficiencia y flexibilidad de Dagger\cite{dagger} como motor de CI/CD (\textit{Continuous Integration}/\textit{Continuous Delivery})\cite{ci,cd}, con el fin de estandarizar y modernizar los ciclos de vida del desarrollo de software.
 
-Se realizará el mismo flujo de trabajo, tanto utilizando Dagger como sin usarlo, y se compararán los resultados en cuanto a rendimiento. Se evaluarán las ventajas que tiene su uso frente a métodos convencionales, entre las que destacarán su portabilidad, al correr sobre un \textit{runtime} de Docker; y su capacidad programática, ya que se pueden crear \textit{pipelines} implementando funciones en el lunguaje conocido para el desarrollador. En vez de coordinar \textit{scripts} creados a mano en diferentes entornos, el programador es capaz de componer acciones reusbles, utilizando un lenguaje de programación y una API (\textit{Application Programming Interface}) REST a su disposición.
+Se usará Dagger con el fin de implementar la lógica necesaria para llevar a cabo los ciclos de CI y CD de una aplicación de prueba. Se evaluarán las ventajas que tiene su uso frente a métodos convencionales, entre las que destacarán su portabilidad, al correr sobre un \textit{runtime} de OCI (\textit{Open Container Initiative}\cite{oci}), como Docker\cite{docker}; y su capacidad programática, ya que se pueden crear \textit{pipelines} implementando funciones en el lunguaje conocido para el desarrollador. En vez de coordinar \textit{scripts} creados a mano en diferentes entornos, el programador es capaz de componer acciones reusables, utilizando un lenguaje de programación y una API (\textit{Application Programming Interface}) a su disposición.
 
-Se van a proporcionar ejemplos de módulos creados con Dagger, los cuales estarán especialmente diseñados para cumplir los ciclos tanto de CI como de CD de una aplicación \textit{dummy}. De esta manera se podrá comprobar que este mismo proceso se puede llevar a cabo para cualquier aplicación, y de una manera sencilla.
+Se van a proporcionar ejemplos de módulos creados con Dagger, los cuales estarán especialmente diseñados para cumplir los ciclos tanto de CI como de CD de la aplicación de prueba. De esta manera se podrá comprobar que este mismo proceso se puede llevar a cabo para cualquier aplicación.
 
 Lo que sigue son las preguntas a las que este trabajo busca responder:
 
@@ -22,7 +22,7 @@ Lo que sigue son las preguntas a las que este trabajo busca responder:
   \item ¿Es capaz de aumentar la velocidad de desarrollo de una aplicación?
   \item ¿Es fácilmente integrable en cualquier tipo de aplicación?
   \item ¿Qué puntos débiles corrige Dagger frente al uso de otros métodos convencionales?
-  \item ¿Qué desafios, limitaciones o desventajas se encuentran al trabajar con Dagger?
+  \item ¿Qué desafíos, limitaciones o desventajas se encuentran al trabajar con Dagger?
 \end{itemize}
 
 \subsection*{Objetivos secundarios}
@@ -32,11 +32,8 @@ Para lograr los objetivos principales es necesario llevar a cabo varios pasos:
 \begin{itemize}
   \item Creación de un \textit{monorepo}\cite{monorepo} en GitHub.
   \item Diseño y creación de una aplicación de prueba. Esta consistirá en una página web de gestión de un zoo, la cual realizará peticiones a una API REST que estará conectada a una base de datos.
-  \item Implementación de un \textit{pipeline} CI/CD con y sin Dagger.
+  \item Implementación de un \textit{pipeline} CI/CD con Dagger.
   \item Entorno orquestado por Kubernetes\cite{kubernetes}, configurado a través de una Chart de Helm\cite{helm}.
-
-    % La fase final del \textit{pipeline} de Dagger no despliega la aplicación, sino que actualiza la configuración en un repositorio de estado. El despliegue sigue un modelo GitOps\cite{gitops} gestionado por ArgoCD\cite{argocd}, el cual se encarga de detectar los cambios en el repositorio de estado y actualizar los \textit{clusters} en consecuencia.
-
   \item Análisis comparativo de las ventajas que ofrece Dagger frente a métodos convencionales.
 \end{itemize}
 
@@ -49,10 +46,10 @@ Para lograr los objetivos principales es necesario llevar a cabo varios pasos:
 
   \item Capítulo 2: Estado del arte y fundamentos teóricos.
 
-    En el segundo capítulo se detallan los conceptos más importantes de CI/CD. Además, se estudia la evolución de las herramientas DevOps\cite{devops}, incluyendo Dagger como una de las últimas y más innovadoras herramientas en este sector, y se compara con las otras tecnologías.
+    En el segundo capítulo se detallan los conceptos más importantes de CI/CD. Además, se estudia la evolución de las herramientas DevOps\cite{devops}, incluyendo Dagger como una de las últimas y más innovadoras herramientas en este sector.
   \item Capítulo 3: Diseño y arquitectura del sistema.
 
-    Aquí se describe la organización de repositorio, así como las tecnologías utilizadas para implementar cada uno de las piezas de software del trabajo. Por lo tanto, se habla de la aplicación de prueba y de los módulos de Dagger. También se explica cómo se ha organizado la infraestructura de despliegue.
+    Aquí se describe la organización de repositorio, así como las tecnologías utilizadas para implementar cada una de las piezas de \textit{software} del trabajo. Por lo tanto, se habla de la aplicación de prueba y de los módulos de Dagger. También se explica cómo se ha organizado la infraestructura de despliegue.
   \item Capítulo 4: Implementación del \textit{pipeline} con Dagger.
 
     Aquí se detallan los pasos que se han dado para crear los \textit{pipelines} con Dagger, utilizando el SDK para definirlos como código. Este es el núcleo del proyecto.

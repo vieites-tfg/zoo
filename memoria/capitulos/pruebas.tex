@@ -1,4 +1,5 @@
 \chapter{Pruebas}
+\label{chap:pruebas}
 
 En este capítulo se realizan pruebas con el fin de medir, cuantitativa y cualitativamente, las ventajas y/o desventajas que tiene el uso de Dagger para la gestión de un ciclo completo de CI/CD.
 
@@ -23,11 +24,7 @@ Las pruebas se realizan en un ordenador portátil con las siguientes caracterís
   \item \textit{Red}: Por cable, aproximadamente 1 GB simétrico.
 \end{itemize}
 
-Las versiones de los binarios utilizados se pueden encontrar en 
-\begin{bclogo}[logo=\bcattention]{Important!}
-  CITAR MANUAL DE USUARIO
-\end{bclogo}
-
+Las versiones de los binarios utilizados se pueden encontrar en \ref{chap:usuario}.
 
 \section{Prueba 1}
 
@@ -80,7 +77,7 @@ En el caso de que no se use Dagger, el desarrollador tendría que obtar por mét
 
 Además, extender la lógica de programación implicaría crear \textit{scripts}, los cuales habría que acomodar a un nuevo entorno de desarrollo en el caso de que este cambie en algún momento. Esto añade más carga al desarrollador, que tiene que mantener dichos \textit{scripts} a lo largo de los diferentes entornos en los que se quieran ejecutar. Crear diferentes \textit{scripts} hace la reutilización de código más complicada, y puede llevar a la duplicación de lógica de programación. Finalmente, también se encuentra el problema de la reproducibilidad, siendo esto más complicado de conseguir debido a las pequeñas diferencias que pueda haber en la configuración del entorno de desarrollo de cada programador.
 
-Sin embargo, la realidad es que las tecnologías y herramientas que se utilizan de manera convencional son más conocidas que Dagger. Por lo tanto, inicialmente puede ser lógico encaminarse por el uso de estas tecnologías, ya que permite iniciar la implementación de este tipo de ciclos más rápidamente. Además, aunque la API de Dagger es intuitiva si ya conoces las otras herramientas convencionales, su amplitud introduce una pequeña curva de aprendizaje. Pero, como se ha comentado, el mantenimiento a la larga es más sencillo con Dagger, debido a que todo se encuentra en un mismo lugar e implementado con un mismo lenguaje de programación, como Go, Python o Typescript (entre otros). Y, lo más importante, Dagger tiene una gran capacidad de portabilidad gracias a que ejecuta todas las funciones en entornos aislados, como los contenedores de Docker. Esto es una ventaja frente a los \textit{scripts} que es necesario mantener en diferentes entornos en el caso de que no se utilice Dagger.
+Sin embargo, la realidad es que las tecnologías y herramientas que se utilizan de manera convencional son más conocidas que Dagger. Por lo tanto, inicialmente puede ser lógico encaminarse por el uso de estas tecnologías, ya que permite iniciar la implementación de este tipo de ciclos más rápidamente. Además, aunque la API de Dagger es intuitiva si ya conoces las otras herramientas convencionales, su amplitud introduce una pequeña curva de aprendizaje. Pero, como se ha comentado, el mantenimiento a la larga es más sencillo con Dagger, debido a que todo se encuentra en un mismo lugar e implementado con un mismo lenguaje de programación, como Go, Python o Typescript (entre otros). Y, lo más importante, Dagger tiene una gran capacidad de portabilidad gracias a que ejecuta todas las funciones en entornos aislados, como los contenedores de Docker. Esto es una ventaja frente a los \textit{scripts}, que es necesario mantener en diferentes entornos en el caso de que no se utilice Dagger.
 
 En el cuadro \ref{table:differences} se proporciona una tabla a modo de resumen, con las diferencias que se encuentran entre las dos opciones de implementación que se han comentado.
 
@@ -98,6 +95,6 @@ En el cuadro \ref{table:differences} se proporciona una tabla a modo de resumen,
     Curva de aprendizaje & Moderada, API extensa pero intuitiva si se tiene experiencia previa con contenedores & Baja, herramientas ampliamente conocidas \\ \hline
     Madurez del ecosistema & En crecimiento activo & Herramientas maduras con amplia documentación y soporte \\ \hline
   \end{tabularx}
-  \caption{Diferencias entre Dagger frente a métodos convencionales}
+  \caption{Diferencias entre Dagger y métodos convencionales}
   \label{table:differences}
 \end{table}
