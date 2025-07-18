@@ -206,7 +206,7 @@ MONGO_DATABASE: zoo
 MONGO_ROOT: carer
 MONGO_ROOT_PASS: carerpass
 CR_PAT: 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
-STATE_REPO: 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
+STATE_REPO: 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
 SOPS_CONFIG_FILE: |
   creation_rules:
       - path_regex: ".*\\\\.ya?ml$"
