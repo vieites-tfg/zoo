@@ -391,7 +391,7 @@ Para encriptar los secretos se utilizan dos herramientas:
 
 \begin{lstlisting}[language=helm,label=lst:sops]{Archivo de configuración de SOPS}
 creation_rules:
-  - path_regex: ".*\\.ya?ml$"
+  - path_regex: ".*\.ya?ml$"
     unencrypted_regex: "^(apiVersion|metadata|kind|type)$"
     age: age15peyc7 #...
 \end{lstlisting}

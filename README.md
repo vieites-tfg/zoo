@@ -209,7 +209,7 @@ CR_PAT: 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
 STATE_REPO: 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
 SOPS_CONFIG_FILE: |
   creation_rules:
-      - path_regex: ".*\\\\.ya?ml$"
+      - path_regex: ".*\\.ya?ml$"
         unencrypted_regex: "^(apiVersion|metadata|kind|type)$"
         age: age15peyc7pedj8gjqwnarat6s3u87wy4j5xtf7t96vuj74m3l9xq5ys0r4sag
 SOPS_PRIVATE_KEY: AGE-SECRET-KEY-1CTS4S4QNNZ9N9YXXM288LSE9VKPJ220E57ZHC4558WMZ8LG2QWKQFFER8C
