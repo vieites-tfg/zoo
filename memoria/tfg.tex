@@ -1,6 +1,6 @@
 \documentclass[12pt,oneside,a4paper]{book}
 \usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
+\usepackage[spanish,es-tabla]{babel}
 \usepackage[margin=25mm]{geometry}
 \usepackage{graphicx}
 \usepackage[dvips]{epsfig}
@@ -13,6 +13,8 @@
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage{listingsutf8}
+\usepackage{minted}
+\usepackage{caption}
 \usepackage{enumitem}
 \usepackage[tikz]{bclogo}
 \usepackage{hyperref} % menús no pdf pero non leva ben co package galician
@@ -20,7 +22,7 @@
 \setlist{itemsep=1pt,topsep=1pt}
 \addto\captionsgalician{\def\contentsname{Memoria tipo B -- \'{I}ndice xeral }}
 
-\definecolor{backcolor}{rgb}{0.95,0.95,0.92}
+\definecolor{backcolor}{rgb}{0.95,0.95,0.95}
 \newcommand{\greencolor}{green!70!black}
 \lstset{
   caption=\lstname,
@@ -44,6 +46,15 @@
   rulesepcolor=\color{gray!50},
   postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
   escapeinside={(*@}{@*)}
+}
+\newenvironment{longlisting}{\captionsetup{type=listing}}{}
+\setminted{
+  samepage=false,
+  linenos,
+  breaklines,
+  frame=leftline,
+  bgcolor=backcolor,
+  breakanywhere,
 }
 \renewcommand*{\lstlistlistingname}{Índice de Listings}
 
@@ -181,7 +192,7 @@
 \include{capitulos/pruebas}
 %
 % Engadir os capitulos que fagan falta
-%
+
 \cleardoublepage
 \include{capitulos/conclusions}
 
@@ -191,7 +202,7 @@
 \include{capitulos/manuales-tecnicos}
 \cleardoublepage
 \include{capitulos/manuales-usuario}
-\cleardoublepage
+% \cleardoublepage
 % \include{capitulos/licenza}
 \cleardoublepage
 \include{capitulos/bibliografia}

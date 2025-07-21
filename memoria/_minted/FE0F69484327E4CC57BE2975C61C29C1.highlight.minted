@@ -1,0 +1,8 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Se ha divido en dos STATE\PYGZus{}REPO, pero es un solo string}
+\PYG{n+nv}{MONGO\PYGZus{}DATABASE}\PYG{o}{=}zoo
+\PYG{n+nv}{MONGO\PYGZus{}ROOT}\PYG{o}{=}carer
+\PYG{n+nv}{MONGO\PYGZus{}ROOT\PYGZus{}PASS}\PYG{o}{=}carerpass
+\PYG{n+nv}{CR\PYGZus{}PAT}\PYG{o}{=}ghp\PYGZus{}vEImTvwOByxaS1FFvYSuNhaRGF2QZf0gARoA
+\PYG{n+nv}{STATE\PYGZus{}REPO}\PYG{o}{=}github\PYGZus{}pat\PYGZus{}11AOOYJPI0zETh9qTHsxYE\PYGZus{}MbGvGQbWlZ52j5AhCwqV4ofE0zkGlwVrXdOM4KFUt3e52GWN3ZD7t0QEG8q
+\end{MintedVerbatim}

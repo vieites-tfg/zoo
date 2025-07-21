@@ -1,0 +1,20 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{package}\PYG{+w}{ }\PYG{n+nx}{main}
+
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{p}{(}
+\PYG{+w}{    }\PYG{l+s}{\PYGZdq{}dagger.io/dagger\PYGZdq{}}
+\PYG{+w}{    }\PYG{l+s}{\PYGZdq{}universe.dagger.io/docker\PYGZdq{}}
+\PYG{p}{)}
+
+\PYG{n+nx}{dagger}\PYG{p}{.}\PYG{err}{\PYGZsh{}}\PYG{n+nx}{Plan}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n+nx}{actions}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n+nx}{pull}\PYG{p}{:}\PYG{+w}{ }\PYG{n+nx}{docker}\PYG{p}{.}\PYG{err}{\PYGZsh{}}\PYG{n+nx}{Pull}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n+nx}{source}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}alpine\PYGZdq{}}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{        }\PYG{n+nx}{push}\PYG{p}{:}\PYG{+w}{ }\PYG{n+nx}{docker}\PYG{p}{.}\PYG{err}{\PYGZsh{}}\PYG{n+nx}{Push}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n+nx}{image}\PYG{p}{:}\PYG{+w}{ }\PYG{n+nx}{pull}\PYG{p}{.}\PYG{n+nx}{output}
+\PYG{+w}{            }\PYG{n+nx}{dest}\PYG{p}{:}\PYG{+w}{  }\PYG{l+s}{\PYGZdq{}localhost:5042/alpine\PYGZdq{}}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

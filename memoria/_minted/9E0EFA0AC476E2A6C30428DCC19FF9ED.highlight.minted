@@ -1,0 +1,4 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+mkdir\PYG{+w}{ }\PYGZhy{}p\PYG{+w}{ }./sops
+\PYG{n+nb}{echo}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}AGE\PYGZhy{}SECRET\PYGZhy{}KEY\PYGZhy{}1CTS4S4QNNZ9N9YXXM288LSE9VKPJ220E57ZHC4558WMZ8LG2QWKQFFER8C\PYGZdq{}}\PYG{+w}{ }\PYGZgt{}\PYG{+w}{ }./sops/age.agekey
+\end{MintedVerbatim}

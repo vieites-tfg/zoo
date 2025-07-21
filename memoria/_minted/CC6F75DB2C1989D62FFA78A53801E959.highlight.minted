@@ -1,0 +1,37 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c}{\PYGZsh{} Base}
+
+\PYG{k}{FROM}\PYG{+w}{ }\PYG{l+s}{node:20}\PYG{+w}{ }\PYG{k}{AS}\PYG{+w}{ }\PYG{l+s}{base}
+
+\PYG{k}{WORKDIR}\PYG{+w}{ }\PYG{l+s}{/app}
+
+\PYG{k}{COPY}\PYG{+w}{ }package.json\PYG{+w}{ }lerna.json\PYG{+w}{ }yarn.lock*\PYG{+w}{ }./
+
+\PYG{k}{COPY}\PYG{+w}{ }packages\PYG{+w}{ }packages/
+
+\PYG{k}{RUN}\PYG{+w}{ }yarn\PYG{+w}{ }install
+
+\PYG{k}{RUN}\PYG{+w}{ }yarn\PYG{+w}{ }global\PYG{+w}{ }add\PYG{+w}{ }lerna@8.2.1
+
+\PYG{k}{RUN}\PYG{+w}{ }yarn\PYG{+w}{ }global\PYG{+w}{ }add\PYG{+w}{ }@vercel/ncc
+
+\PYG{c}{\PYGZsh{} Frontend build stage}
+
+\PYG{k}{FROM}\PYG{+w}{ }\PYG{l+s}{base}\PYG{+w}{ }\PYG{k}{AS}\PYG{+w}{ }\PYG{l+s}{frontend\PYGZhy{}build}
+
+\PYG{k}{WORKDIR}\PYG{+w}{ }\PYG{l+s}{/app}
+
+\PYG{k}{RUN}\PYG{+w}{ }lerna\PYG{+w}{ }run\PYG{+w}{ }\PYGZhy{}\PYGZhy{}scope\PYG{+w}{ }@vieites\PYGZhy{}tfg/zoo\PYGZhy{}frontend\PYG{+w}{ }build
+
+\PYG{c}{\PYGZsh{} Frontend}
+
+\PYG{k}{FROM}\PYG{+w}{ }\PYG{l+s}{nginx:alpine}\PYG{+w}{ }\PYG{k}{AS}\PYG{+w}{ }\PYG{l+s}{frontend}
+
+\PYG{k}{WORKDIR}\PYG{+w}{ }\PYG{l+s}{/usr/share/nginx/html}
+
+\PYG{k}{COPY}\PYG{+w}{ }\PYGZhy{}\PYGZhy{}from\PYG{o}{=}frontend\PYGZhy{}build\PYG{+w}{ }/app/packages/frontend/dist\PYG{+w}{ }.
+
+\PYG{k}{EXPOSE}\PYG{+w}{ }\PYG{l+s}{80}
+
+\PYG{k}{CMD}\PYG{+w}{ }\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}nginx\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}\PYGZhy{}g\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}daemon off;\PYGZdq{}}\PYG{p}{]}
+\end{MintedVerbatim}

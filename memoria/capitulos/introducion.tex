@@ -1,20 +1,16 @@
 \chapter{Introducción}
 
-% Obxectivos Xerais, Relación da Documentación que conforma a Memoria, Descrición do Sistema, Información Adicional de Interese (métodos, técnicas ou arquitecturas utilizadas, xustificación da súa elección, etc.).
+En este Trabajo de Fin de Grado se pretende demostrar y evaluar la viabilidad, eficiencia y flexibilidad de Dagger\cite{dagger} como motor programable de ciclos de CI/CD (\textit{Continuous Integration}/\textit{Continuous Delivery})\cite{ci,cd}, con el fin de estandarizar y modernizar los ciclos de vida del desarrollo de software. Esto es importante debido a la actual complejidad que involucra mantener \textit{pipelines} de este tipo en entornos de desarrollo con un gran volumen de tecnologías.
 
-\section{Objetivos generales}
-
-% qué problema se resuelve y cuál es el propósito de este trabajo
+\section{Objetivos}
 
 \subsection*{Objetivos principales}
 
-En este trabajo se pretende demostrar y evaluar la viabilidad, eficiencia y flexibilidad de Dagger\cite{dagger} como motor de CI/CD (\textit{Continuous Integration}/\textit{Continuous Delivery})\cite{ci,cd}, con el fin de estandarizar y modernizar los ciclos de vida del desarrollo de software.
-
-Se usará Dagger con el fin de implementar la lógica necesaria para llevar a cabo los ciclos de CI y CD de una aplicación de prueba. Se evaluarán las ventajas que tiene su uso frente a métodos convencionales, entre las que destacarán su portabilidad, al correr sobre un \textit{runtime} de OCI (\textit{Open Container Initiative}\cite{oci}), como Docker\cite{docker}; y su capacidad programática, ya que se pueden crear \textit{pipelines} implementando funciones en el lunguaje conocido para el desarrollador. En vez de coordinar \textit{scripts} creados a mano en diferentes entornos, el programador es capaz de componer acciones reusables, utilizando un lenguaje de programación y una API (\textit{Application Programming Interface}) a su disposición.
+Se usará Dagger con el fin de implementar la lógica necesaria para llevar a cabo los ciclos de CI y CD de una aplicación de prueba. Se evaluarán las ventajas que tiene su uso frente a métodos convencionales, entre las que destacarán su portabilidad, al correr sobre un \textit{runtime} de OCI (\textit{Open Container Initiative}\cite{oci}), como Docker\cite{docker}; y su capacidad programática, ya que se pueden crear \textit{pipelines} implementando funciones en el lenguaje conocido para el desarrollador. En vez de coordinar \textit{scripts} creados a mano en diferentes entornos, el programador es capaz de componer acciones reusables, utilizando un lenguaje de programación y una API (\textit{Application Programming Interface}) a su disposición.
 
 Se van a proporcionar ejemplos de módulos creados con Dagger, los cuales estarán especialmente diseñados para cumplir los ciclos tanto de CI como de CD de la aplicación de prueba. De esta manera se podrá comprobar que este mismo proceso se puede llevar a cabo para cualquier aplicación.
 
-Lo que sigue son las preguntas a las que este trabajo busca responder:
+Lo que sigue son las preguntas a las que este Trabajo de Fin de Grado busca responder:
 
 \begin{itemize}
   \item ¿Qué grado de complejidad tiene desarrollar módulos de Dagger para la gestión de un ciclo de CI/CD de una aplicación?
@@ -37,7 +33,7 @@ Para lograr los objetivos principales es necesario llevar a cabo varios pasos:
   \item Análisis comparativo de las ventajas que ofrece Dagger frente a métodos convencionales.
 \end{itemize}
 
-\section{Relación de la documentación}
+\section{Estructura de la memoria}
 
 \begin{itemize}
   \item Capítulo 1: Introducción.

@@ -1,0 +1,4 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+dagger\PYG{+w}{ }call\PYG{+w}{ }\PYGZhy{}\PYGZhy{}sec\PYGZhy{}env\PYG{o}{=}file://../../.env\PYG{+w}{ }backend\PYG{+w}{ }service\PYG{+w}{ }up\PYG{+w}{ }\PYGZhy{}\PYGZhy{}ports\PYG{+w}{ }\PYG{l+m}{3010}:3000
+dagger\PYG{+w}{ }call\PYG{+w}{ }\PYGZhy{}\PYGZhy{}sec\PYGZhy{}env\PYG{o}{=}file://../../.env\PYG{+w}{ }frontend\PYG{+w}{ }service\PYG{+w}{ }up\PYG{+w}{ }\PYGZhy{}\PYGZhy{}ports\PYG{+w}{ }\PYG{l+m}{8090}:80
+\end{MintedVerbatim}

@@ -1,0 +1,6 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{creation\PYGZus{}rules}\PYG{p}{:}
+\PYG{+w}{  }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{path\PYGZus{}regex}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{.*}\PYG{err}{\PYGZbs{}}\PYG{l+s}{.ya?ml\PYGZdl{}}\PYG{l+s}{\PYGZdq{}}
+\PYG{+w}{    }\PYG{n+nt}{unencrypted\PYGZus{}regex}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{\PYGZca{}(apiVersion|metadata|kind|type)\PYGZdl{}}\PYG{l+s}{\PYGZdq{}}
+\PYG{+w}{    }\PYG{n+nt}{age}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{age15peyc7}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}...}
+\end{MintedVerbatim}

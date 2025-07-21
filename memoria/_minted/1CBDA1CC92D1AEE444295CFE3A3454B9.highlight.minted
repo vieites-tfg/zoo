@@ -1,0 +1,40 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{// Ci (main.go)}
+
+\PYG{k+kd}{type}\PYG{+w}{ }\PYG{n+nx}{Ci}\PYG{+w}{ }\PYG{k+kd}{struct}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{c+c1}{// +required}
+\PYG{+w}{	}\PYG{n+nx}{SecEnv}\PYG{+w}{  }\PYG{o}{*}\PYG{n+nx}{dagger}\PYG{p}{.}\PYG{n+nx}{Secret}
+\PYG{+w}{	}\PYG{n+nx}{secrets}\PYG{+w}{ }\PYG{n+nx}{secrets}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{k+kd}{func}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{m}\PYG{+w}{ }\PYG{o}{*}\PYG{n+nx}{Ci}\PYG{p}{)}\PYG{+w}{ }\PYG{n+nx}{Backend}\PYG{p}{(}
+\PYG{n+nx}{ctx}\PYG{+w}{ }\PYG{n+nx}{context}\PYG{p}{.}\PYG{n+nx}{Context}\PYG{p}{,}
+\PYG{c+c1}{// +defaultPath=\PYGZdq{}/\PYGZdq{}}
+\PYG{n+nx}{src}\PYG{+w}{ }\PYG{o}{*}\PYG{n+nx}{dagger}\PYG{p}{.}\PYG{n+nx}{Directory}\PYG{p}{,}
+\PYG{p}{)}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{*}\PYG{n+nx}{Backend}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{error}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{n+nx}{base}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{\PYGZus{}}\PYG{+w}{ }\PYG{o}{:=}\PYG{+w}{ }\PYG{n+nx}{m}\PYG{p}{.}\PYG{n+nx}{Init}\PYG{p}{(}\PYG{n+nx}{ctx}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{src}\PYG{p}{)}
+
+\PYG{+w}{  }\PYG{c+c1}{// Se obtienen las claves y los valores de los secretos para}
+\PYG{+w}{  }\PYG{c+c1}{// el *backend*.}
+
+\PYG{+w}{  }\PYG{k}{return}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n+nx}{Backend}\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n+nx}{Name}\PYG{p}{:}\PYG{+w}{    }\PYG{l+s}{\PYGZdq{}backend\PYGZdq{}}\PYG{p}{,}
+
+\PYG{+w}{    }\PYG{c+c1}{// Imagen base, con todo lo necesario para ejecutar los}
+\PYG{+w}{    }\PYG{c+c1}{// comandos que se precise.}
+\PYG{+w}{    }\PYG{n+nx}{Base}\PYG{p}{:}\PYG{+w}{    }\PYG{n+nx}{base}\PYG{p}{,}
+
+\PYG{+w}{    }\PYG{c+c1}{// Claves y valores de los secretos obtenidos antes.}
+\PYG{+w}{    }\PYG{n+nx}{Secrets}\PYG{p}{:}\PYG{+w}{ }\PYG{n+nx}{SecMap}\PYG{p}{\PYGZob{}}\PYG{n+nx}{Keys}\PYG{p}{:}\PYG{+w}{ }\PYG{n+nx}{keys}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{Values}\PYG{p}{:}\PYG{+w}{ }\PYG{n+nx}{values}\PYG{p}{\PYGZcb{}}\PYG{p}{,}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kc}{nil}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{// Backend (backend.go)}
+
+\PYG{k+kd}{func}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{m}\PYG{+w}{ }\PYG{o}{*}\PYG{n+nx}{Backend}\PYG{p}{)}\PYG{+w}{ }\PYG{n+nx}{Test}\PYG{p}{(}\PYG{n+nx}{ctx}\PYG{+w}{ }\PYG{n+nx}{context}\PYG{p}{.}\PYG{n+nx}{Context}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{string}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{error}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{m}\PYG{p}{.}\PYG{n+nx}{Base}\PYG{p}{.}
+\PYG{+w}{    }\PYG{n+nx}{WithExec}\PYG{p}{(}\PYG{p}{[}\PYG{p}{]}\PYG{k+kt}{string}\PYG{p}{\PYGZob{}}\PYG{l+s}{\PYGZdq{}lerna\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}run\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}test\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZhy{}\PYGZhy{}scope\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}@vieites\PYGZhy{}tfg/zoo\PYGZhy{}backend\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{    }\PYG{n+nx}{Stdout}\PYG{p}{(}\PYG{n+nx}{ctx}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\end{MintedVerbatim}

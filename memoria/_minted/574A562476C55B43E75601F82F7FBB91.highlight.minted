@@ -1,0 +1,43 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{configs}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{cm}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{kustomize.buildOptions}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{\PYGZhy{}\PYGZhy{}enable\PYGZhy{}alpha\PYGZhy{}plugins}\PYG{n+nv}{ }\PYG{l+s}{\PYGZhy{}\PYGZhy{}enable\PYGZhy{}exec}\PYG{l+s}{\PYGZdq{}}
+\PYG{+w}{    }\PYG{n+nt}{ui.bannerpermanent}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{true}\PYG{l+s}{\PYGZdq{}}
+
+\PYG{n+nt}{repoServer}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{env}\PYG{p}{:}
+\PYG{+w}{    }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{XDG\PYGZus{}CONFIG\PYGZus{}HOME}
+\PYG{+w}{      }\PYG{n+nt}{value}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{/.config}
+\PYG{+w}{    }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{SOPS\PYGZus{}AGE\PYGZus{}KEY\PYGZus{}FILE}
+\PYG{+w}{      }\PYG{n+nt}{value}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{/.config/sops/age/keys.txt}
+
+\PYG{+w}{  }\PYG{n+nt}{volumes}\PYG{p}{:}
+\PYG{+w}{    }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{custom\PYGZhy{}tools}
+\PYG{+w}{      }\PYG{n+nt}{emptyDir}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{sops\PYGZhy{}age}
+\PYG{+w}{      }\PYG{n+nt}{secret}\PYG{p}{:}
+\PYG{+w}{        }\PYG{n+nt}{secretName}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{sops\PYGZhy{}age}
+
+\PYG{+w}{  }\PYG{n+nt}{initContainers}\PYG{p}{:}
+\PYG{+w}{    }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{install\PYGZhy{}ksops}
+\PYG{+w}{      }\PYG{n+nt}{image}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{viaductoss/ksops:v4}
+\PYG{+w}{      }\PYG{n+nt}{command}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{[}\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{/bin/sh}\PYG{l+s}{\PYGZdq{}}\PYG{p+pIndicator}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{\PYGZhy{}c}\PYG{l+s}{\PYGZdq{}}\PYG{p+pIndicator}{]}
+\PYG{+w}{      }\PYG{n+nt}{args}\PYG{p}{:}
+\PYG{+w}{        }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{echo}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdq{}Installing}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{KSOPS}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{and}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{Kustomize...\PYGZdq{};}
+\PYG{+w}{          }\PYG{l+lScalar+lScalarPlain}{mv}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{ksops}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{/custom\PYGZhy{}tools/;}
+\PYG{+w}{          }\PYG{l+lScalar+lScalarPlain}{mv}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{kustomize}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{/custom\PYGZhy{}tools/;}
+\PYG{+w}{          }\PYG{l+lScalar+lScalarPlain}{echo}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdq{}Done.\PYGZdq{};}
+\PYG{+w}{      }\PYG{n+nt}{volumeMounts}\PYG{p}{:}
+\PYG{+w}{        }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{mountPath}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{/custom\PYGZhy{}tools}
+\PYG{+w}{          }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{custom\PYGZhy{}tools}
+
+\PYG{+w}{  }\PYG{n+nt}{volumeMounts}\PYG{p}{:}
+\PYG{+w}{    }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{mountPath}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{/usr/local/bin/kustomize}
+\PYG{+w}{      }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{custom\PYGZhy{}tools}
+\PYG{+w}{      }\PYG{n+nt}{subPath}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{kustomize}
+\PYG{+w}{    }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{mountPath}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{/usr/local/bin/ksops}
+\PYG{+w}{      }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{custom\PYGZhy{}tools}
+\PYG{+w}{      }\PYG{n+nt}{subPath}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{ksops}
+\PYG{+w}{    }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{sops\PYGZhy{}age}
+\PYG{+w}{      }\PYG{n+nt}{mountPath}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{/.config/sops/age}
+\end{MintedVerbatim}

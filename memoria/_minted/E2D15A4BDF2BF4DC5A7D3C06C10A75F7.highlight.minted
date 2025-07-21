@@ -1,0 +1,22 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{apiVersion}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{argoproj.io/v1alpha1}
+\PYG{n+nt}{kind}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Application}
+\PYG{n+nt}{metadata}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{app\PYGZhy{}dev}
+\PYG{+w}{  }\PYG{n+nt}{namespace}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{argocd}
+\PYG{n+nt}{spec}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{project}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{default}
+\PYG{+w}{  }\PYG{n+nt}{source}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{repoURL}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZsq{}}\PYG{l+s}{https://github.com/vieites\PYGZhy{}tfg/state.git}\PYG{l+s}{\PYGZsq{}}
+\PYG{+w}{    }\PYG{n+nt}{path}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{dev}
+\PYG{+w}{    }\PYG{n+nt}{targetRevision}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{deploy}
+\PYG{+w}{  }\PYG{n+nt}{destination}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{server}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZsq{}}\PYG{l+s}{https://kubernetes.default.svc}\PYG{l+s}{\PYGZsq{}}
+\PYG{+w}{    }\PYG{n+nt}{namespace}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{dev}
+\PYG{+w}{  }\PYG{n+nt}{syncPolicy}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{automated}\PYG{p}{:}
+\PYG{+w}{      }\PYG{n+nt}{prune}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{true}
+\PYG{+w}{      }\PYG{n+nt}{selfHeal}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{true}
+\PYG{+w}{    }\PYG{n+nt}{syncOptions}\PYG{p}{:}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{CreateNamespace=true}
+\end{MintedVerbatim}

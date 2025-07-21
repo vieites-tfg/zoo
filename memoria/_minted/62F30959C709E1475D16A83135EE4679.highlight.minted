@@ -1,0 +1,37 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c}{\PYGZsh{} \PYGZhy{}\PYGZhy{}\PYGZhy{} ALIASES \PYGZhy{}\PYGZhy{}\PYGZhy{}}
+\PYG{c}{\PYGZsh{} Defines shortcuts (aliases) for longer commands.}
+\PYG{n+nf}{alias dv }\PYG{o}{:}= \PYG{n}{down\PYGZus{}vol}
+
+\PYG{c}{\PYGZsh{} \PYGZhy{}\PYGZhy{}\PYGZhy{} DEFAULT RECIPE \PYGZhy{}\PYGZhy{}\PYGZhy{}}
+\PYG{c}{\PYGZsh{} This is the recipe that runs if you just type \PYGZsq{}just\PYGZsq{} in the}
+\PYG{c}{\PYGZsh{} terminal.}
+\PYG{c}{\PYGZsh{} By default, it invokes the \PYGZsq{}just \PYGZhy{}l\PYGZsq{} recipe, which lists all}
+\PYG{c}{\PYGZsh{} available recipes.}
+\PYG{c}{\PYGZsh{} The \PYGZsq{}\PYGZus{}\PYGZsq{} prefix indicates that it is a helper recipe, not}
+\PYG{c}{\PYGZsh{} intended to be called directly by the user.}
+\PYG{n+nf}{\PYGZus{}default}\PYG{o}{:}
+\PYG{+w}{  }just\PYG{+w}{ }\PYGZhy{}l
+
+\PYG{c}{\PYGZsh{} \PYGZhy{}\PYGZhy{}\PYGZhy{} INTERNAL (PRIVATE) RECIPES \PYGZhy{}\PYGZhy{}\PYGZhy{}}
+\PYG{n+nf}{\PYGZus{}build\PYGZus{}zoo\PYGZus{}base}\PYG{o}{:}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{}!/usr/bin/env bash}
+\PYG{+w}{  }\PYG{k}{if}\PYG{+w}{ }\PYG{o}{[}\PYG{o}{[}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{k}{\PYGZdl{}(}docker\PYG{+w}{ }images\PYG{+w}{ }\PYGZhy{}f\PYG{+w}{ }\PYG{n+nv}{reference}\PYG{o}{=}zoo\PYGZhy{}base\PYG{+w}{ }\PYG{p}{|}\PYG{+w}{ }wc\PYG{+w}{ }\PYGZhy{}l\PYG{+w}{ }\PYG{p}{|}\PYG{+w}{ }xargs\PYG{k}{)}\PYG{l+s+s2}{\PYGZdq{}}\PYG{+w}{ }!\PYG{o}{=}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}2\PYGZdq{}}\PYG{+w}{ }\PYG{o}{]}\PYG{o}{]}
+\PYG{+w}{  }\PYG{k}{then}
+\PYG{+w}{    }docker\PYG{+w}{ }build\PYG{+w}{ }\PYGZhy{}\PYGZhy{}target\PYG{+w}{ }base\PYG{+w}{ }\PYGZhy{}t\PYG{+w}{ }zoo\PYGZhy{}base\PYG{+w}{ }.
+\PYG{+w}{  }\PYG{k}{fi}
+
+\PYG{c}{\PYGZsh{} Accepts two parameters: \PYGZsq{}entrypoint\PYGZsq{} and \PYGZsq{}command\PYGZsq{}.}
+\PYG{n+nf}{\PYGZus{}run entrypoint command}\PYG{o}{:}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} \PYGZsq{}@\PYGZsq{} at the beginning of a command line prevents \PYGZsq{}just\PYGZsq{} from}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} printing the command before executing it.}
+\PYG{+w}{  }@just\PYG{+w}{ }\PYGZus{}build\PYGZus{}zoo\PYGZus{}base
+\PYG{+w}{  }docker\PYG{+w}{ }run\PYG{+w}{ }\PYGZhy{}\PYGZhy{}rm\PYG{+w}{ }\PYGZhy{}w\PYG{+w}{ }/app\PYG{+w}{ }\PYGZhy{}v\PYG{+w}{ }\PYG{n+nv}{\PYGZdl{}PWD}:/app\PYG{+w}{ }\PYGZhy{}\PYGZhy{}env\PYGZhy{}file\PYG{+w}{ }.env\PYG{+w}{ }\PYGZhy{}\PYGZhy{}entrypoint\PYG{o}{=}\PYG{o}{\PYGZob{}}\PYG{o}{\PYGZob{}}entrypoint\PYG{o}{\PYGZcb{}}\PYG{o}{\PYGZcb{}}\PYG{+w}{ }zoo\PYGZhy{}base\PYG{+w}{ }\PYG{o}{\PYGZob{}}\PYG{o}{\PYGZob{}}command\PYG{o}{\PYGZcb{}}\PYG{o}{\PYGZcb{}}
+
+\PYG{c}{\PYGZsh{} \PYGZhy{}\PYGZhy{}\PYGZhy{} PUBLIC RECIPES \PYGZhy{}\PYGZhy{}\PYGZhy{}}
+\PYG{n+nf}{init}\PYG{o}{:}
+\PYG{+w}{  }@just\PYG{+w}{ }\PYGZus{}run\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}yarn\PYGZdq{}}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}install\PYGZdq{}}
+
+\PYG{n+nf}{down\PYGZus{}vol}\PYG{o}{:}
+\PYG{+w}{  }docker\PYG{+w}{ }compose\PYG{+w}{ }down\PYG{+w}{ }\PYGZhy{}v
+\end{MintedVerbatim}

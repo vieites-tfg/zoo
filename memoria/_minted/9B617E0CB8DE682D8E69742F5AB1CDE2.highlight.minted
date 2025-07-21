@@ -1,0 +1,17 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+dev
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }kustomization.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }non\PYGZhy{}secrets.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }secret\PYGZus{}generator.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }secrets.yaml
+pre
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }kustomization.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }non\PYGZhy{}secrets.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }secret\PYGZus{}generator.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }secrets.yaml
+pro
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }kustomization.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }non\PYGZhy{}secrets.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }secret\PYGZus{}generator.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }secrets.yaml
+\end{MintedVerbatim}
