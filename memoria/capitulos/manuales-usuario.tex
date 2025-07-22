@@ -9,8 +9,6 @@ Este Trabajo de Fin de Grado se compone de tres repositorios bien diferenciados 
   \item \texttt{state}: En él se almacenan los valores de las Charts de Helm correspondientes a cada uno de los entornos en los que se puede desplegar la aplicación. Funciona como única fuente de verdad. También es el lugar de donde ArgoCD obtiene los recursos de Kubernetes, con el fin de ser desplegados.
 \end{itemize}
 
-Cada uno de los repositorios tiene su propio \texttt{README}. Consultar los demás para más información.
-
 \section{zoo}
 
 \subsection*{Estructura general del repositorio}
@@ -46,10 +44,10 @@ sops
 |- .sops.yaml
 |- age.agekey
 \end{minted}
-\caption{Estructura principal del repositorio ``zoo''}
+\caption{Estructura del repositorio \texttt{zoo}.}
 \end{longlisting}
 
-Este repositorio funciona como un monorepo, lo cual indica que todo el código fuente se encuentra en este único lugar.
+Este repositorio funciona como un \textit{monorepo}, lo cual indica que todo el código fuente se encuentra en este lugar.
 
 \subsubsection*{Aplicación de prueba}
 
@@ -65,14 +63,7 @@ También se pueden encontrar varios ejecutables en el directorio de \texttt{scri
 
 En todos los \textit{clusters} se instala ArgoCD, aplicación creada específicamente para Kubernetes y que utiliza el método \textit{pull}, siguiendo la filisofía GitOps, leyendo los recursos a desplegar del repositorio de estado (\texttt{state}) mencionado anteriormente. Este tiene una rama \texttt{deploy}, en la que se suben los archivos necesarios para que ArgoCD lea y despliegue la aplicación.
 
-Se configuran los \textit{clusters} y las propias instancias de ArgoCD de manera diferente para cada uno de los clusters. Estas configuraciones se pueden encontrar en los directorios \texttt{cluster} y \texttt{argo}.
-
-Además, este Trabajo de Fin de Grado tiene una memoria asociada, en la cual se pueden encontrar unas claves privada y pública, junto con otros \textit{tokens}, necesarias para poder probar la implementación. Estas claves y \textit{tokens} tienen varios propósitos:
-
-\begin{itemize}
-  \item Claves privada y pública: Se utilizan para encriptar y desencriptar los secretos (\texttt{Secrets}) de Kubernetes.
-  \item \texttt{tokens}: Un \texttt{CR\_PAT}, que permite acceder al Container Registry de GitHub, donde se encuentran las imágenes de Docker de la aplicación; y un \texttt{STATE\_REPO}, necesario para poder actualizar el repositorio de estado y actualizar los recursos que se van a desplegar.
-\end{itemize}
+Se configuran los \textit{clusters} y las propias instancias de ArgoCD de manera diferente para cada uno de los \textit{clusters}. Estas configuraciones se pueden encontrar en los directorios \texttt{cluster} y \texttt{argo}.
 
 \subsection*{Prueba mínima}
 
@@ -86,7 +77,7 @@ A continuación, en la Tabla \ref{table:software} se indica el software junto co
 
 Es necesario tener en cuenta que \textit{no} se ha probado en un sistema operativo Windows, por lo que no se asegura su funcionamiento en este. Sí se ha probado en MacOS y distribuciones Linux.
 
-\begin{table}
+\begin{table}[ht]
   \centering
   \begin{tabular}{|l|l|}
     \hline
@@ -98,7 +89,7 @@ Es necesario tener en cuenta que \textit{no} se ha probado en un sistema operati
     \href{https://kubernetes.io/docs/tasks/tools/#kind}{Kind} & 0.27.0 \\ \hline
     \href{https://helm.sh/docs/intro/install/}{Helm} & 3.17.3 \\ \hline
   \end{tabular}
-  \caption{Software y versiones utilizadas durante el desarrollo}
+  \caption{Software y versiones utilizadas durante el desarrollo.}
   \label{table:software}
 \end{table}
 
@@ -114,7 +105,7 @@ Es necesario tener en cuenta que \textit{no} se ha probado en un sistema operati
 git clone https://github.com/vieites-tfg/zoo ~/zoo
 cd ~/zoo
 \end{minted}
-\caption{Clonado y acceso al repositorio}
+\caption{Clonado y acceso al repositorio.}
 \end{listing}
 
 \item Clave privada.
@@ -124,54 +115,56 @@ cd ~/zoo
 mkdir -p ./sops
 echo "AGE-SECRET-KEY-1CTS4S4QNNZ9N9YXXM288LSE9VKPJ220E57ZHC4558WMZ8LG2QWKQFFER8C" > ./sops/age.agekey
 \end{minted}
-\caption{Almacenamiento de la clave privada de encriptado}
+\caption{Almacenamiento de la clave privada de encriptado.}
 \end{listing}
 
-  \item Ejecutar el script de creación de los entornos.
+  \item Ejecutar el \textit{script} de creación de los entornos.
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
 ./scripts/create_envs.sh
 \end{minted}
-\caption{Script de creación de los entornos}
+\caption{\textit{Script} de creación de los entornos.}
 \end{listing}
 
-    El script anterior:
+  El \textit{script} anterior:
     \begin{itemize}
-      \item Crea tres clusters (`dev`, `pre` y `pro`), con tres contextos diferentes (`kind-{{cluster}}`), con su propia configuración.
-      \item Introduce la clave privada, creada previamente, en cada uno de los clusters, para permitir a ArgoCD desencriptar los secretos.
-      \item Instala ArgoCD en cada uno de los clusters, con sus respectivas configuraciones, obteniendo cada uno los recursos de despliegue del entorno que le toca.
+      \item Crea tres \textit{clusters} (\texttt{dev}, \texttt{pre} y \texttt{pro}), con tres contextos diferentes (\texttt{kind-\string{\string{cluster\string}\string}}), con su propia configuración.
+      \item Introduce la clave privada, creada previamente, en cada uno de los \textit{clusters}, para permitir a ArgoCD desencriptar los secretos.
+      \item Instala ArgoCD en cada uno de los \textit{clusters}, con sus respectivas configuraciones, obteniendo cada uno los recursos de despliegue del entorno que le toca.
     \end{itemize}
 
-  \item Acceso a los clusters.
+  \item Acceso a los \textit{clusters}.
 
-    A medida que se van creando los clusters, las contraseñas del usuario \texttt{admin} de ArgoCD se van mostrando. También se muestran todas al finalizar la ejecución del script.
+    A medida que se van creando los \textit{clusters}, las contraseñas del usuario \texttt{admin} de ArgoCD se van mostrando. También se muestran todas al finalizar la ejecución del \textit{script}.
 
-    Para poder acceder a cada uno de los clusters, lo primero que hay que hacer es mapear un puerto local libre al puerto 443 del servidor de ArgoCD. Esto se consigue de la siguiente manera:
+    Para poder acceder a cada uno de los \textit{clusters}, lo primero que hay que hacer es mapear un puerto local libre al puerto 443 del servidor de ArgoCD. Esto se consigue con el comando que se muestra en el Listing \ref{lst:portforward}:
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
 kubectl port-forward svc/argocd-server -n argocd --context kind-{{cluster}} 8086:443
 \end{minted}
-\caption{Disponer un puerto en local para acceder a ArgoCD}
+\caption{Disponer un puerto en local para acceder a ArgoCD.}
+\label{lst:portforward}
 \end{listing}
 
     En el anterior comando, hay que cambiar \texttt{\{\{cluster\}\}} por aquel al que se quiera acceder. Se podrá acceder a ArgoCD a través del navegador en \texttt{localhost:8086}
 
-    Se pide usuario y contraseña para entrar, que son \texttt{admin} y la contraseña de dicho cluster, mostrada en la salida del script que se ha ejecutado antes.
+    Se pide usuario y contraseña para entrar, que son \texttt{admin} y la contraseña de dicho \textit{cluster}, mostrada en la salida del \textit{script} que se ha ejecutado antes.
 
   \item Acceder a la aplicación. (opcional)
 
-    Lo primero que hay que hacer es configurar los hosts del ordenador para que se resuelvan las rutas como \texttt{localhost}. Para ello se puede ejecutar el siguiente comando:
+    Lo primero que hay que hacer es configurar los \textit{hosts} del ordenador para que se resuelvan las rutas como \texttt{localhost}. Para ello se puede ejecutar el comando del Listing \ref{lst:checkhosts}
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
 just check_hosts dev pre pro
 \end{minted}
-\caption{Configuración del host para acceder a las URLs de la aplicación}
+\caption{Configuración del \textit{host} para acceder a las URLs de la aplicación.}
+\label{lst:checkhosts}
 \end{listing}
 
-    El comando anterior modifica el archivo \texttt{/etc/hosts}, incluyendo las líneas nesecarias para poder resolver las rutas de acceso a la aplicación. Es necesario tener permisos de usuario o poner la contraseña de este en el caso de que se pida.
+    El comando anterior modifica el archivo \texttt{/etc/hosts}, incluyendo las líneas necesarias para poder resolver las rutas de acceso a la aplicación. Es necesario tener permisos de usuario o poner la contraseña de este en el caso de que se pida.
 
     Hay que tener en cuenta que cada entorno tiene su propio puerto, que son:
     \begin{itemize}
@@ -180,9 +173,9 @@ just check_hosts dev pre pro
       \item \texttt{pro}: 8082
     \end{itemize}
 
-    Los anteriores puertos se podrían modificar, pero sería necesario actualizar tanto las configuraciones de los clusters en \texttt{zoo/cluster} como los valores de los puertos del Ingress en el repositorio de estado \texttt{state} para cada uno de los entornos. Esto implicaría tener que hacer un nuevo despliegue con el fin de actualizar los valores en los propios recursos de Kubernetes. No sería necesario publicar nuevas imágenes.
+    Los anteriores puertos se podrían modificar, pero sería necesario actualizar tanto las configuraciones de los \textit{clusters} en \texttt{zoo/cluster} como los valores de los puertos del Ingress en el repositorio de estado \texttt{state} para cada uno de los entornos. Esto implicaría tener que hacer un nuevo despliegue con el fin de actualizar los valores en los propios recursos de Kubernetes. No sería necesario publicar nuevas imágenes.
 
-    Ahora se puede acceder a la aplicación de gestión del zoo. a través de las siguientes rutas en el navegador:
+    Ahora se puede acceder a la aplicación de gestión del zoo a través de las siguientes rutas en el navegador:
 
     \begin{itemize}
       \item \textit{frontend}: \texttt{zoo-\{\{entorno\}\}.example.com:\{\{puerto\_entorno\}\}}
@@ -195,13 +188,13 @@ just check_hosts dev pre pro
 
 Se comprueba que funciona el despliegue de la aplicación para cualquiera de los entornos. Esta configuración permite al desarrollador tener a su disposición cada una de las versiones y comprobar que el despliegue se realiza correctamente. El uso de ArgoCD y la capacidad de obtener los recursos de una única fuente de verdad hace de este flujo de despliegue algo esencial en cualquier equipo de desarrollo.
 
-Es necesario mencionar que, en entornos de producción reales, los clusters se encontrarían en la nube. Sin embargo, se podría mantener el cluster de desarrollo \texttt{dev}, con el fin de realizar implementaciones y probar su funcionamiento sin depender de herramientas remotas.
+Es necesario mencionar que, en entornos de producción reales, los \textit{clusters} se encontrarían en la nube. Sin embargo, se podría mantener el \textit{cluster} de desarrollo \texttt{dev}, con el fin de realizar implementaciones y probar su funcionamiento sin depender de herramientas remotas.
 
 A continuación se indica cómo probar los módulos de Dagger.
 
 \subsection*{Prueba de Dagger}
 
-En este caso se va mostrar cómo probar tanto los módulos de Dagger como el workflow completo de CI/CD, desde la simulación de implementación de una nueva característica en la aplicación, pasando por su despliegue en todos los entornos.
+En este caso se va mostrar cómo probar tanto los módulos de Dagger como el \textit{workflow} completo de CI/CD, desde la simulación de implementación de una nueva característica en la aplicación, pasando por su despliegue en todos los entornos.
 
 \subsubsection*{Requisitos de software}
 
@@ -217,31 +210,31 @@ Incluyendo los de la prueba anterior.
   \end{tabular}
 \end{table}
 
-Para la simulación de una nueva \textit{feature} se utilizar \textit{act}, herramienta que permite ejecutar workflows de GitHub de manera local. Con ella se simulará el disparo de los eventos que hac que el workflow se ejecute, y se comportará de la misma manera que haría en remoto.
+Para la simulación de una nueva \textit{feature} se utilizar \textit{act}, herramienta que permite ejecutar \textit{workflows} de GitHub de manera local. Con ella se simulará el disparo de los eventos que hacen que el \textit{workflow} se ejecute, y se comportará de la misma manera que haría en remoto.
 
 \subsubsection*{Cómo probar}
 
 \begin{enumerate}
-  \item Creación de archivos `.env` y `.secrets.yaml`
+  \item Creación de archivos \texttt{.env} y \texttt{.secrets.yaml}
 
-    Es necesario modificar los archivos `example.env` y `example.secrets.yaml` con los datos pertinentes. Los archivos quedarían como se muestra en los Listings \ref{lst:env-file} y \ref{lst:secrets-file}.
+    Es necesario modificar los archivos \texttt{example.env} y \texttt{example.secrets.yaml} con los datos pertinentes. Los archivos quedarían como se muestra en los Listings \ref{lst:env-file} y \ref{lst:secrets-file}.
   
 \begin{listing}[!ht]
   \begin{minted}{bash}
-# Se ha divido en dos STATE_REPO, pero es un solo string
+# Se ha dividido en dos STATE_REPO, pero es un solo string
 MONGO_DATABASE=zoo
 MONGO_ROOT=carer
 MONGO_ROOT_PASS=carerpass
 CR_PAT=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
 STATE_REPO=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
 \end{minted}
-\caption{Archivo de secretos .env}
+\caption{Archivo de secretos \texttt{.env}.}
 \label{lst:env-file}
 \end{listing}
 
 \begin{listing}[!ht]
   \begin{minted}{yaml}
-# Se han divido en dos STATE_REPO, age y SOPS_PRIVATE_KEY,
+# Se han dividido en dos STATE_REPO, age y SOPS_PRIVATE_KEY,
 # pero son un solo string
 MONGO_DATABASE: zoo
 MONGO_ROOT: carer
@@ -255,18 +248,18 @@ SOPS_CONFIG_FILE: |
         age: age15peyc7pedj8gjqwnarat6s3u87wy4j5xtf7t96vuj74m3l9xq5ys0r4sag
 SOPS_PRIVATE_KEY: AGE-SECRET-KEY-1CTS4S4QNNZ9N9YXXM288LSE9VKPJ220E57ZHC4558WMZ8LG2QWKQFFER8C
 \end{minted}
-\caption{Archivo de secretos .secrets.yaml, para pruebas con act}
+\caption{Archivo de secretos \texttt{.secrets.yaml}, para pruebas con \texttt{act}.}
 \label{lst:secrets-file}
 \end{listing}
 
-    Se puede copiar el contenido anterior y pegarlo en su respectivo archivo. Posteriormente, hay que cambiar el nombre de estos, eliminando la parte de `example`.
+Se puede copiar el contenido anterior y pegarlo en su respectivo archivo. Posteriormente, hay que cambiar el nombre de estos, eliminando la parte de \texttt{example}.
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
 mv example.env .env
 mv example.secrets.yaml .secrets.yaml
 \end{minted}
-\caption{Cambio de nombre de archivos ocultos}
+\caption{Cambio de nombre de archivos ocultos.}
 \end{listing}
 
   \item Prueba local del módulo de CI.
@@ -296,16 +289,17 @@ cd dagger/ci
 \caption{Acceder al módulo de Dagger de CI.}
 \end{listing}
 
-Se pueden obtener las funciones de \texttt{CI}, junto con los campos de la estructura, con el comando:
+Se pueden obtener las funciones de \texttt{CI}, junto con los campos de la estructura, con el comando del Listing \ref{lst:daggerfunctions}:
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
 dagger functions
 \end{minted}
 \caption{Comprobación de las funciones disponibles con Dagger.}
+\label{lst:daggerfunctions}
 \end{listing}
 
-    Para conocer las funciones y campos de las demás estructuras se ejecuta:
+  Para conocer las funciones y campos de las demás estructuras se ejecuta el comando del Listing \ref{lst:daggerhelp}:
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
@@ -313,20 +307,20 @@ dagger call backend --help
 dagger call frontend --help
 \end{minted}
 \caption{Obtener las funciones de cada uno de los objetos customizados del módulo de Dagger de CI.}
+\label{lst:daggerhelp}
 \end{listing}
 
-    \texttt{CI} tiene un parámetro requerido, que se trata del archivo \texttt{.env} que se ha creado anteriormente. A continuación se muestra cómo se ejecutarían los tests \textit{end-to-end} de la aplicación, teniendo en cuenta que hay que encontrarse en el directorio del módulo y que el archivo \texttt{.env} se ha creado correctamente en la raíz del repositorio:
+  \texttt{CI} tiene un parámetro requerido, que se trata del archivo \texttt{.env} que se ha creado anteriormente. En el Listing \ref{lst:daggere2e} se muestra cómo se ejecutarían los tests \textit{end-to-end} de la aplicación, teniendo en cuenta que hay que encontrarse en el directorio del módulo y que el archivo \texttt{.env} se ha creado correctamente en la raíz del repositorio:
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
 dagger call --sec-env=file://../../.env endtoend
 \end{minted}
 \caption{Ejecutar la función de prueba íntegra de los paquetes de la aplicación con Dagger.}
+\label{lst:daggere2e}
 \end{listing}
 
-    La primera vez que se ejecuta el comando anterior puede tardar alrededor de 10 minutos. Siempre dependiendo de la conexión a Internet que se tenga. La segunda vez, ese tiempo debería reducirse considerablemente, alrededor de un 40\%, tardando así 6 minutos. Este tiempo puede reducirse más, a medida que se realizan ejecuciones del mismo, hasta alrededor de un 60\% del tiempo inicial.
-
-    Otro ejemplo sería, levantar el frontend y el backend y hacer que se comuniquen de manera local.
+Otro ejemplo sería, levantar el \textit{frontend} y el \textit{backend} y hacer que se comuniquen de manera local.
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
@@ -338,9 +332,7 @@ dagger call --sec-env=file://../../.env frontend service up --ports 8090:80
 
     Simplemente, ejecutando los comandos anteriores en terminales diferentes, los servicios serán capaces de comunicarse. Estos estarán disponibles en \texttt{localhost:\{\{puerto\}\}}. Para acceder a la API se añade la ruta \texttt{/animals}.
 
-    En los comandos anteriores, \texttt{up} es una función del tipo Service, propio de Dagger, que se devuelve en la función \texttt{service}, como se muestra en el diagrama anterior. \texttt{--ports} es un argumento de la función \texttt{up}.
-
-    Otros ejemplos de comandos:
+    En los comandos anteriores, \texttt{up} es una función del tipo \texttt{Service}, propio de Dagger, que se devuelve en la función \texttt{service}, como se muestra en el diagrama anterior. \texttt{--ports} es un argumento de la función \texttt{up}.
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
@@ -401,40 +393,40 @@ dagger call \
 
   \item Prueba con \texttt{act}.
 
-    \texttt{act} es una herramienta que permite ejecutar workflows de GitHub en local, pudiendo indicar el \textit{trigger} que dispara el workflow. 
+    \texttt{act} es una herramienta que permite ejecutar \textit{workflows} de GitHub en local, pudiendo indicar el \textit{trigger} que dispara el \textit{workflow}. 
 
     De esta manera, se puede probar cómo sería el flujo de ejecución en el caso de que se introdujera en la rama principal una nueva característica de la aplicación.
 
-    El workflow encargado de realizar las operaciones de CI y CD es el que se encuentra en \texttt{.github/workflows/cicd.yaml}.
+    El \textit{workflow} encargado de realizar las operaciones de CI y CD es el que se encuentra en \texttt{.github/workflows/cicd.yaml}.
 
     La definición de los objetos del \textit{trigger} \texttt{release} se encuentran en el directorio \texttt{.github/workflows/events}.
 
     Una vez se tenga \texttt{act} instalado, se puede iniciar la \textit{promoción de entornos}.
 
-    Antes de nada, para comprobar que se ha realizado el cambio, se realizarán los siguientes pasos para asegurarse de que las \textit{tags} de la imagen de \texttt{dev} es nueva:
+    Antes de nada, para comprobar que se ha realizado el cambio, se realizarán una serie de pasos para asegurarse de que las \textit{tags} de la imagen de \texttt{dev} es nueva. El comando del Listing \ref{lst:newbranch} creará una rama nueva con el nombre \texttt{environments-test}.
+
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
 git switch -c environments-test
   \end{minted}
   \caption{Creación de una nueva rama con Git.}
+  \label{lst:newbranch}
 \end{listing}
-
-    El comando anterior creará una rama nueva con el nombre \texttt{environments-test}.
 
     Ahora se puede cambiar el título de la página web. Este se encuentra en el archivo \texttt{packages/frontend/src/components/MainTitle.vue}, de ``Zoo'' a algo como ``Mi zoo''.
 
-    Se debe crear un \textit{commit} para que la imagen use como \textit{tag} los ocho primeros caracteres de este:
+    Se debe crear un \textit{commit} para que la imagen use como \textit{tag} los ocho primeros caracteres de este.
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
 git add .
 git commit -m 'cambio de nombre'
   \end{minted}
-  \caption{Creación del commit del cambio realizado en el código.}
+  \caption{Creación del \textit{commit} del cambio realizado en el código.}
 \end{listing}
 
-    Así se utilizará el \textit{commit} anterior para generar el nombre de la \textit{tag} de las imágenes.
+    Así se utilizará el \textit{commit} que se acaba de crear para generar el nombre de la \textit{tag} de las imágenes.
 
     \textbf{dev}
 
@@ -445,16 +437,17 @@ git commit -m 'cambio de nombre'
 # se utiliza el archivo .secrets.yaml creado anteriormente
 act --secret-file .secrets.yaml
   \end{minted}
-  \caption{Simulación de push a la rama principal con act.}
+  \caption{Simulación de \textit{push} a la rama principal con \texttt{act}.}
+  \label{lst:actpush}
 \end{listing}
 
-    Una vez terminada la ejecución, si se tiene levantado el cluster de \texttt{dev}, se debería poder sincronizar ArgoCD. Para comprobar que se ha actualizado la imagen correctamente, se puede visualizar la \textit{tag} que está en uso en el Deployment del frontend \texttt{zoo-dev-frontend}, y buscar el campo \texttt{spec.template.spec.containers.image}, en la pestaña de ``\textit{Live manifest}''. Este campo debería contener la nueva imagen generada.
+    Una vez terminada la ejecución, si se tiene levantado el \textit{cluster} de \texttt{dev}, se debería poder sincronizar ArgoCD. Para comprobar que se ha actualizado la imagen correctamente, se puede visualizar la \textit{tag} que está en uso en el Deployment del \textit{frontend} \texttt{zoo-dev-frontend}, y buscar el campo \texttt{spec.template.spec.containers.image}, en la pestaña de ``\textit{Live manifest}''. Este campo debería contener la nueva imagen generada.
 
     También se puede entrar en la propia web, en \texttt{zoo-dev.example.com:8080}, para ver el nuevo título.
 
     \textbf{pre}
 
-    Para pasar los cambios que se han realizado al entorno de \texttt{pre}, sería neceario crear una \texttt{pre-release}. Se va a simular su creación utilizando la configuración de dicho evento, que se encuentra en \texttt{.github/events/prerelease.json}.
+    Para pasar los cambios que se han realizado al entorno de \texttt{pre}, sería necesario crear una \texttt{pre-release}. Se va a simular su creación utilizando la configuración de dicho evento, que se encuentra en \texttt{.github/events/prerelease.json}.
 
     Lo mejor para comprobar que se actualiza correctamente, es cambiar el nombre de la \texttt{pre-release}, en el campo \texttt{name} del archivo del evento. Por ejemplo, \texttt{0.0.123-snapshot}.
 
@@ -464,32 +457,33 @@ act --secret-file .secrets.yaml
   \begin{minted}{bash}
 act release --eventpath .github/events/prerelease.json --secret-file .secrets.yaml
   \end{minted}
-    \caption{Simulación de creación de una prerelease con act.}
+  \caption{Simulación de creación de una \textit{prerelease} con \texttt{act}.}
   \label{lst:actrelease}
 \end{listing}
 
     El archivo de comprobación del recurso es, en este caso, \texttt{zoo-pre-frontend}, y el mismo campo que antes.
 
-    La url sería \texttt{zoo-dev.example.com:8081}.
+    La URL sería \texttt{zoo-dev.example.com:8081}.
 
     \textbf{pro}
 
-    Ahora, es necesario realizar algo parecido al paso anterior. Se modifica el archivo \texttt{.github/events/release.json}, y se pone el mismo \texttt{name} que anter, pero sin la coletilla \texttt{snapshot}, es decir, \texttt{0.0.123}.
+    Ahora, es necesario realizar algo parecido al paso anterior. Se modifica el archivo \texttt{.github/events/release.json}, y se pone el mismo \texttt{name} que antes, pero sin la coletilla \texttt{snapshot}, es decir, \texttt{0.0.123}.
 
-    Se simula el cambio al entorno de \texttt{pro}.
+    Se simula el cambio al entorno de \texttt{pro} con el comando del Listing \ref{lst:propromotion}.
 
 \begin{listing}[!ht]
   \begin{minted}{bash}
 act release --eventpath .github/events/release.json --secret-file .secrets.yaml
   \end{minted}
-    \caption{Simulación de creación de una release con act.}
+  \caption{Simulación de creación de una \textit{release} con \texttt{act}.}
+    \label{lst:propromotion}
 \end{listing}
 
 \end{enumerate}
 
 \subsubsection*{Conclusión}
 
-Se puede comprobar que el ciclo completo funciona correctamente, y la flexibilidad que da poder ejecutar los módulos de Dagger en local. Esto facilita el desarrollo de características nuevas para la aplicación sin miedo a que se produzca un fallo durante la ejecución del workflow de GitHub en la nube. Así, el resultado que va a dar la ejecución de dicho workflow ya se sabe de antemano, porque se ha probado de manera local, en un entorno controlado gracias a Docker. Por lo tanto, se sabe que este se va a comportar de la misma manera en cualquier otro sistema.
+Se puede comprobar que el ciclo completo funciona correctamente, y la flexibilidad que da poder ejecutar los módulos de Dagger en local. Esto facilita el desarrollo de características nuevas para la aplicación sin miedo a que se produzca un fallo durante la ejecución del \textit{workflow} de GitHub en la nube. Así, el resultado que va a dar la ejecución de dicho \textit{workflow} ya se sabe de antemano, porque se ha probado de manera local, en un entorno controlado gracias a Docker. Por lo tanto, se sabe que este se va a comportar de la misma manera en cualquier otro sistema.
 
 \subsubsection*{Prueba la API}
 
@@ -505,7 +499,7 @@ La API está disponible en \texttt{https://api-\string{\string{env\string}\strin
     \texttt{POST} & \texttt{/animals} & Añadir un nuevo animal \\ \hline
     \texttt{PUT} & \texttt{/animals/\{id\}} & Actualizar el animal con cierto ID \\ \hline
   \end{tabular}
-  \caption{Endpoints de la API}
+  \caption{Endpoints de la API.}
   \label{tabla:endpoints}
 \end{table}
 
@@ -553,9 +547,7 @@ En los siguientes Listings se muestran peticiones de ejemplo que se pueden utili
 
 \subsection{helm-repository}
 
-Este repositorio forma parte de un TFG, donde el repositorio principal es [zoo](http://github.com/vieites-tfg/zoo).
-
-En este reposito se albergan las Charts Helm correspondientes a la aplicación que se implementa en el repositorio principal `zoo`.
+En este reposito se albergan las Charts Helm correspondientes a la aplicación que se implementa en el repositorio principal \texttt{zoo}.
 
 En la Figura \ref{fig:charts_diagram} se muestra un diagrama de la disposición de las Charts.
 
@@ -601,7 +593,7 @@ zoo
     |- _helpers.tpl
     |- ghcr-secret.yaml
   \end{minted}
-  \caption{Estructura del repositorio \texttt{helm-repository}}
+  \caption{Estructura del repositorio \texttt{helm-repository}.}
 \end{longlisting}
 
 \subsection{state}
@@ -650,11 +642,11 @@ Existen directorios para cada uno de los posibles entornos, con valores específ
 
 \subsubsection*{Rama de despliegue}
 
-La rama de despliegue \texttt{deploy} es la rama en la que se publican los recursos que ArgoCD va a leer para construir la aplicación.
+La rama de despliegue \texttt{deploy} es la rama en la que se publican los recursos que ArgoCD va a leer para construir la aplicación.\\
 
-\textbf{Estructura}
+\noindent\textbf{Estructura}
 
-\begin{listing}[!ht]
+\begin{longlisting}
   \begin{minted}{bash}
 dev
 |- kustomization.yaml
@@ -673,14 +665,15 @@ pro
 |- secrets.yaml
   \end{minted}
   \caption{Estructura de la rama \texttt{deploy} en \texttt{state}.}
-\end{listing}
+\end{longlisting}
 
-% Se puede comprobar que hay un directorio con los recursos correspondientes de cada uno de los entornos posibles.
-%
-% En ellos encontramos:
-%
-% - `non-secrets`: Los recursos de Kubernetes que no son secretos.
-% - `secrets`: Los recursos de Kubernetes que son secretos, encriptados utilizando [SOPS](https://github.com/getsops/sops) y [age](https://github.com/FiloSottile/age).
-% - `kustomization`: Archivo que lee la herramienta [kustomize](https://kustomize.io/) e indica los recursos y el generador a utilizar para crear los secretos desencriptados.
-% - `secret_generator`: Indica la necesidad del uso de la herramienta [ksops](https://github.com/kubernetes/kops) con el fin de desencriptar los secretos.
-%
+Se puede comprobar que hay un directorio con los recursos correspondientes de cada uno de los entornos posibles.
+
+En ellos se encuentran los seguientes archivos:
+
+\begin{itemize}
+  \item \texttt{non-secrets}: Los recursos de Kubernetes que no son secretos.
+  \item \texttt{secrets}: Los recursos de Kubernetes que son secretos, encriptados utilizando \href{https://github.com/getsops/sops}{SOPS} y \href{https://github.com/FiloSottile/age}{age}.
+  \item \texttt{kustomization}: Archivo que lee la herramienta \href{https://kustomize.io/}{kustomize} e indica los recursos y el generador a utilizar para crear los secretos desencriptados.
+  \item \texttt{secret\_generator}: Indica la necesidad del uso de la herramienta \href{https://github.com/kubernetes/kops}{ksops} con el fin de desencriptar los secretos.
+\end{itemize}

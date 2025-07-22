@@ -45,7 +45,7 @@ dagger core engine local-cache prune
 
 docker system prune -af
 \end{minted}
-\caption{Borrado de caché de Dagger y Docker}
+\caption{Borrado de caché de Dagger y Docker.}
 \label{lst:no-cache}
 \end{listing}
 
@@ -55,7 +55,7 @@ Para probar la función, simplemente es necesario ejecutar el comando que se mue
   \begin{minted}{bash}
 dagger call --sec-env=file://../../.env endtoend
 \end{minted}
-\caption{Testeo integral de la aplicación con el módulo de CI}
+\caption{Testeo integral de la aplicación con el módulo de CI.}
 \label{lst:endtoend}
 \end{listing}
 
@@ -79,7 +79,7 @@ El módulo de Dagger de CI es el encargado de realizar las acciones comentadas. 
 
 La ejecución del módulo se puede hacer de manera local gracias a que Dagger lanza sus funciones sobre un \textit{runtime} de OCI, como Docker. Dagger también facilita la reproducibilidad gracias a que construye grafos para definir dependencias entre funciones, donde cada nodo del grafo define su entrada y su salida. Además, lo anterior también permite gestionar de mejor manera la caché, haciendo que las ejecuciones sean más rápidas, como ya se ha visto en la primera prueba de este capítulo.
 
-En el caso de que no se use Dagger, el desarrollador tendría que obtar por métodos convencionales. Comenzaría por crear un \texttt{Dockerfile} que permitiera realizar la construcción de los paquetes de la aplicación. Para realizar los tests del \textit{frontend}, haría falta otro \texttt{Dockerfile} específico para utilizar Cypress. Estos tests implicarían también implementar un archivo de Docker Compose, el cual permite levantar todos los servicios al mismo tiempo con posibilidad de comunicación entre ellos, necesario para realizar los tests \textit{end-to-end} del \textit{frontend}. 
+En el caso de que no se use Dagger, el desarrollador tendría que optar por métodos convencionales. Comenzaría por crear un \texttt{Dockerfile} que permitiera realizar la construcción de los paquetes de la aplicación. Para realizar los tests del \textit{frontend}, haría falta otro \texttt{Dockerfile} específico para utilizar Cypress. Estos tests implicarían también implementar un archivo de Docker Compose, el cual permite levantar todos los servicios al mismo tiempo con posibilidad de comunicación entre ellos, necesario para realizar los tests \textit{end-to-end} del \textit{frontend}. 
 
 Además, extender la lógica de programación implicaría crear \textit{scripts}, los cuales habría que acomodar a un nuevo entorno de desarrollo en el caso de que este cambie en algún momento. Esto añade más carga al desarrollador, que tiene que mantener dichos \textit{scripts} a lo largo de los diferentes entornos en los que se quieran ejecutar. Crear diferentes \textit{scripts} hace la reutilización de código más complicada, y puede llevar a la duplicación de lógica de programación. Finalmente, también se encuentra el problema de la reproducibilidad, siendo esto más complicado de conseguir debido a las pequeñas diferencias que pueda haber en la configuración del entorno de desarrollo de cada programador.
 
@@ -101,6 +101,6 @@ En la Tabla \ref{table:differences} se proporciona una tabla a modo de resumen, 
     Curva de aprendizaje & Moderada, API extensa pero intuitiva si se tiene experiencia previa con contenedores & Baja, herramientas ampliamente conocidas \\ \hline
     Madurez del ecosistema & En crecimiento activo & Herramientas maduras con amplia documentación y soporte \\ \hline
   \end{tabularx}
-  \caption{Diferencias entre Dagger y métodos convencionales}
+  \caption{Diferencias entre Dagger y métodos convencionales.}
   \label{table:differences}
 \end{table}

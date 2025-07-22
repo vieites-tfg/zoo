@@ -132,7 +132,7 @@ done
 
 printf "${PASSWORDS}"
 \end{minted}
-\caption{Script de creación de los clusters. También referenciado en la Sección \ref{sec:secrets}.}
+\caption{\textit{Script} de creación de los \textit{clusters}. También referenciado en la Sección \ref{sec:secrets}.}
 \label{lst:create-clusters}
 \end{longlisting}
 
@@ -163,7 +163,7 @@ nodes:
     hostPort: 8443
     protocol: TCP
   \end{minted}
-  \caption{Configuración del cluster de dev}
+  \caption{Configuración del \textit{cluster} de \texttt{dev}.}
   \label{lst:conf-cluster}
 \end{listing}
 
@@ -194,7 +194,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
     \end{minted}
-    \caption{Configuración de ArgoCD en dev}
+    \caption{Configuración de ArgoCD en \texttt{dev}.}
     \label{lst:conf-argo}
 \end{listing}
 
@@ -266,7 +266,7 @@ Es una práctica habitual tener un repositorio con todas las Charts de Helm que 
 Este repositorio tiene como finalidad lo que se acaba de comentar, funcionar como el lugar en el que se almacena la Chart de Helm de la aplicación de prueba.
 
 La Figura \ref{fig:helm-repository} muestra que se ha creado una Chart \textit{umbrella} llamada \texttt{zoo}. Una Chart de este tipo funciona como una agrupación de más \textit{subcharts} que están interrelacionadas. Normalmente se utiliza este método para gestionar despliegues de aplicaciones complejas en Kubernetes.
-La definición de la Chart \texttt{zoo} se puede ver en el Listing \ref{lst:umbrella}. En esta se indican las dependencias (\textit{subcharts}) que agrupa la Chart. Entre estas se encuentran las Charts propias de la aplicación, \texttt{zoo-frontend} y \texttt{zoo-backend}. Además, se puede ver que se utiliza una Chart ya definida en un repositorio conocido, perteneceinte a Bitnami\cite{bitnami}. De este repositorio se obtiene la Chart de MongoDB. De esta manera, se utiliza una Chart ya implementada y desarrollada por expertos, proporcionando muchas opciones de configuración y ofreciendo mucha más seguridad de lo que se tendría en el caso de crear una Chart de MongoDB propia para la aplicación.
+La definición de la Chart \texttt{zoo} se puede ver en el Listing \ref{lst:umbrella}. En esta se indican las dependencias (\textit{subcharts}) que agrupa la Chart. Entre estas se encuentran las Charts propias de la aplicación, \texttt{zoo-frontend} y \texttt{zoo-backend}. Además, se puede ver que se utiliza una Chart ya definida en un repositorio conocido, perteneciente a Bitnami\cite{bitnami}. De este repositorio se obtiene la Chart de MongoDB. De esta manera, se utiliza una Chart ya implementada y desarrollada por expertos, proporcionando muchas opciones de configuración y ofreciendo mucha más seguridad de lo que se tendría en el caso de crear una Chart de MongoDB propia para la aplicación.
 
 \begin{listing}[!ht]
   \begin{minted}{yaml}
@@ -287,7 +287,7 @@ dependencies:
     version: 15.0.0
     condition: mongo.internal.enabled
   \end{minted}
-  \caption{Definición de la Chart umbrella de la aplicación}
+  \caption{Definición de la Chart \textit{umbrella} de la aplicación.}
   \label{lst:umbrella}
 \end{listing}
 
@@ -350,7 +350,7 @@ releases:
             rootUser: {{ requiredEnv "MONGO_ROOT" | quote }}
             rootPassword: {{ requiredEnv "MONGO_ROOT_PASS" | quote }}
   \end{minted}
-  \caption{Archivo de configuración de helmfile}
+  \caption{Archivo de configuración de \texttt{helmfile}.}
   \label{lst:helmfile}
 \end{longlisting}
 
@@ -367,7 +367,7 @@ zoo-backend:
   ingress:
     hostTemplate: "api-zoo-dev.example.com"
   \end{minted}
-  \caption{Archivo de valores de zoo-backend en dev}
+  \caption{Archivo de valores de \texttt{zoo-backend} en \texttt{dev}}
   \label{lst:values}
 \end{listing}
 

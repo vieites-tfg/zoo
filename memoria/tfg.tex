@@ -23,30 +23,6 @@
 \addto\captionsgalician{\def\contentsname{Memoria tipo B -- \'{I}ndice xeral }}
 
 \definecolor{backcolor}{rgb}{0.95,0.95,0.95}
-\newcommand{\greencolor}{green!70!black}
-\lstset{
-  caption=\lstname,
-  captionpos=b,
-  label=lst:code,
-  basicstyle=\ttfamily\footnotesize,
-  numbers=left,
-  commentstyle=\color{gray},
-  keywordstyle=\color{blue},
-  stringstyle=\color{\greencolor},
-  showspaces=false,
-  showstringspaces=false,
-  showtabs=false,
-  tabsize=2,
-  keepspaces=true,
-  breaklines=true,
-  linewidth=\textwidth,
-  breakatwhitespace=false,
-  frame=l,
-  backgroundcolor=\color{backcolor},
-  rulesepcolor=\color{gray!50},
-  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
-  escapeinside={(*@}{@*)}
-}
 \newenvironment{longlisting}{\captionsetup{type=listing}}{}
 \setminted{
   samepage=false,
@@ -56,113 +32,7 @@
   bgcolor=backcolor,
   breakanywhere,
 }
-\renewcommand*{\lstlistlistingname}{Índice de Listings}
-
-\lstdefinelanguage{Dockerfile}{
-  keywords={FROM, RUN, COPY, ADD, ENTRYPOINT, CMD, ENV, ARG, WORKDIR, EXPOSE, LABEL, USER, VOLUME, STOPSIGNAL, ONBUILD, MAINTAINER, HEALTHCHECK},
-  keywordstyle=\color{blue}\bfseries,
-  identifierstyle=\color{black},
-  comment=[l]{\#},
-  commentstyle=\color{gray}\ttfamily,
-  stringstyle=\color{\greencolor}\ttfamily,
-  morestring=[b]',
-  morestring=[b]"
-}
-
-\lstdefinelanguage{docker-compose}{
-  keywords={services, depends_on, hostname, image, environment, container_name, ports, volumes, links},
-  keywordstyle=\color{blue}\bfseries,
-  identifierstyle=\color{black},
-  comment=[l]{\#},
-  commentstyle=\color{purple}\ttfamily,
-  stringstyle=\color{\greencolor}\ttfamily,
-  morestring=[b]',
-  morestring=[b]"
-}
-\lstdefinelanguage{helm}{
-  alsoletter={.,/},
-  keywords={
-    apiVersion, metadata, name, namespace, annotations,
-    spec, status, data, port, number, appVersion,
-    dependencies, version, repository, condition,
-    replicas, selector, matchLabels, template, strategy, type,
-    containers, initContainers, image, imagePullPolicy, command, args,
-    ports, containerPort, hostPort, protocol, name,
-    env, value, valueFrom, secretKeyRef, configMapKeyRef, key,
-    resources, requests, limits, cpu, memory,
-    volumeMounts, mountPath, readOnly, subPath,
-    volumes, persistentVolumeClaim, claimName, secretName, configMap,
-    restartPolicy, service, clusterIP, loadBalancerIP,
-    externalIPs, sessionAffinity, servicePort, tls, stringData,
-    rules, host, http, paths, path, pathType, serviceName,
-    Values, Release, Chart, Files, Capabilities, Template,
-    include, tpl, toYaml, fromYaml, nindent, quote, required,
-    networking, nodes, apiServerPort, extraPortMappings, role, project,
-    source, repoURL, targetRevision, destination, syncPolicy, automated,
-    prune, selfHeal, syncOptions, server, creation_rules, path_regex,
-    unencrypted_regex, generators, config.kubernetes.io/function, exec,
-    files, configs, cm, kustomize.buildOptions, ui.bannerpermanent, repoServer,
-    emptyDir, description
-  },
-  keywordstyle=\color{blue}\bfseries,
-  identifierstyle=\color{black},
-  comment=[l]{\#},
-  commentstyle=\color{gray}\ttfamily,
-  stringstyle=\color{\greencolor}\ttfamily,
-  morestring=[b]',
-  morestring=[b]",
-  moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}},
-  literate={
-    {kind:}{{{\textcolor{blue}{kind:}}}}5
-    {secret:}{{{\textcolor{blue}{secret:}}}}7
-    {age:}{{{\textcolor{blue}{age:}}}}4
-    {image:}{{{\textcolor{blue}{image:}}}}6
-    {backend:}{{{\textcolor{blue}{backend:}}}}8
-  }
-}
-
-\lstdefinelanguage{workflows}{
-  alsoletter={-},
-  keywords={
-    name, on, jobs, runs-on, container, services, id,
-    steps, uses, run, with, permissions, push, release,
-    workflow_dispatch, shell, working-directory, concurrency
-  },
-  keywordstyle=\color{blue}\bfseries,
-  identifierstyle=\color{black},
-  comment=[l]{\#},
-  commentstyle=\color{gray}\ttfamily,
-  stringstyle=\color{\greencolor}\ttfamily,
-  morestring=[b]',
-  morestring=[b]",
-  moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}},
-  morekeywords={true,false,null},
-  keywordstyle=[2]\color{blue},
-  sensitive=true,
-  literate={
-    {env:}{{{\textcolor{blue}{env:}}}}4
-  }
-}
-
-\lstdefinelanguage{helmfile}{
-  alsoletter={-,.},
-  keywords={
-    repositories, environments, releases, namespaces, values,
-    name, url, chart, version, namespace,
-  },
-  keywordstyle=\color{blue}\bfseries,
-  sensitive=true,
-  identifierstyle=\color{black},
-  comment=[l]{\#},
-  commentstyle=\color{gray}\ttfamily,
-  stringstyle=\color{\greencolor}\ttfamily,
-  morestring=[b]',
-  morestring=[b]",
-  moredelim=[s][\color{purple}\bfseries]{\{\{}{\}\}},
-  morekeywords={requiredEnv, quote, .Values, .Environment.Name},
-  keywordstyle=[2]\color{purple}\bfseries
-}
-
+\renewcommand\listoflistingscaption{Índice de Listings}
 
 % \includeonly{capitulos/cap3}
 
@@ -174,7 +44,7 @@
 \tableofcontents
 \listoffigures
 \listoftables
-\lstlistoflistings
+\listoflistings
 
 % Agora incluimos os capítulos. Cambiamos a numeración e as cabeceiras
 \clearpage

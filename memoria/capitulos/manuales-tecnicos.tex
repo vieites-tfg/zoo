@@ -1,6 +1,6 @@
 \chapter{Manuales técnicos}
 
-Todo el código fuente se encuentra en la siguiente organicación de GitHub: \href{https://github.com/vieites-tfg}{vieites-tfg}. En este se puede encontrar tres repositorios y un rengistro de contenedores de GitHub, donde se publican las imágenes y los paquetes NPM de la aplicación.
+Todo el código fuente se encuentra en la siguiente organización de GitHub: \href{https://github.com/vieites-tfg}{vieites-tfg}. En este se puede encontrar tres repositorios y un registro de contenedores de GitHub, donde se publican las imágenes y los paquetes NPM de la aplicación.
 
 \section{Descripción de tecnologías}
 \label{sec:tech-desc}
@@ -25,7 +25,7 @@ Como se puede comprobar en el Listing \ref{lst:just}, el archivo de configuraci�
 
 Docker permite empaquetar aplicaciones, creando imágenes con las dependencias necesarias para que la aplicación se lance sin problemas. Las imágenes generadas se pueden ejecutar, creando contenedores, que son entornos completamente aislados del contexto de la máquina en la que han levantado.
 
-El proceso más habitual a la hora de construir una imagen de Docker es definir un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{multi-stage builds}, distintos estados de la construcción. Esto permite corstruir imágenes de Docker más pequeñas y optimizadas separando el proceso de construcción en distintas fases.
+El proceso más habitual a la hora de construir una imagen de Docker es definir un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{multi-stage builds}, distintos estados de la construcción. Esto permite construir imágenes de Docker más pequeñas y optimizadas separando el proceso de construcción en distintas fases.
 
 \begin{longlisting}
   \begin{minted}{Dockerfile}
@@ -65,7 +65,7 @@ EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
 \end{minted}
-\caption{Extracto de Dockerfile utilizado en el proyecto}
+\caption{Extracto de \texttt{Dockerfile} utilizado en el proyecto.}
 \label{lst:dockerfile}
 \end{longlisting}
 
@@ -78,7 +78,7 @@ docker build -t my-image .
 
 docker run --rm -d -p 8080:80 my-image
 \end{minted}
-\caption{Construir y levantar una imagen de Docker}
+\caption{Construir y levantar una imagen de Docker.}
 \label{lst:dockerbuildrun}
 \end{listing}
 
@@ -148,11 +148,11 @@ services:
 volumes:
   mongo_data:
 \end{minted}
-\caption{docker-compose.yaml usado en el proyecto}
+\caption{\texttt{docker-compose.yaml} usado en el proyecto.}
 \label{lst:dockercompose}
 \end{longlisting}
 
-Utilizando el comando del Listing \ref{lst:dcup}, y teniendo encuenta el Listing \ref{lst:dockercompose}:
+Utilizando el comando del Listing \ref{lst:dcup}, y teniendo en cuenta el Listing \ref{lst:dockercompose}:
 
 \begin{itemize}
   \item Se levantan los tres servicios.
@@ -165,7 +165,7 @@ Utilizando el comando del Listing \ref{lst:dcup}, y teniendo encuenta el Listing
   \begin{minted}{bash}
 docker compose up
 \end{minted}
-\caption{Despliegue con Docker Compose}
+\caption{Despliegue con Docker Compose.}
 \label{lst:dcup}
 \end{listing}
 
@@ -250,7 +250,7 @@ creation_rules:
     unencrypted_regex: "^(apiVersion|metadata|kind|type)$"
     age: age15peyc7 #...
   \end{minted}
-  \caption{Archivo de configuración de SOPS}
+  \caption{Archivo de configuración de SOPS.}
   \label{lst:sops}
 \end{listing}
 
@@ -276,7 +276,7 @@ resources:
 generators:
   - secret_generator.yaml
 \end{minted}
-\caption{Archivo 'kustomization.yaml'}
+\caption{Archivo \texttt{kustomization.yaml}.}
 \label{lst:kustomization}
 \end{listing}
 
@@ -297,7 +297,7 @@ metadata:
 files:
   - secrets.yaml
 \end{minted}
-\caption{Generador de los secretos}
+\caption{Generador de los secretos.}
 \label{lst:generator}
 \end{listing}
 
@@ -359,7 +359,7 @@ repoServer:
     - name: sops-age
       mountPath: /.config/sops/age
     \end{minted}
-    \caption{Valores que pueblan la Chart de ArgoCD}
+    \caption{Valores que pueblan la Chart de ArgoCD.}
     \label{lst:argo-values}
 \end{longlisting}
 
@@ -470,7 +470,7 @@ jobs:
             --age-key=file://sops/age.agekey \
             --sops-config=file://sops/.sops.yaml
   \end{minted}
-  \caption{Workflow de CI/CD}
+  \caption{\textit{Workflow} de CI/CD.}
   \label{lst:workflowcicd}
 \end{longlisting}
 
@@ -488,7 +488,7 @@ El proceso de desarrollo de la Chart comienza con la propia creación de esta. T
   \begin{minted}{bash}
 helm package zoo
 \end{minted}
-\caption{Generación de un archivo comprimido de la Chart}
+\caption{Generación de un archivo comprimido de la Chart.}
 \label{lst:compression}
 \end{listing}
 
@@ -547,7 +547,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   \end{minted}
-  \caption{Workflow de publicación de la Chart en GH Pages}
+  \caption{\textit{Workflow} de publicación de la Chart en GitHub Pages.}
   \label{lst:ghpages}
 \end{longlisting}
 
