@@ -1,0 +1,44 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Variables globales}
+\PYG{c+c1}{\PYGZsh{} \PYGZhy{}\PYGZhy{}\PYGZhy{}}
+
+\PYG{k}{for}\PYG{+w}{ }ENV\PYG{+w}{ }\PYG{k}{in}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{ENVS}\PYG{p}{[@]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{;}\PYG{+w}{ }\PYG{k}{do}
+\PYG{+w}{  }\PYG{k}{case}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{ENV}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{+w}{ }\PYG{k}{in}
+\PYG{+w}{    }dev\PYG{o}{)}
+\PYG{+w}{      }\PYG{n+nv}{BANNER\PYGZus{}TEXT}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}We are in DEV\PYGZdq{}}\PYG{p}{;}\PYG{p}{;}
+\PYG{+w}{    }\PYG{c+c1}{\PYGZsh{} ... otros entornos}
+\PYG{+w}{  }\PYG{k}{esac}
+
+\PYG{+w}{  }\PYG{n+nv}{CONTEXT}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{kind\PYGZhy{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{ENV}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+
+\PYG{+w}{  }kind\PYG{+w}{ }create\PYG{+w}{ }cluster\PYG{+w}{ }\PYGZhy{}\PYGZhy{}config\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{CLUSTER\PYGZus{}DIR}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/kind\PYGZus{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{ENV}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{.yaml}\PYG{l+s+s2}{\PYGZdq{}}
+
+\PYG{+w}{  }kubectl\PYG{+w}{ }apply\PYG{+w}{ }\PYGZhy{}f\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{INGRESS\PYGZus{}MANIFEST}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{+w}{ }\PYGZhy{}\PYGZhy{}context\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{CONTEXT}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Se espera a que se construya}
+
+\PYG{+w}{  }kubectl\PYG{+w}{ }create\PYG{+w}{ }namespace\PYG{+w}{ }argocd\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{n+nb}{true}
+
+\PYG{+w}{  }cat\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{SOPS\PYGZus{}DIR}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/age.agekey}\PYG{l+s+s2}{\PYGZdq{}}\PYG{+w}{ }\PYG{p}{|}
+\PYG{+w}{    }kubectl\PYG{+w}{ }create\PYG{+w}{ }secret\PYG{+w}{ }generic\PYG{+w}{ }sops\PYGZhy{}age\PYG{+w}{ }\PYGZhy{}n\PYG{+w}{ }argocd\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}\PYGZhy{}context\PYG{+w}{ }\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{CONTEXT}\PYG{l+s+si}{\PYGZcb{}}\PYG{+w}{ }\PYGZhy{}\PYGZhy{}from\PYGZhy{}file\PYG{o}{=}keys.txt\PYG{o}{=}/dev/stdin
+
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Se descarga el repositorio de la Chart}
+\PYG{+w}{  }helm\PYG{+w}{ }install\PYG{+w}{ }argocd\PYG{+w}{ }argo/argo\PYGZhy{}cd\PYG{+w}{ }\PYGZhy{}n\PYG{+w}{ }argocd\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}f\PYG{+w}{ }argo/values.yaml\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYG{c+c1}{\PYGZsh{} ... otros *flags*}
+
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Se espera a que se instale la Chart de Argo}
+
+\PYG{+w}{  }kubectl\PYG{+w}{ }apply\PYG{+w}{ }\PYGZhy{}f\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{ARGO\PYGZus{}DIR}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/argo\PYGZus{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{ENV}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{.yaml}\PYG{l+s+s2}{\PYGZdq{}}\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}\PYGZhy{}context\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{CONTEXT}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Se espera a que se apliquen los cambios}
+
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Se aplica el banner a la interfaz de Argo}
+
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Se obtiene la clave inicial del usuario \PYGZdq{}admin\PYGZdq{} y se muestra}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} por pantalla}
+\PYG{+w}{  }\PYG{n+nv}{PASSWORDS}\PYG{o}{+=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{current\PYGZus{}pass}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{k}{done}
+
+\PYG{n+nb}{printf}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{PASSWORDS}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+\end{MintedVerbatim}

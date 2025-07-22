@@ -1,0 +1,30 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+argo
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }argo\PYGZus{}dev.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }argo\PYGZus{}pre.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }argo\PYGZus{}pro.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }values.yaml
+cluster
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }kind\PYGZus{}dev.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }kind\PYGZus{}local.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }kind\PYGZus{}pre.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }kind\PYGZus{}pro.yaml
+dagger
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }\PYG{n+nb}{cd}
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }ci
+docker\PYGZhy{}compose.yml
+Dockerfile
+example.env
+mongo\PYGZhy{}init
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }init\PYGZhy{}zoo.js
+packages
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }backend
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }frontend
+scripts
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }create\PYGZus{}envs.sh
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }image.sh
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }push\PYGZus{}package.sh
+sops
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }.sops.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }age.agekey
+\end{MintedVerbatim}

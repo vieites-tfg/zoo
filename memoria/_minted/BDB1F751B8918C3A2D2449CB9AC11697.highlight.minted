@@ -1,0 +1,3 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+kubectl\PYG{+w}{ }port\PYGZhy{}forward\PYG{+w}{ }svc/argocd\PYGZhy{}server\PYG{+w}{ }\PYGZhy{}n\PYG{+w}{ }argocd\PYG{+w}{ }\PYGZhy{}\PYGZhy{}context\PYG{+w}{ }kind\PYGZhy{}\PYG{o}{\PYGZob{}}\PYG{o}{\PYGZob{}}cluster\PYG{o}{\PYGZcb{}}\PYG{o}{\PYGZcb{}}\PYG{+w}{ }\PYG{l+m}{8086}:443
+\end{MintedVerbatim}

@@ -1,0 +1,7 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{// PUT http://localhost:3000/animals/\PYGZob{}\PYGZob{}ID\PYGZus{}FROM\PYGZus{}LAST\PYGZus{}POST\PYGZcb{}\PYGZcb{}}
+\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n+nx}{condition}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}Injured\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{    }\PYG{n+nx}{notes}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}Recovering from minor foot injury.\PYGZdq{}}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

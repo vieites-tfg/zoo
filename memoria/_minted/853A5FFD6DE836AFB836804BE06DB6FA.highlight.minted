@@ -1,0 +1,3 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+act\PYG{+w}{ }release\PYG{+w}{ }\PYGZhy{}\PYGZhy{}eventpath\PYG{+w}{ }.github/events/prerelease.json\PYG{+w}{ }\PYGZhy{}\PYGZhy{}secret\PYGZhy{}file\PYG{+w}{ }.secrets.yaml
+\end{MintedVerbatim}

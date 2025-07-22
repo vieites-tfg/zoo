@@ -1,0 +1,12 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{apiVersion}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{viaduct.ai/v1}
+\PYG{n+nt}{kind}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{ksops}
+\PYG{n+nt}{metadata}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{secret\PYGZhy{}generator}
+\PYG{+w}{  }\PYG{n+nt}{annotations}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{config.kubernetes.io/function}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{|}
+\PYG{+w}{      }\PYG{n+no}{exec:}
+\PYG{+w}{        }\PYG{n+no}{path: ksops}
+\PYG{n+nt}{files}\PYG{p}{:}
+\PYG{+w}{  }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{secrets.yaml}
+\end{MintedVerbatim}

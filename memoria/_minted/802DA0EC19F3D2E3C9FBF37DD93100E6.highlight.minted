@@ -1,0 +1,5 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+docker\PYG{+w}{ }build\PYG{+w}{ }\PYGZhy{}t\PYG{+w}{ }my\PYGZhy{}image\PYG{+w}{ }.
+
+docker\PYG{+w}{ }run\PYG{+w}{ }\PYGZhy{}\PYGZhy{}rm\PYG{+w}{ }\PYGZhy{}d\PYG{+w}{ }\PYGZhy{}p\PYG{+w}{ }\PYG{l+m}{8080}:80\PYG{+w}{ }my\PYGZhy{}image
+\end{MintedVerbatim}

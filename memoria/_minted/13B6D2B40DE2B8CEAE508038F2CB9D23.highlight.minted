@@ -1,0 +1,10 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{zoo\PYGZhy{}backend}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{image}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{tag}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{69ab8a1e}\PYG{l+s}{\PYGZdq{}}
+\PYG{+w}{  }\PYG{n+nt}{mongo}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{service}\PYG{p}{:}
+\PYG{+w}{      }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{zoo\PYGZhy{}dev\PYGZhy{}mongodb}\PYG{l+s}{\PYGZdq{}}
+\PYG{+w}{  }\PYG{n+nt}{ingress}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{hostTemplate}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{api\PYGZhy{}zoo\PYGZhy{}dev.example.com}\PYG{l+s}{\PYGZdq{}}
+\end{MintedVerbatim}

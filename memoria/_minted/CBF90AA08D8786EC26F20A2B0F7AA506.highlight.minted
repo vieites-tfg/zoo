@@ -1,0 +1,52 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Release}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{Helm}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{Charts}
+
+\PYG{n+nt}{concurrency}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{release\PYGZhy{}helm}
+
+\PYG{n+nt}{on}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{workflow\PYGZus{}dispatch}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{push}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{branches}\PYG{p}{:}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{main}
+\PYG{+w}{    }\PYG{n+nt}{paths}\PYG{p}{:}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+s}{\PYGZsq{}}\PYG{l+s}{temp/**}\PYG{l+s}{\PYGZsq{}}
+
+\PYG{n+nt}{permissions}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{contents}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{write}
+
+\PYG{n+nt}{jobs}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{release}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{runs\PYGZhy{}on}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{ubuntu\PYGZhy{}latest}
+\PYG{+w}{    }\PYG{n+nt}{steps}\PYG{p}{:}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{err}{\PYGZpc{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Clona}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{la}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{rama}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{principal}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{del}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{repositorio}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{en}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdq{}src/\PYGZdq{}}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{err}{\PYGZpc{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Clona}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{la}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{rama}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdq{}gh\PYGZhy{}pages\PYGZdq{}}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{del}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{repositorio}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{en}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdq{}dest/\PYGZdq{}}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Install}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{Helm}
+\PYG{+w}{        }\PYG{n+nt}{uses}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{azure/setup\PYGZhy{}helm@v4.3.0}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Update}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{New}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{Files}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{and}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{push}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{to}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{main}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{branch}
+\PYG{+w}{        }\PYG{n+nt}{shell}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{bash}
+\PYG{+w}{        }\PYG{n+nt}{working\PYGZhy{}directory}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{src}
+\PYG{+w}{        }\PYG{n+nt}{run}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{|}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} Se genera o actualiza el \PYGZdq{}index.yaml\PYGZdq{} con la URL}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} donde se van a alojar las diferentes versione de la}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} Chart}
+
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} Se guarda el .tgz del directorio \PYGZdq{}temp/\PYGZdq{} con la Chart}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} en la rama de \PYGZdq{}gh\PYGZhy{}pages\PYGZdq{}, el \PYGZdq{}index.yaml\PYGZdq{} en la raiz}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} de la misma rama y se suben los cambios la rama}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} principal}
+\PYG{+w}{        }\PYG{n+nt}{env}\PYG{p}{:}
+\PYG{+w}{          }\PYG{n+nt}{GITHUB\PYGZus{}TOKEN}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdl{}\PYGZob{}\PYGZob{}}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{secrets.GITHUB\PYGZus{}TOKEN}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZcb{}\PYGZcb{}}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Push}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{New}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{Files}
+\PYG{+w}{        }\PYG{n+nt}{shell}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{bash}
+\PYG{+w}{        }\PYG{n+nt}{working\PYGZhy{}directory}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{dest}
+\PYG{+w}{        }\PYG{n+nt}{run}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{|}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} Se guardan los cambios en la rama \PYGZdq{}gh\PYGZhy{}pages\PYGZdq{},}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} realizando finalmente la publicacion de la version}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} de la Chart}
+\PYG{+w}{        }\PYG{n+nt}{env}\PYG{p}{:}
+\PYG{+w}{          }\PYG{n+nt}{GITHUB\PYGZus{}TOKEN}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdl{}\PYGZob{}\PYGZob{}}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{secrets.GITHUB\PYGZus{}TOKEN}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZcb{}\PYGZcb{}}
+\end{MintedVerbatim}

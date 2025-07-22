@@ -1,0 +1,4 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+mv\PYG{+w}{ }example.env\PYG{+w}{ }.env
+mv\PYG{+w}{ }example.secrets.yaml\PYG{+w}{ }.secrets.yaml
+\end{MintedVerbatim}

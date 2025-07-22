@@ -1,0 +1,5 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+dagger\PYG{+w}{ }core\PYG{+w}{ }engine\PYG{+w}{ }local\PYGZhy{}cache\PYG{+w}{ }prune
+
+docker\PYG{+w}{ }system\PYG{+w}{ }prune\PYG{+w}{ }\PYGZhy{}af
+\end{MintedVerbatim}

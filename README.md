@@ -2,7 +2,7 @@
 
 ## Repositorios
 
-Este trabajo se compone de tres repositorios bien diferenciados y con su protia funcionalidad. Todos ellos se pueden encontrar en esta organización, `vieites-tfg`.
+Este trabajo se compone de tres repositorios bien diferenciados y con su propia funcionalidad. Todos ellos se pueden encontrar en esta organización, `vieites-tfg`.
 
 - `zoo`: Este repositorio. Es el principal del trabajo. En él se encuentra todo el código fuente, desde la aplicación *dummy* hasta la implementación de los módulos de Dagger. Es el único necesario para probar las diferentes funcionalidades.
 - `helm-repository`: Alberga las Chart de Helm que describen el despliegue de la aplicación *dummy* en Kubernetes.
@@ -59,9 +59,9 @@ En el directorio `dagger` se encuentran las implementaciones de los módulos cor
 
 También se pueden encontrar varios ejecutables en el directorio de `scripts`, de los cuales `create_envs.sh` es el más interesante. Este permite levantar los clusters en local para probar el despliegue de la aplicación en los tres entornos posibles: `dev`, `pre` y `pro`.
 
-En todos los clusters se instala ArgoCD, aplicación creada específicamente para Kubernetes y que utiliza el método *pull*, siguiendo la filisofía GitOps, leyendo los recursos a desplegar del repositorio de estado (`state`) mencionado anteriormente. Este tiene una rama `deploy`, en la que se suben los archivos necesarios para que Argo lea y despliegue la aplicación.
+En todos los clusters se instala ArgoCD, aplicación creada específicamente para Kubernetes y que utiliza el método *pull*, siguiendo la filisofía GitOps, leyendo los recursos a desplegar del repositorio de estado (`state`) mencionado anteriormente. Este tiene una rama `deploy`, en la que se suben los archivos necesarios para que ArgoCD lea y despliegue la aplicación.
 
-Se configuran los clusters y las propias instancias de Argo de manera diferente para cada uno de los clusters. Estas configuraciones se pueden encontrar en los directorios `cluster` y `argo`.
+Se configuran los clusters y las propias instancias de ArgoCD de manera diferente para cada uno de los clusters. Estas configuraciones se pueden encontrar en los directorios `cluster` y `argo`.
 
 Además, este trabajo tiene una memoria asociada, en la cual se pueden encontrar unas claves privada y pública, junto con otros *tokens*, necesarias para poder probar la implementación. Estas claves y *tokens* tienen varios propósitos:
 
@@ -80,7 +80,7 @@ A continuación se indica el software junto con las versiones utilizadas para el
 
 > [!note]
 > **No** se ha probado en un sistema operativo Windows, por lo que no se asegura su funcionamiento en este.
-> Sí se ha probado en MacOS y distrybuciones Linux.
+> Sí se ha probado en MacOS y distribuciones Linux.
 
 | **Software** | **Version** | **Docs** |
 |---|---|---|
@@ -125,15 +125,15 @@ El script anterior:
 
 4. Acceso a los clusters.
 
-A medida que se van creando los clusters, las contraseñas del usuario `admin` de Argo se van mostrando. También se muestran todas al finalizar la ejecución del script.
+A medida que se van creando los clusters, las contraseñas del usuario `admin` de ArgoCD se van mostrando. También se muestran todas al finalizar la ejecución del script.
 
-Para poder acceder a cada uno de los clusters, lo primero que hay que hacer es mapear un puerto local libre al puerto 443 del servidor de Argo. Esto se consigue de la siguiente manera:
+Para poder acceder a cada uno de los clusters, lo primero que hay que hacer es mapear un puerto local libre al puerto 443 del servidor de ArgoCD. Esto se consigue de la siguiente manera:
 
 ```bash
 kubectl port-forward svc/argocd-server -n argocd --context kind-{{cluster}} 8086:443
 ```
 
-En el anterior comando, hay que cambiar `{{cluster}}` por aquel al que se quiera acceder. Se podrá acceder a Argo a través del navegador en `localhost:8086`
+En el anterior comando, hay que cambiar `{{cluster}}` por aquel al que se quiera acceder. Se podrá acceder a ArgoCD a través del navegador en `localhost:8086`
 
 Se pide usuario y contraseña para entrar, que son `admin` y la contraseña de dicho cluster, mostrada en la salida del script que se ha ejecutado antes.
 
@@ -197,7 +197,7 @@ MONGO_DATABASE=zoo
 MONGO_ROOT=carer
 MONGO_ROOT_PASS=carerpass
 CR_PAT=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
-STATE_REPO=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
+STATE_REPO=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
 ```
 
 ```yaml
@@ -206,10 +206,10 @@ MONGO_DATABASE: zoo
 MONGO_ROOT: carer
 MONGO_ROOT_PASS: carerpass
 CR_PAT: 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
-STATE_REPO: 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
+STATE_REPO: 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
 SOPS_CONFIG_FILE: |
   creation_rules:
-      - path_regex: ".*\\\\.ya?ml$"
+      - path_regex: ".*\\.ya?ml$"
         unencrypted_regex: "^(apiVersion|metadata|kind|type)$"
         age: age15peyc7pedj8gjqwnarat6s3u87wy4j5xtf7t96vuj74m3l9xq5ys0r4sag
 SOPS_PRIVATE_KEY: AGE-SECRET-KEY-1CTS4S4QNNZ9N9YXXM288LSE9VKPJ220E57ZHC4558WMZ8LG2QWKQFFER8C
@@ -358,7 +358,7 @@ Ahora se puede subir todo al entorno de "dev", simulando un `push` (*trigger* po
 act --secret-file .secrets.yaml
 ```
 
-Una vez terminada la ejecución, si se tiene levantado el cluster de `dev`, se debería poder sincronizar Argo. Para comprobar que se ha actualizado la imagen correctamente, se puede visualizar la *tag* que está en uso en el Deployment del frontend `zoo-dev-frontend`, y buscar el campo `spec.template.spec.containers.image`, en la pestaña de "*Live manifest*". Este campo debería contener la nueva imagen generada.
+Una vez terminada la ejecución, si se tiene levantado el cluster de `dev`, se debería poder sincronizar ArgoCD. Para comprobar que se ha actualizado la imagen correctamente, se puede visualizar la *tag* que está en uso en el Deployment del frontend `zoo-dev-frontend`, y buscar el campo `spec.template.spec.containers.image`, en la pestaña de "*Live manifest*". Este campo debería contener la nueva imagen generada.
 
 También se puede entrar en la propia web, en `zoo-dev.example.com:8080`, para ver el nuevo título.
 

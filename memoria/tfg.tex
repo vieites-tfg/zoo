@@ -1,0 +1,80 @@
+\documentclass[12pt,oneside,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[margin=25mm]{geometry}
+\usepackage{graphicx}
+\usepackage[dvips]{epsfig}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{eurosym}
+\usepackage{float}
+\usepackage{latexsym}
+\usepackage{a4}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{listingsutf8}
+\usepackage{minted}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage[tikz]{bclogo}
+\usepackage{hyperref} % menús no pdf pero non leva ben co package galician
+
+\setlist{itemsep=1pt,topsep=1pt}
+\addto\captionsgalician{\def\contentsname{Memoria tipo B -- \'{I}ndice xeral }}
+
+\definecolor{backcolor}{rgb}{0.95,0.95,0.95}
+\newenvironment{longlisting}{\captionsetup{type=listing}}{}
+\setminted{
+  samepage=false,
+  linenos,
+  breaklines,
+  frame=leftline,
+  bgcolor=backcolor,
+  breakanywhere,
+}
+\renewcommand\listoflistingscaption{Índice de Listings}
+
+% \includeonly{capitulos/cap3}
+
+\begin{document}
+\include{capitulos/titulo}
+\clearpage
+\include{capitulos/resumo} % páxina de resumo (optativa) 
+
+\tableofcontents
+\listoffigures
+\listoftables
+\listoflistings
+
+% Agora incluimos os capítulos. Cambiamos a numeración e as cabeceiras
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\pagestyle{headings}
+\include{capitulos/introducion}
+\clearpage
+\include{capitulos/cap2}
+\clearpage
+\include{capitulos/cap3}
+\clearpage
+\include{capitulos/cap4}
+\clearpage
+\include{capitulos/pruebas}
+%
+% Engadir os capitulos que fagan falta
+
+\cleardoublepage
+\include{capitulos/conclusions}
+
+% Aquí empezan os apéndices
+\appendix
+\cleardoublepage
+\include{capitulos/manuales-tecnicos}
+\cleardoublepage
+\include{capitulos/manuales-usuario}
+% \cleardoublepage
+% \include{capitulos/licenza}
+\cleardoublepage
+\include{capitulos/bibliografia}
+
+\end{document}

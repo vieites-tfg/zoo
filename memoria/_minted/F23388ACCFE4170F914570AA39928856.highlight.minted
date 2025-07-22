@@ -1,0 +1,26 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c}{\PYGZsh{} Compiler}
+\PYG{n+nv}{CC}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }gcc
+
+\PYG{c}{\PYGZsh{} Compiler options}
+\PYG{n+nv}{CFLAGS}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYGZhy{}Wall\PYG{+w}{ }\PYGZhy{}g
+
+\PYG{c}{\PYGZsh{} Final executable name}
+\PYG{n+nv}{TARGET}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }my\PYGZus{}program
+
+\PYG{c}{\PYGZsh{} The object files (.o) needed by the program}
+\PYG{c}{\PYGZsh{} Make infers automatically that .o depends on the corresponding .c}
+\PYG{n+nv}{OBJS}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }main.o\PYG{+w}{ }hello.o
+
+\PYG{c}{\PYGZsh{} \PYGZhy{}\PYGZhy{}\PYGZhy{} Rules \PYGZhy{}\PYGZhy{}\PYGZhy{}}
+
+\PYG{c}{\PYGZsh{} The first rule is the one executed by default with *make*}
+\PYG{c}{\PYGZsh{} It declares that to create the TARGET, it needs the OBJS}
+\PYG{n+nf}{\PYGZdl{}(TARGET)}\PYG{o}{:}\PYG{+w}{ }\PYG{k}{\PYGZdl{}(}\PYG{n+nv}{OBJS}\PYG{k}{)}
+\PYG{+w}{  }\PYG{k}{\PYGZdl{}(}CC\PYG{k}{)}\PYG{+w}{ }\PYG{k}{\PYGZdl{}(}CFLAGS\PYG{k}{)}\PYG{+w}{ }\PYGZhy{}o\PYG{+w}{ }\PYG{k}{\PYGZdl{}(}TARGET\PYG{k}{)}\PYG{+w}{ }\PYG{k}{\PYGZdl{}(}OBJS\PYG{k}{)}
+
+\PYG{c}{\PYGZsh{} *.PHONY* tells Make that *clean* is not a file}
+\PYG{n+nf}{.PHONY}\PYG{o}{:}\PYG{+w}{ }\PYG{n}{clean}
+\PYG{n+nf}{clean}\PYG{o}{:}
+\PYG{+w}{  }rm\PYG{+w}{ }\PYGZhy{}f\PYG{+w}{ }\PYG{k}{\PYGZdl{}(}TARGET\PYG{k}{)}\PYG{+w}{ }\PYG{k}{\PYGZdl{}(}OBJS\PYG{k}{)}
+\end{MintedVerbatim}

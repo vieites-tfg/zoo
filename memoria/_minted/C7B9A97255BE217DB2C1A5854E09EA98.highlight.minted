@@ -1,0 +1,6 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+dagger\PYG{+w}{ }call\PYG{+w}{ }\PYGZhy{}\PYGZhy{}sec\PYGZhy{}env\PYG{o}{=}file://../../.env\PYG{+w}{ }\PYG{o}{[}backend\PYG{p}{|}frontend\PYG{o}{]}\PYG{+w}{ }lint
+dagger\PYG{+w}{ }call\PYG{+w}{ }\PYGZhy{}\PYGZhy{}sec\PYGZhy{}env\PYG{o}{=}file://../../.env\PYG{+w}{ }\PYG{o}{[}backend\PYG{p}{|}frontend\PYG{o}{]}\PYG{+w}{ }\PYG{n+nb}{test}
+dagger\PYG{+w}{ }call\PYG{+w}{ }\PYGZhy{}\PYGZhy{}sec\PYGZhy{}env\PYG{o}{=}file://../../.env\PYG{+w}{ }\PYG{o}{[}backend\PYG{p}{|}frontend\PYG{o}{]}\PYG{+w}{ }publish\PYGZhy{}image\PYG{+w}{ }\PYGZhy{}\PYGZhy{}tag\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}\PYGZob{}\PYGZob{}tag\PYGZcb{}\PYGZcb{}\PYGZdq{}}
+dagger\PYG{+w}{ }call\PYG{+w}{ }\PYGZhy{}\PYGZhy{}sec\PYGZhy{}env\PYG{o}{=}file://../../.env\PYG{+w}{ }\PYG{o}{[}backend\PYG{p}{|}frontend\PYG{o}{]}\PYG{+w}{ }publish\PYGZhy{}pkg
+\end{MintedVerbatim}

@@ -1,0 +1,553 @@
+\chapter{Manuales técnicos}
+
+Todo el código fuente se encuentra en la siguiente organización de GitHub: \href{https://github.com/vieites-tfg}{vieites-tfg}. En este se puede encontrar tres repositorios y un registro de contenedores de GitHub, donde se publican las imágenes y los paquetes NPM de la aplicación.
+
+\section{Descripción de tecnologías}
+\label{sec:tech-desc}
+
+\subsection*{Just}
+\label{tech:just}
+
+Herramienta con la misma funcionalidad que Make, pero con más funcionalidades, entre las cuales destacan:
+
+\begin{itemize}
+  \item Poder pasar parámetros a las ``recetas'' (las ``reglas'' en \texttt{make}).
+  \item Crear \textit{aliases} para las recetas.
+  \item Cargar archivos \texttt{.env}.
+  \item Poder definir recetas como \textit{scripts} en el lenguaje que se prefiera, simplemente añadiendo el \textit{shebang}\cite{shebang} correspondiente.
+  \item Ser capaz de ser invocado desde cualquier subdirectorio.
+\end{itemize}
+
+Como se puede comprobar en el Listing \ref{lst:just}, el archivo de configuración de \texttt{just}, en este caso nombrado habitualmente \texttt{justfile}, tiene una estructura similar a la de un \texttt{Makefile}. La diferencia principal es que los nombres de las recetas no hacen referencia a un archivo objetivo que se supone que se debe crear al ejecutar el bloque de comandos, sino que se trata simplemente del nombre de la receta.
+
+\subsection*{Docker}
+\label{tech:docker}
+
+Docker permite empaquetar aplicaciones, creando imágenes con las dependencias necesarias para que la aplicación se lance sin problemas. Las imágenes generadas se pueden ejecutar, creando contenedores, que son entornos completamente aislados del contexto de la máquina en la que han levantado.
+
+El proceso más habitual a la hora de construir una imagen de Docker es definir un \texttt{Dockerfile} como el del Listing \ref{lst:dockerfile}. En este se indica, paso a paso, todo el proceso de instalación de dependencias y compilación del código fuente, necesario para lanzar la aplicación. En el \texttt{Dockerfile} mencionado, se puede observar que, además, se hace uso de \textit{multi-stage builds}, distintos estados de la construcción. Esto permite construir imágenes de Docker más pequeñas y optimizadas separando el proceso de construcción en distintas fases.
+
+\begin{longlisting}
+  \begin{minted}{Dockerfile}
+# Base
+
+FROM node:20 AS base
+
+WORKDIR /app
+
+COPY package.json lerna.json yarn.lock* ./
+
+COPY packages packages/
+
+RUN yarn install
+
+RUN yarn global add lerna@8.2.1
+
+RUN yarn global add @vercel/ncc
+
+# Frontend build stage
+
+FROM base AS frontend-build
+
+WORKDIR /app
+
+RUN lerna run --scope @vieites-tfg/zoo-frontend build 
+
+# Frontend
+
+FROM nginx:alpine AS frontend
+
+WORKDIR /usr/share/nginx/html
+
+COPY --from=frontend-build /app/packages/frontend/dist .
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+\end{minted}
+\caption{Extracto de \texttt{Dockerfile} utilizado en el proyecto.}
+\label{lst:dockerfile}
+\end{longlisting}
+
+
+El comando del Listing \ref{lst:dockerbuildrun}, muestra en la línea 1 cómo se construye la imagen que se define en el \texttt{Dockerfile} del directorio de trabajo actual (\texttt{.}), con el nombre \texttt{my-image}. Con el siguiente comando se ejecuta la imagen. Las \textit{flags} indican:
+
+\begin{listing}[!ht]
+  \begin{minted}{bash}
+docker build -t my-image .
+
+docker run --rm -d -p 8080:80 my-image
+\end{minted}
+\caption{Construir y levantar una imagen de Docker.}
+\label{lst:dockerbuildrun}
+\end{listing}
+
+\begin{itemize}
+  \item \texttt{--rm}
+
+    Se eliminará el contenedor creado al finalizar su ejecución.
+
+  \item \texttt{-d}
+
+    El contenedor correrá en \textit{background}.
+
+  \item \texttt{-p 8080:80}
+
+    Se mapea el puerto 8080 de la máquina local al puerto 80 del contenedor.
+\end{itemize}
+
+\subsection*{Docker Compose}
+\label{tech:docker-compose}
+
+Con Docker se es capaz de gestionar varios servicios desplegados en distintos contenedores. Pero existe una herramienta que apareció poco después y que facilita esta tarea, llamada ``Docker Compose''\cite{docker-compose}. Esta permite simular entornos con múltiples contenedores para desarrollar localmente.
+
+En el archivo que se muestra en el Listing \ref{lst:dockercompose}, se puede observar cómo se configura el despliegue de tres servicios diferentes. Cada uno de los servicios se construye a partir de una imagen de Docker. Las imágenes correspondientes al \textit{frontend} y al \textit{backend} de la aplicación (\texttt{zoo-frontend} y \texttt{zoo-backend}, respectivamente) se generan y almacenan en un registro de GitHub al finalizar el ciclo de CI. Una vez publicadas, se pueden descargar indicando en el campo \texttt{image} el registro en el que están almacenadas junto con su nombre, como se puede ver en las líneas 3 y 15.
+
+\begin{longlisting}
+  \begin{minted}{yaml}
+services:
+  zoo-frontend:
+    image: ghcr.io/vieites-tfg/zoo-frontend
+    container_name: zoo-frontend
+    hostname: zoo-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - zoo-backend
+    environment:
+      NODE_ENV: production
+      YARN_CACHE_FOLDER: .cache
+
+  zoo-backend:
+    image: ghcr.io/vieites-tfg/zoo-backend
+    container_name: zoo-backend
+    hostname: zoo-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    environment:
+      NODE_ENV: production
+      YARN_CACHE_FOLDER: .cache
+      MONGODB_URI: "mongodb://${MONGO_ROOT}:${MONGO_ROOT_PASS}@mongodb:${MONGO_PORT:-27017}/${MONGO_DATABASE}?authSource=admin"
+
+  mongodb:
+    image: mongo:7.0
+    container_name: zoo-mongo
+    hostname: mongodb
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASS}
+    ports:
+      - "${MONGO_PORT_HOST:-27017}:${MONGO_PORT:-27017}"
+    volumes:
+      - ./mongo-init/:/docker-entrypoint-initdb.d/
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
+\end{minted}
+\caption{\texttt{docker-compose.yaml} usado en el proyecto.}
+\label{lst:dockercompose}
+\end{longlisting}
+
+Utilizando el comando del Listing \ref{lst:dcup}, y teniendo en cuenta el Listing \ref{lst:dockercompose}:
+
+\begin{itemize}
+  \item Se levantan los tres servicios.
+  \item Se les pasarán las variables de entorno indicadas.
+  \item Se podrá acceder a ellos a través de los puertos establecidos en, siendo el primer número el puerto local y el segundo el puerto del contenedor (\texttt{<local>:<contenedor>}).
+  \item Se compartirán los volúmenes mencionados.
+\end{itemize}
+
+\begin{listing}[!ht]
+  \begin{minted}{bash}
+docker compose up
+\end{minted}
+\caption{Despliegue con Docker Compose.}
+\label{lst:dcup}
+\end{listing}
+
+Los valores de las variables de entorno, los indicados como \texttt{\$\{variable\}}, se obtienen de un archivo \texttt{.env}, el cual debe estar presente en el mismo directo que el archivo de configuración. En otro caso, es posible indicar la ruta al archivo mediante el campo \texttt{env\_file}, dentro de cada uno de los servicios configurados.
+
+\subsection*{Kubernetes}
+\label{tech:k8s}
+
+Se trata de una herramienta de \textit{software} que permite orquestar contenedores y el ciclo de vida de las aplicaciones en contenedores que viven en un \textit{cluster}.
+
+En la Figura \ref{fig:k8s}, se puede observar la estructura de un \textit{cluster} de Kubernetes, el cual se compone de dos tipos principales de servidores (``nodos''):
+
+\begin{figure}
+  \centerline{\includegraphics[width=10cm]{figuras/k8s}}
+  \caption{Arquitectura de Kubernetes\cite{img:k8s}.}
+  \label{fig:k8s}
+\end{figure}
+
+\begin{itemize}
+  \item El \textit{Control Plane}.
+
+    Toma todas las decisiones. Se encarga de que todo el sistema funcione como debe.
+
+  \item Los nodos de trabajo.
+
+    Donde realmente se ejecutan las aplicaciones. Reciben órdenes del \textit{Control Plane}. Puede y suele haber más de un nodo de trabajo en un \textit{cluster}.
+\end{itemize}
+
+Kubernetes permite definir diferentes elementos en archivos \texttt{YAML}. Estos archivos describen el estado que deseamos que tenga el sistema en todo momento. Kubernetes se encarga de procesar estos archivos e intentar hacer que el estado real del sistema sea igual al estado deseado.
+
+Entre los elementos que se pueden construir se encuentran los siguientes:
+
+\begin{itemize}
+  \item Pod.
+
+    Es la unidad más pequeña que se puede crear. Puede tener uno o más contenedores, pero lo normal es que tenga solo uno. Su función es encapsular y ejecutar la aplicación que le corresponda, que se indica mediante una imagen de Docker.
+  \item Deployment.
+
+    Se trata de un controlador de Pods. Normalmente se utiliza este tipo de elementos en vez de crear Pods directamente. Esto es porque le puedes indicar la cantidad de Pods (réplicas) que deseas que haya en todo momento en el sistema, y el Deployment lo hace por ti.
+  \item Service.
+
+    Debido a que los Pods son efímeros, es decir, se crean y se destruyen constantemente, cambiando así su dirección IP; es necesario tener un elemento que funcione como punto fijo de acceso a un Pod. Para eso sirve un Service. Estos proporcionan un nombre y una IP únicos y fijos para los Pods.
+  \item Ingress.
+
+    Es un elemento más avanzado que un Service. Permite gestionar el acceso desde Internet, dirigiendo las peticiones hacia los servicios correctos dentro del \textit{cluster}.
+
+  \item ConfigMap.
+
+    Este elemento está diseñado para almacenar valores no sensibles. Se definen en formato clave-valor. Permite separar la configuración de una aplicación de su código.
+
+  \item Secret.
+
+    Es muy similar a un ConfigMap, pero está diseñado para almacenar y gestionar información sensible. Su función es guardar datos que no se deberían mostrar a simple vista en la configuración de una aplicación, como contraseñas o \textit{tokens} de autenticación.
+\end{itemize}
+
+\subsection*{ArgoCD}
+\label{tech:argocd}
+
+Herramienta diseñada específicamente para Kubernetes. Automatiza el despliegue de las aplicaciones, supervisando repositorios de Git para aplicar los cambios que se realizan en ellos automáticamente en el \textit{cluster}. Su uso permite no tener que realizar actualizaciones manuales en entornos de producción, y hace que el entorno siempre esté sincronizado con el código definido en el repositorio. Esto se consigue gracias al proceso de reconciliación que realiza ArgoCD cada vez que detecta cambios en el repositorio que se le ha indicado.
+
+\clearpage
+
+\section{Gestión de secretos}
+\label{sec:secrets}
+
+Para encriptar los secretos se utilizan dos herramientas:
+
+\begin{itemize}
+  \item \texttt{age}\cite{age}.
+
+    \texttt{age} es una herramienta creada con Go que permite encriptar y desencriptar archivos. Una vez instalada, es necesario crear unas claves privada y pública. Estas se proporcionan en el manual de usuario (ver Apéndice \ref{chap:usuario}) para poder probar la aplicación.
+  \item SOPS\cite{sops}.
+
+    SOPS (\textit{Secrets OPerationS}) permite editar archivos encriptados, pero con la capacidad de realizar la encriptación de campos específicos de tipos de archivos como YAML o JSON. Esta herramienta tiene compatibilidad con \texttt{age}, por lo que es un recurso excelente para encriptar recursos de Kubernetes, ya que estos se definen mediante archivos en formato YAML.
+
+    El archivo de configuración de SOPS es como el que se muestra en el Listing \ref{lst:sops}. En él se indican: el formato de los nombres de los archivos que tiene que encriptar (línea 2), los campos que \textit{no} tiene que encriptar (línea 3) y la herramienta de encriptado junto con la clave pública que le sirve para realizar la encriptación (línea 4).
+
+\begin{listing}[!ht]
+  \begin{minted}{yaml}
+creation_rules:
+  - path_regex: ".*\.ya?ml$"
+    unencrypted_regex: "^(apiVersion|metadata|kind|type)$"
+    age: age15peyc7 #...
+  \end{minted}
+  \caption{Archivo de configuración de SOPS.}
+  \label{lst:sops}
+\end{listing}
+
+\end{itemize}
+
+Con las claves pública y privada, y la configuración de SOPS, se es capaz de encriptar los Secrets de Kubernetes durante el ciclo de CD, en el módulo de Dagger. Los archivos encriptados se suben a la rama de despliegue del repositorio de estado, junto con los demás recursos que definen la aplicación.
+
+Para desencriptar los secretos, ArgoCD necesita información: la clave privada creada con \texttt{age} y las herramientas necesarias para gestionar archivos encriptados con SOPS. La clave se le proporciona durante uno de los pasos de la creación de los \textit{clusters}, que se muestra en la Sección \ref{subsec:clusters}. Sin embargo, es necesario decirle a ArgoCD cómo utilizarla.
+
+Para ello es necesario el uso de otras dos herramientas:
+
+\begin{itemize}
+  \item \texttt{kustomize}\cite{kustomize}.
+
+    \texttt{kustomize} permite modificar valores de definiciones de recursos de Kubernetes sin necesidad de realizar cambios directamente en el archivo original, o bien crear recursos completamente nuevos a partir de otros. Las customizaciones se definen igual que cualquier otro recurso de Kubernetes, como se muestra en el Listing \ref{lst:kustomization}. En dicho archivo, el cual se debe llamar \texttt{kustomization.yaml}, se indican: \texttt{resources}, que son los archivos que se van a incluir tal y como estén definidos; y \texttt{generators}, archivos que muestran cómo construir recursos a partir de otros. El generador que se utiliza en este Trabajo de Fin de Grado se muestra en el Listing \ref{lst:generator}. Estos archivos los lee ArgoCD, los interpreta, y así sabe cómo comportarse y las herramientas que tiene que utilizar cuando encuentra los archivos que definen los recursos, como \texttt{secrets.yaml} y \texttt{non-secrets.yaml}.
+
+\begin{listing}[!ht]
+  \begin{minted}{yaml}
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - non-secrets.yaml
+generators:
+  - secret_generator.yaml
+\end{minted}
+\caption{Archivo \texttt{kustomization.yaml}.}
+\label{lst:kustomization}
+\end{listing}
+
+  \item \texttt{ksops}\cite{ksops}.
+
+    \texttt{ksops} (kustomize-SOPS) es un \textit{plugin} de \texttt{kustomize} para gestionar recursos encriptados con SOPS. Se utiliza, sobre todo, para desencriptar Secrets o ConfigMaps de Kubernetes encriptados con SOPS. En el generador del Listing \ref{lst:generator} se ve cómo se le indica a ArgoCD que debe utilizar el \textit{plugin}  \texttt{ksops} para desencriptar el archivo con el nombre \texttt{secrets.yaml}.
+
+\begin{listing}[!ht]
+  \begin{minted}{yaml}
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: secret-generator
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - secrets.yaml
+\end{minted}
+\caption{Generador de los secretos.}
+\label{lst:generator}
+\end{listing}
+
+\end{itemize}
+
+Lo único que falta es instalar estas herramientas dentro de ArgoCD, \texttt{kustomize} y \texttt{ksops}, e indicarle dónde se encuentra la clave privada que usará para desencriptar los secretos.
+
+Esto se consigue con los valores que muestran en la línea 26 del Listing \ref{lst:create-clusters}. El archivo \texttt{values.yaml} tiene el contenido que se muestra en el Listing \ref{lst:argo-values}. Con estos valores se consigue:
+
+\begin{itemize}
+  \item Indicar las \textit{flags} que tiene que utilizar ArgoCD a la hora de ejecutar comandos con \texttt{kustomize} (líneas 1-4).
+  \item Crear variables de entorno (líneas 6-11) que guardan información sobre (de arriba a abajo, respectivamente) el directorio raíz de archivos de configuración del sistema y la ruta en la que se puede encontrar la clave privada de \texttt{age}.
+  \item Construir dos volúmenes (líneas 13-18), uno para almacenar los binarios de \texttt{kustomize} y \texttt{ksops}, y otro para la clave privada que se ha introducido en el \textit{cluster} en las líneas 20-22 del Listing \ref{lst:create-clusters}.
+  \item Instalar los binarios de \texttt{kustomize} y \texttt{ksops} en el volumen \texttt{custom-tools} creado previamente (líneas 20-21).
+  \item Permitir a ArgoCD acceder a los binarios y a la clave, montando los volúmenes que contienen estos elementos dentro del servidor principal de ArgoCD (líneas 33-41).
+\end{itemize}
+
+\begin{longlisting}
+  \begin{minted}{yaml}
+configs:
+  cm:
+    kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
+    ui.bannerpermanent: "true"
+
+repoServer:
+  env:
+    - name: XDG_CONFIG_HOME
+      value: /.config
+    - name: SOPS_AGE_KEY_FILE
+      value: /.config/sops/age/keys.txt
+
+  volumes:
+    - name: custom-tools
+      emptyDir: {}
+    - name: sops-age
+      secret:
+        secretName: sops-age
+
+  initContainers:
+    - name: install-ksops
+      image: viaductoss/ksops:v4
+      command: ["/bin/sh", "-c"]
+      args:
+        - echo "Installing KSOPS and Kustomize...";
+          mv ksops /custom-tools/;
+          mv kustomize /custom-tools/;
+          echo "Done.";
+      volumeMounts:
+        - mountPath: /custom-tools
+          name: custom-tools
+
+  volumeMounts:
+    - mountPath: /usr/local/bin/kustomize
+      name: custom-tools
+      subPath: kustomize
+    - mountPath: /usr/local/bin/ksops
+      name: custom-tools
+      subPath: ksops
+    - name: sops-age
+      mountPath: /.config/sops/age
+    \end{minted}
+    \caption{Valores que pueblan la Chart de ArgoCD.}
+    \label{lst:argo-values}
+\end{longlisting}
+
+Los archivos: \texttt{kustomization.yaml}, \texttt{secret\_generator.yaml}, \texttt{secrets.yaml} y \texttt{non-secrets.yaml}; todos ellos son los ficheros que se disponen en la rama de despliegue \texttt{deploy} del repositorio \texttt{state}. Por lo tanto, son los archivos que ArgoCD obtiene y utiliza para desplegar toda la aplicación en los distintos entornos.
+
+En la Figura \ref{fig:secrets} se puede ver el ciclo completo de encriptado y desencriptado de secretos
+
+\begin{figure}
+  \centerline{\includegraphics[width=13.5cm]{figuras/secrets}}
+  \caption{Encriptado y desencriptado de secretos. Imagen creada con \href{https://excalidraw.com}{excalidraw.com}. También referenciado en las Secciones \ref{subsec:state} y \ref{sec:secrets}.}
+  \label{fig:secrets}
+\end{figure}
+
+\section{Promoción de entornos}
+\label{sec:promotion}
+
+Referenciado en las Secciones \ref{subsec:cluster-func} y \ref{subsec:state}.
+
+Estos son los pasos que se realizan en el \textit{workflow} que realiza el despliegue al entorno correspondiente:
+
+\begin{enumerate}
+  \item Se clonan los repositorios necesarios (líneas 12-15).
+  \item Se instala Dagger (líneas 17-18).
+  \item Se determina el entorno y la \textit{tag} que se le pondrá a la imagen de Docker de los paquetes de la aplicación (\textit{backend} y \textit{frontend}) (líneas 20-29).
+    \begin{itemize}
+      \item En \texttt{dev} la \textit{tag} se trata de los ocho primeros caracteres del último \textit{commit} que se ha realizado. De esta manera se sabe a ciencia cierta el código que conforma la aplicación en dicha imagen, y facilita la detección de errores. El entorno es \texttt{dev} siempre que el evento que haya disparado el \textit{workflow} sea un \textit{push} de la PR a la rama principal, en este caso \texttt{main}.
+      \item En \texttt{pre} se publica la imagen y los recursos siempre que el evento que lanza el \textit{workflow} sea la creación de una \textit{prerelease}. La \textit{tag} que se utiliza es la que se le pone al nombre de la \textit{prerelease}. Esta debería tener formato SemVer\cite{semver} con una coletilla ``\texttt{snapshot}'' (e.j. \texttt{1.2.3-snapshot}). Se utiliza esta coletilla con el fin de dar a entender que dicha imagen es una copia o ``captura'' de lo que sería la versión final de la imagen, la que se publicaría en el entorno de producción.
+      \item En \texttt{pro} se despliega la aplicación cuando el evento que lanza el \textit{workflow} no es una \textit{prerelease}, sino una \textit{release}. Al igual que en \texttt{pre}, la \textit{tag} sigue el formato SemVer, pero en este caso sin la coletilla que se usaba antes (e.j. \texttt{1.2.3}).
+    \end{itemize}
+     
+  \item Se crean los archivos necesarios con las variables almacenadas en GitHub (líneas 31-39). Se proporcionan estos archivos y datos en los manuales de usuario del Capítulo \ref{chap:usuario} para su testeo en local.
+  \item Se ejecuta el ciclo de CI para ambos paquetes de la aplicación y se publica cada una de las imágenes, indicando la \textit{tag} que se ha determinado previamente (líneas 51-57). Además, es necesario actualizar los valores de las \textit{tags} en el repositorio de estado, el cual tiene un campo específico para indicar este dato (líneas 45-49). Más información en la Sección \ref{subsec:state}.
+  \item Se ejecuta el ciclo de CD, aportando los parámetros necesarios, entre los que se encuentran los archivos que se han construido previamente (líneas 59-69).
+\end{enumerate}
+
+Finalmente, la instancia de ArgoCD instalada en el entorno se sincroniza con el repositorio, obtiene los recursos de Kubernetes que se han almacenado en este y despliega la aplicación.
+
+\begin{longlisting}
+  \begin{minted}{yaml}
+on:
+  push:
+    branches: [ main ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+jobs:
+  cicd:
+    runs-on: ubuntu-24.04
+    steps:
+      - % Clona el repositorio "zoo" en la ruta "/zoo"
+
+      - % Clona el repositorio "state" en la ruta "/state"
+        % utilizando el token STATE_REPO
+
+      - name: Install Dagger
+        uses: dagger/dagger-for-github@8.0.0
+
+      - name: Determine environment
+        id: env_tag
+        run: |
+          % Determina el entorno en el que se despliega,
+          % teniendo en cuenta el *trigger* que ha lanzado
+          % el workflow:
+          %   - *push*    -> main
+          %   - *release* -> *release* o *pre-release*
+
+          echo "environment=${envi}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Recreate needed files
+        run: |
+          % Recrea el archivo .env para tenerlo disponible
+          % en "zoo"
+          echo "CR_PAT=${{ secrets.CR_PAT }}" >> ./.env
+          % .... se incluyen todas las variables
+
+          % Almacena la clave privada de "age"
+          % Crea el archivo de configuracion de SOPS
+
+      - name: Run Dagger CI module
+        run: |
+          tag=${{ steps.env_tag.outputs.tag }} 
+
+          update_state () {
+            % Actualiza el valor en "state" de la *tag* de
+            % la imagen para que se despliegue la que se
+            % acaba de publicar
+          }
+
+          dagger call --sec-env=file://.env backend \
+              publish-image --tag "${tag}"
+          update_state "zoo-backend" "${tag}"
+
+          dagger call --sec-env=file://.env frontend \
+              publish-image --tag "${tag}"
+          update_state "zoo-frontend" "${tag}"
+
+      - name: Run Dagger CD module
+        run: |
+          dagger call -m "./dagger/cd" \
+            --socket=/var/run/docker.sock \
+            --kind-svc=tcp://localhost:3000 \
+            --config-file=file://cluster/kind_local.yaml \
+            deploy \
+            --sec-env=file://.env \
+            --env=${{ steps.env_tag.outputs.environment }} \
+            --age-key=file://sops/age.agekey \
+            --sops-config=file://sops/.sops.yaml
+  \end{minted}
+  \caption{\textit{Workflow} de CI/CD.}
+  \label{lst:workflowcicd}
+\end{longlisting}
+
+En la Figura \ref{fig:promotion} se muestra el ciclo de eventos que se realizan previa y posteriormente a la ejecución del \textit{workflow}.
+
+
+\section{Desarrollo de la Chart de la aplicación}
+\label{sec:chart}
+
+Referenciado en la Sección \ref{subsec:helm}.
+
+El proceso de desarrollo de la Chart comienza con la propia creación de esta. Tras realizar pruebas de construcción de la aplicación, se construye un archivo comprimido con el comando que se muestra en el Listing \ref{lst:compression}. De esta manera se obtiene un archivo \texttt{.tgz} con toda la definición de la Chart de la aplicación. Posteriormente, se almacena el archivo comprimido en un directorio \texttt{temp}.
+
+\begin{listing}[!ht]
+  \begin{minted}{bash}
+helm package zoo
+\end{minted}
+\caption{Generación de un archivo comprimido de la Chart.}
+\label{lst:compression}
+\end{listing}
+
+Por último, se publica la Chart a través de GitHub Pages. Esto se consigue gracias a un \textit{workflow} que existe en el repositorio, el cual se ve en el Listing \ref{lst:ghpages} (se han comentado las acciones que se realizan en cada paso para reducir su tamaño). El \textit{workflow} se lanza únicamente cuando existe un directorio \texttt{temp} con archivos en su interior (líneas 10-11). Este realiza los comandos necesarios para actualizar el archivo \texttt{index.yaml}, el cual define las diferentes versiones de la Chart y la URL pública donde se pueden descargar. Además, actualiza las ramas principal y \texttt{gh-pages}, siendo esta última en la que se puede encontrar el archivo índice ya mencionado.
+
+\begin{longlisting}
+  \begin{minted}{yaml}
+name: Release Helm Charts
+
+concurrency: release-helm
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'temp/**'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - % Clona la rama principal del repositorio en "src/"
+
+      - % Clona la rama "gh-pages" del repositorio en "dest/"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4.3.0
+
+      - name: Update New Files and push to main branch
+        shell: bash
+        working-directory: src
+        run: |
+          % Se genera o actualiza el "index.yaml" con la URL
+          % donde se van a alojar las diferentes versione de la
+          % Chart
+
+          % Se guarda el .tgz del directorio "temp/" con la Chart
+          % en la rama de "gh-pages", el "index.yaml" en la raiz
+          % de la misma rama y se suben los cambios la rama
+          % principal
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push New Files
+        shell: bash
+        working-directory: dest
+        run: |
+          % Se guardan los cambios en la rama "gh-pages",
+          % realizando finalmente la publicacion de la version
+          % de la Chart
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  \end{minted}
+  \caption{\textit{Workflow} de publicación de la Chart en GitHub Pages.}
+  \label{lst:ghpages}
+\end{longlisting}
+

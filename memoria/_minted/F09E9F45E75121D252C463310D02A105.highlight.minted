@@ -1,0 +1,72 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{on}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{push}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{branches}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{[}\PYG{+w}{ }\PYG{n+nv}{main}\PYG{+w}{ }\PYG{p+pIndicator}{]}
+\PYG{+w}{  }\PYG{n+nt}{release}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{types}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{[}\PYG{+w}{ }\PYG{n+nv}{published}\PYG{+w}{ }\PYG{p+pIndicator}{]}
+\PYG{+w}{  }\PYG{n+nt}{workflow\PYGZus{}dispatch}\PYG{p}{:}
+
+\PYG{n+nt}{jobs}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{cicd}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{runs\PYGZhy{}on}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{ubuntu\PYGZhy{}24.04}
+\PYG{+w}{    }\PYG{n+nt}{steps}\PYG{p}{:}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{err}{\PYGZpc{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Clona}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{el}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{repositorio}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdq{}zoo\PYGZdq{}}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{en}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{la}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{ruta}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdq{}/zoo\PYGZdq{}}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{err}{\PYGZpc{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Clona}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{el}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{repositorio}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdq{}state\PYGZdq{}}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{en}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{la}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{ruta}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZdq{}/state\PYGZdq{}}
+\PYG{+w}{        }\PYG{l+lScalar+lScalarPlain}{\PYGZpc{}}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{utilizando}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{el}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{token}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{STATE\PYGZus{}REPO}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Install}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{Dagger}
+\PYG{+w}{        }\PYG{n+nt}{uses}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{dagger/dagger\PYGZhy{}for\PYGZhy{}github@8.0.0}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Determine}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{environment}
+\PYG{+w}{        }\PYG{n+nt}{id}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{env\PYGZus{}tag}
+\PYG{+w}{        }\PYG{n+nt}{run}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{|}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} Determina el entorno en el que se despliega,}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} teniendo en cuenta el *trigger* que ha lanzado}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} el workflow:}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{}   \PYGZhy{} *push*    \PYGZhy{}\PYGZgt{} main}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{}   \PYGZhy{} *release* \PYGZhy{}\PYGZgt{} *release* o *pre\PYGZhy{}release*}
+
+\PYG{+w}{          }\PYG{n+no}{echo \PYGZdq{}environment=\PYGZdl{}\PYGZob{}envi\PYGZcb{}\PYGZdq{} \PYGZgt{}\PYGZgt{} \PYGZdq{}\PYGZdl{}GITHUB\PYGZus{}OUTPUT\PYGZdq{}}
+\PYG{+w}{          }\PYG{n+no}{echo \PYGZdq{}tag=\PYGZdl{}\PYGZob{}tag\PYGZcb{}\PYGZdq{} \PYGZgt{}\PYGZgt{} \PYGZdq{}\PYGZdl{}GITHUB\PYGZus{}OUTPUT\PYGZdq{}}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Recreate}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{needed}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{files}
+\PYG{+w}{        }\PYG{n+nt}{run}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{|}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} Recrea el archivo .env para tenerlo disponible}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} en \PYGZdq{}zoo\PYGZdq{}}
+\PYG{+w}{          }\PYG{n+no}{echo \PYGZdq{}CR\PYGZus{}PAT=\PYGZdl{}\PYGZob{}\PYGZob{} secrets.CR\PYGZus{}PAT \PYGZcb{}\PYGZcb{}\PYGZdq{} \PYGZgt{}\PYGZgt{} ./.env}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} .... se incluyen todas las variables}
+
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} Almacena la clave privada de \PYGZdq{}age\PYGZdq{}}
+\PYG{+w}{          }\PYG{n+no}{\PYGZpc{} Crea el archivo de configuracion de SOPS}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Run}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{Dagger}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{CI}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{module}
+\PYG{+w}{        }\PYG{n+nt}{run}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{|}
+\PYG{+w}{          }\PYG{n+no}{tag=\PYGZdl{}\PYGZob{}\PYGZob{} steps.env\PYGZus{}tag.outputs.tag \PYGZcb{}\PYGZcb{}}
+
+\PYG{+w}{          }\PYG{n+no}{update\PYGZus{}state () \PYGZob{}}
+\PYG{+w}{            }\PYG{n+no}{\PYGZpc{} Actualiza el valor en \PYGZdq{}state\PYGZdq{} de la *tag* de}
+\PYG{+w}{            }\PYG{n+no}{\PYGZpc{} la imagen para que se despliegue la que se}
+\PYG{+w}{            }\PYG{n+no}{\PYGZpc{} acaba de publicar}
+\PYG{+w}{          }\PYG{n+no}{\PYGZcb{}}
+
+\PYG{+w}{          }\PYG{n+no}{dagger call \PYGZhy{}\PYGZhy{}sec\PYGZhy{}env=file://.env backend \PYGZbs{}}
+\PYG{+w}{              }\PYG{n+no}{publish\PYGZhy{}image \PYGZhy{}\PYGZhy{}tag \PYGZdq{}\PYGZdl{}\PYGZob{}tag\PYGZcb{}\PYGZdq{}}
+\PYG{+w}{          }\PYG{n+no}{update\PYGZus{}state \PYGZdq{}zoo\PYGZhy{}backend\PYGZdq{} \PYGZdq{}\PYGZdl{}\PYGZob{}tag\PYGZcb{}\PYGZdq{}}
+
+\PYG{+w}{          }\PYG{n+no}{dagger call \PYGZhy{}\PYGZhy{}sec\PYGZhy{}env=file://.env frontend \PYGZbs{}}
+\PYG{+w}{              }\PYG{n+no}{publish\PYGZhy{}image \PYGZhy{}\PYGZhy{}tag \PYGZdq{}\PYGZdl{}\PYGZob{}tag\PYGZcb{}\PYGZdq{}}
+\PYG{+w}{          }\PYG{n+no}{update\PYGZus{}state \PYGZdq{}zoo\PYGZhy{}frontend\PYGZdq{} \PYGZdq{}\PYGZdl{}\PYGZob{}tag\PYGZcb{}\PYGZdq{}}
+
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Run}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{Dagger}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{CD}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{module}
+\PYG{+w}{        }\PYG{n+nt}{run}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{|}
+\PYG{+w}{          }\PYG{n+no}{dagger call \PYGZhy{}m \PYGZdq{}./dagger/cd\PYGZdq{} \PYGZbs{}}
+\PYG{+w}{            }\PYG{n+no}{\PYGZhy{}\PYGZhy{}socket=/var/run/docker.sock \PYGZbs{}}
+\PYG{+w}{            }\PYG{n+no}{\PYGZhy{}\PYGZhy{}kind\PYGZhy{}svc=tcp://localhost:3000 \PYGZbs{}}
+\PYG{+w}{            }\PYG{n+no}{\PYGZhy{}\PYGZhy{}config\PYGZhy{}file=file://cluster/kind\PYGZus{}local.yaml \PYGZbs{}}
+\PYG{+w}{            }\PYG{n+no}{deploy \PYGZbs{}}
+\PYG{+w}{            }\PYG{n+no}{\PYGZhy{}\PYGZhy{}sec\PYGZhy{}env=file://.env \PYGZbs{}}
+\PYG{+w}{            }\PYG{n+no}{\PYGZhy{}\PYGZhy{}env=\PYGZdl{}\PYGZob{}\PYGZob{} steps.env\PYGZus{}tag.outputs.environment \PYGZcb{}\PYGZcb{} \PYGZbs{}}
+\PYG{+w}{            }\PYG{n+no}{\PYGZhy{}\PYGZhy{}age\PYGZhy{}key=file://sops/age.agekey \PYGZbs{}}
+\PYG{+w}{            }\PYG{n+no}{\PYGZhy{}\PYGZhy{}sops\PYGZhy{}config=file://sops/.sops.yaml}
+\end{MintedVerbatim}

@@ -1,0 +1,47 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{package}\PYG{+w}{ }\PYG{n+nx}{main}
+
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{p}{(}
+\PYG{+w}{	}\PYG{l+s}{\PYGZdq{}context\PYGZdq{}}
+\PYG{+w}{	}\PYG{l+s}{\PYGZdq{}dagger/dagger/internal/dagger\PYGZdq{}}
+\PYG{+w}{	}\PYG{l+s}{\PYGZdq{}fmt\PYGZdq{}}
+\PYG{+w}{	}\PYG{l+s}{\PYGZdq{}strconv\PYGZdq{}}
+\PYG{p}{)}
+
+\PYG{k+kd}{type}\PYG{+w}{ }\PYG{n+nx}{Backend}\PYG{+w}{ }\PYG{k+kd}{struct}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{n+nx}{Name}\PYG{+w}{ }\PYG{k+kt}{string}
+\PYG{+w}{	}\PYG{n+nx}{Base}\PYG{+w}{ }\PYG{o}{*}\PYG{n+nx}{dagger}\PYG{p}{.}\PYG{n+nx}{Container}
+\PYG{+w}{	}\PYG{n+nx}{Secrets}\PYG{+w}{ }\PYG{n+nx}{SecMap}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{k+kd}{func}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{m}\PYG{+w}{ }\PYG{o}{*}\PYG{n+nx}{Backend}\PYG{p}{)}\PYG{+w}{ }\PYG{n+nx}{Build}\PYG{p}{(}\PYG{n+nx}{ctx}\PYG{+w}{ }\PYG{n+nx}{context}\PYG{p}{.}\PYG{n+nx}{Context}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{*}\PYG{n+nx}{dagger}\PYG{p}{.}\PYG{n+nx}{Container}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{n+nx}{build}\PYG{+w}{ }\PYG{o}{:=}\PYG{+w}{ }\PYG{n+nx}{m}\PYG{p}{.}\PYG{n+nx}{Base}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithWorkdir}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}/app\PYGZdq{}}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithExec}\PYG{p}{(}\PYG{p}{[}\PYG{p}{]}\PYG{k+kt}{string}\PYG{p}{\PYGZob{}}\PYG{l+s}{\PYGZdq{}lerna\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}run\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZhy{}\PYGZhy{}scope\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}@vieites\PYGZhy{}tfg/zoo\PYGZhy{}backend\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}build\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithExec}\PYG{p}{(}\PYG{p}{[}\PYG{p}{]}\PYG{k+kt}{string}\PYG{p}{\PYGZob{}}\PYG{l+s}{\PYGZdq{}ncc\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}build\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}./packages/backend/dist/index.js\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZhy{}o\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}./dist\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
+
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{build}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{k+kd}{func}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{m}\PYG{+w}{ }\PYG{o}{*}\PYG{n+nx}{Backend}\PYG{p}{)}\PYG{+w}{ }\PYG{n+nx}{Ctr}\PYG{p}{(}\PYG{n+nx}{ctx}\PYG{+w}{ }\PYG{n+nx}{context}\PYG{p}{.}\PYG{n+nx}{Context}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{*}\PYG{n+nx}{dagger}\PYG{p}{.}\PYG{n+nx}{Container}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{n+nx}{build}\PYG{+w}{ }\PYG{o}{:=}\PYG{+w}{ }\PYG{n+nx}{m}\PYG{p}{.}\PYG{n+nx}{Build}\PYG{p}{(}\PYG{n+nx}{ctx}\PYG{p}{)}
+
+\PYG{+w}{	}\PYG{n+nx}{compiled}\PYG{+w}{ }\PYG{o}{:=}\PYG{+w}{ }\PYG{n+nx}{build}\PYG{p}{.}\PYG{n+nx}{File}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}/app/dist/index.js\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{	}\PYG{n+nx}{pkgJson}\PYG{+w}{ }\PYG{o}{:=}\PYG{+w}{ }\PYG{n+nx}{build}\PYG{p}{.}\PYG{n+nx}{File}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}/app/packages/backend/package.json\PYGZdq{}}\PYG{p}{)}
+
+\PYG{+w}{	}\PYG{n+nx}{dag}\PYG{+w}{ }\PYG{o}{:=}\PYG{+w}{ }\PYG{n+nx}{dagger}\PYG{p}{.}\PYG{n+nx}{Connect}\PYG{p}{(}\PYG{p}{)}
+\PYG{+w}{	}\PYG{n+nx}{back}\PYG{+w}{ }\PYG{o}{:=}\PYG{+w}{ }\PYG{n+nx}{dag}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{Container}\PYG{p}{(}\PYG{p}{)}\PYG{p}{.}\PYG{n+nx}{From}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}node:20\PYGZhy{}alpine\PYGZdq{}}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithExposedPort}\PYG{p}{(}\PYG{l+m+mi}{3000}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithEnvVariable}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}NODE\PYGZus{}ENV\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}production\PYGZdq{}}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithEnvVariable}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}YARN\PYGZus{}CACHE\PYGZus{}FOLDER\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}/.yarn/cache\PYGZdq{}}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithMountedCache}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}/.yarn/cache\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{dag}\PYG{p}{.}\PYG{n+nx}{CacheVolume}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}yarn\PYGZhy{}cache\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithWorkdir}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}/app\PYGZdq{}}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithFile}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}/app/package.json\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{pkgJson}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithFile}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}/app/index.js\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{compiled}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithExec}\PYG{p}{(}\PYG{p}{[}\PYG{p}{]}\PYG{k+kt}{string}\PYG{p}{\PYGZob{}}\PYG{l+s}{\PYGZdq{}yarn\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}install\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZhy{}\PYGZhy{}production\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{p}{.}
+\PYG{+w}{		}\PYG{n+nx}{WithEntrypoint}\PYG{p}{(}\PYG{p}{[}\PYG{p}{]}\PYG{k+kt}{string}\PYG{p}{\PYGZob{}}\PYG{l+s}{\PYGZdq{}node\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}index.js\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
+
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{back}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

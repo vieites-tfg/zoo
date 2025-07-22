@@ -1,0 +1,18 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nb}{cd}\PYG{+w}{ }\PYGZti{}/zoo/dagger/cd
+
+just\PYG{+w}{ }deploy\PYG{+w}{ }dev
+\PYG{c+c1}{\PYGZsh{} just deploy pre}
+\PYG{c+c1}{\PYGZsh{} just deploy pro}
+
+\PYG{c+c1}{\PYGZsh{} lo anterior ejecuta:}
+dagger\PYG{+w}{ }call\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}\PYGZhy{}socket\PYG{o}{=}/var/run/docker.sock\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}\PYGZhy{}kind\PYGZhy{}svc\PYG{o}{=}tcp://localhost:3000\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}\PYGZhy{}config\PYGZhy{}file\PYG{o}{=}file://../../cluster/kind\PYGZus{}local.yaml\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }launch\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}\PYGZhy{}sec\PYGZhy{}env\PYG{o}{=}file://../../.env\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}\PYGZhy{}env\PYG{o}{=}\PYG{o}{\PYGZob{}}\PYG{o}{\PYGZob{}}env\PYG{o}{\PYGZcb{}}\PYG{o}{\PYGZcb{}}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} \PYGZlt{}\PYGZhy{} cambiar \PYGZob{}\PYGZob{}env\PYGZcb{}\PYGZcb{} por \PYGZdq{}dev\PYGZdq{}, \PYGZdq{}pre\PYGZdq{} o \PYGZdq{}pro\PYGZdq{} \PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}\PYGZhy{}age\PYGZhy{}key\PYG{o}{=}file://../../sops/age.agekey\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{    }\PYGZhy{}\PYGZhy{}sops\PYGZhy{}config\PYG{o}{=}file://../../sops/.sops.yaml
+\end{MintedVerbatim}

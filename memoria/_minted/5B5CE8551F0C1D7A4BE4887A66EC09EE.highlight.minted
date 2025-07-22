@@ -1,0 +1,41 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{+w}{  }\PYG{n+nt}{repositories}\PYG{p}{:}
+\PYG{+w}{  }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{helm\PYGZhy{}repository}
+\PYG{+w}{    }\PYG{n+nt}{url}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{https://raw.githubusercontent.com/vieites\PYGZhy{}tfg/helm\PYGZhy{}repository/gh\PYGZhy{}pages/}
+
+\PYG{n+nt}{environments}\PYG{p}{:}
+\PYG{+w}{  }\PYG{n+nt}{dev}\PYG{p}{:}
+\PYG{+w}{    }\PYG{n+nt}{values}\PYG{p}{:}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{./dev.yaml}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} ... otros entornos}
+
+\PYG{n+nn}{\PYGZhy{}\PYGZhy{}\PYGZhy{}}
+
+\PYG{n+nt}{releases}\PYG{p}{:}
+\PYG{+w}{  }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{zoo\PYGZhy{}\PYGZob{}\PYGZob{}}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{.Environment.Name}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{\PYGZcb{}\PYGZcb{}}
+\PYG{+w}{    }\PYG{n+nt}{namespace}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{.Environment.Name}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{n+nt}{chart}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{helm\PYGZhy{}repository/zoo}
+\PYG{+w}{    }\PYG{n+nt}{version}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{.Values.version}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{n+nt}{values}\PYG{p}{:}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{zoo\PYGZhy{}frontend.yaml}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{zoo\PYGZhy{}backend.yaml}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{mongodb.yaml}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{global.yaml}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{.Environment.Name}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}\PYG{l+lScalar+lScalarPlain}{/zoo\PYGZhy{}frontend.yaml}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{.Environment.Name}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}\PYG{l+lScalar+lScalarPlain}{/zoo\PYGZhy{}backend.yaml}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{.Environment.Name}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}\PYG{l+lScalar+lScalarPlain}{/mongodb.yaml}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{.Environment.Name}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}\PYG{l+lScalar+lScalarPlain}{/global.yaml}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{global}\PYG{p}{:}
+\PYG{+w}{          }\PYG{n+nt}{ghcrSecret}\PYG{p}{:}
+\PYG{+w}{            }\PYG{n+nt}{enabled}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{true}
+\PYG{+w}{            }\PYG{n+nt}{password}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{requiredEnv}\PYG{n+nv}{ }\PYG{n+nv}{\PYGZdq{}CR\PYGZus{}PAT\PYGZdq{}}\PYG{n+nv}{ }\PYG{n+nv}{|}\PYG{n+nv}{ }\PYG{n+nv}{quote}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{zoo\PYGZhy{}backend}\PYG{p}{:}
+\PYG{+w}{          }\PYG{n+nt}{mongo}\PYG{p}{:}
+\PYG{+w}{            }\PYG{n+nt}{root}\PYG{p}{:}
+\PYG{+w}{              }\PYG{n+nt}{user}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{requiredEnv}\PYG{n+nv}{ }\PYG{n+nv}{\PYGZdq{}MONGO\PYGZus{}ROOT\PYGZdq{}}\PYG{n+nv}{ }\PYG{n+nv}{|}\PYG{n+nv}{ }\PYG{n+nv}{quote}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}
+\PYG{+w}{              }\PYG{n+nt}{password}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{requiredEnv}\PYG{n+nv}{ }\PYG{n+nv}{\PYGZdq{}MONGO\PYGZus{}ROOT\PYGZus{}PASS\PYGZdq{}}\PYG{n+nv}{ }\PYG{n+nv}{|}\PYG{n+nv}{ }\PYG{n+nv}{quote}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{mongodb}\PYG{p}{:}
+\PYG{+w}{          }\PYG{n+nt}{auth}\PYG{p}{:}
+\PYG{+w}{            }\PYG{n+nt}{rootUser}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{requiredEnv}\PYG{n+nv}{ }\PYG{n+nv}{\PYGZdq{}MONGO\PYGZus{}ROOT\PYGZdq{}}\PYG{n+nv}{ }\PYG{n+nv}{|}\PYG{n+nv}{ }\PYG{n+nv}{quote}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}
+\PYG{+w}{            }\PYG{n+nt}{rootPassword}\PYG{p}{:}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZob{}}\PYG{p+pIndicator}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nv}{requiredEnv}\PYG{n+nv}{ }\PYG{n+nv}{\PYGZdq{}MONGO\PYGZus{}ROOT\PYGZus{}PASS\PYGZdq{}}\PYG{n+nv}{ }\PYG{n+nv}{|}\PYG{n+nv}{ }\PYG{n+nv}{quote}\PYG{+w}{ }\PYG{p+pIndicator}{\PYGZcb{}}\PYG{p+pIndicator}{\PYGZcb{}}
+\end{MintedVerbatim}

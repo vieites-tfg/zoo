@@ -1,0 +1,31 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+helm
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }zoo\PYGZhy{}0.0.0.tgz
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }zoo\PYGZhy{}0.0.1.tgz
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }zoo\PYGZhy{}0.0.2.tgz
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }zoo\PYGZhy{}0.0.3.tgz
+zoo
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }Chart.yaml
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }charts
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }zoo\PYGZhy{}backend
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }Chart.yaml
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }templates
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYG{+w}{       }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }configMap.yaml
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYG{+w}{       }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }deployment.yaml
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYG{+w}{       }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }ingress.yaml
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYG{+w}{       }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }secret.yaml
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYG{+w}{       }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }service.yaml
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}
+\PYG{p}{|}\PYG{+w}{   }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }zoo\PYGZhy{}frontend
+\PYG{p}{|}\PYG{+w}{       }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }Chart.yaml
+\PYG{p}{|}\PYG{+w}{       }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }templates
+\PYG{p}{|}\PYG{+w}{           }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }configmap\PYGZhy{}js.yaml
+\PYG{p}{|}\PYG{+w}{           }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }configmap.yaml
+\PYG{p}{|}\PYG{+w}{           }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }deployment.yaml
+\PYG{p}{|}\PYG{+w}{           }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }ingress.yaml
+\PYG{p}{|}\PYG{+w}{           }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }service.yaml
+\PYG{p}{|}
+\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }templates
+\PYG{+w}{    }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }\PYGZus{}helpers.tpl
+\PYG{+w}{    }\PYG{p}{|}\PYGZhy{}\PYG{+w}{ }ghcr\PYGZhy{}secret.yaml
+\end{MintedVerbatim}

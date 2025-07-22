@@ -1,0 +1,30 @@
+\chapter{Conclusiones y posibles ampliaciones}
+
+%O traballo describe o grao de cumprimento dos obxectivos. Posibles vías de mellora.
+
+A lo largo del Trabajo de Fin de Grado se explica todo el proceso de diseño e implementación de: la aplicación de prueba, las Charts de Helm que permiten el despliegue de la aplicación en Kubernetes y los módulos de Dagger para los ciclos de CI y CD. Esto último es la razón por la que se ha hecho este Trabajo de Fin de Grado.
+
+Crear un módulo de Dagger implica tener conocimientos de programación, pero también de creación de entornos aislados, como son los contenedores de Docker. Además, requiere estudiar la API que proporciona, la cual es más intuitiva en el caso de tener los conocimientos que se acaban de mencionar. Por lo tanto, es una herramienta que tiene una curva de aprendizaje moderada, sobre todo inicialmente.
+
+Una vez se comienza el desarrollo de los módulos, el hecho de que se utilice un lenguaje de programación como Go facilita mucho la gestión de la lógica de programación, permitiendo crear funciones que se pueden llamar desde cualquier otro lugar dentro del módulo. Tras tener más conocimiento de la herramienta, la dificultad de desarrollar módulos de CI y CD radica más en el diseño de los propios módulos que en la programación en sí.
+
+La capacidad de Dagger para crear módulos de CI/CD de manera programática facilita en gran medida el mantenimiento de estos a largo plazo, ya que no se utilizan diferentes herramientas o tecnologías que puedan depender del entorno de desarrollo. A lo largo de la implementación de los módulos, el programador se da cuenta de las ventajas que tiene poder centralizar toda la lógica de programación. Cabe mencionar la gran portabilidad que proporciona Dagger gracias a que se ejecuta sobre un \textit{runtime} de OCI, lo cual permite ejecutar los módulos creados con esta herramienta de manera local en una gran variedad de entornos de desarrollo. Además, se encuentran de manera pública módulos en el Daggerverse, los cuales están implementados por otros desarrolladores. Estos se pueden integrar muy fácilmente en otros módulos en desarrollo.
+
+Por otro lado, la gestión que realiza Dagger de la caché permite al desarrollador reducir en gran medida los tiempos de ejecución de funciones que se lanzan de manera repetitiva a lo largo del proceso de desarrollo de la aplicación. Un ejemplo de esto se ha visto en las pruebas realizadas en el Capítulo \ref{chap:pruebas}.
+
+Todo lo mencionado anteriormente hace de Dagger una excelente opción para crear módulos de este tipo para cualquier aplicación. Aprender a utilizar esta herramienta puede facilitar en gran medida la implementación, el mantenimiento, la portabilidad, la flexibilidad, la escalabilidad y la reproducibilidad de \textit{pipelines} de CI/CD para una aplicación.
+
+\section{Vías de mejora}
+
+A continuación, se mencionan elementos que se pueden mejorar en un futuro con respecto al trabajo realizado:
+
+\begin{itemize}
+  \item Posible mejora del diseño de los módulos de CI/CD.
+  \item Añadir más funcionalidades a la aplicación de prueba.
+  \item Despliegue de la aplicación en proveedores en la nube, en vez de levantar todos los \textit{clusters} de KinD de manera local.
+  \item Gestión de secretos más avanzada.
+  \item Añadir una herramienta de monitorización y observabilidad de métricas de la aplicación, tales como DataDog\cite{datadog} o Prometheus\cite{prometheus}.
+  \item Escalado horizontal\cite{horizontal}, con el fin de distribuir la carga entre múltiples instancias, mejorando la escalabilidad, la tolerancia a fallos y la disponibilidad de la aplicación.
+  \item Análisis de imágenes de Docker y \texttt{Dockerfiles}, para mayor seguridad, empleando herramientas como Trivy\cite{trivy}.
+  \item Realización de encuestas o entrevistas a más desarrolladores que prueben la herramienta, con el fin de obtener más \textit{feedback} y validar con mayor firmeza las conclusiones a las que se han llegado en este Trabajo de Fin de Grado.
+\end{itemize}

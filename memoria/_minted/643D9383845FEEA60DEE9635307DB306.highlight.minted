@@ -1,0 +1,18 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{apiVersion}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{v2}
+\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{zoo}
+\PYG{n+nt}{description}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{Umbrella}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{chart}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{to}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{deploy}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{frontend,}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{backend}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{and}\PYG{l+lScalar+lScalarPlain}{ }\PYG{l+lScalar+lScalarPlain}{mongo}
+\PYG{n+nt}{version}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{0.0.7}
+\PYG{n+nt}{appVersion}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}}\PYG{l+s}{0.0.0}\PYG{l+s}{\PYGZdq{}}
+\PYG{n+nt}{dependencies}\PYG{p}{:}
+\PYG{+w}{  }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{zoo\PYGZhy{}frontend}
+\PYG{+w}{    }\PYG{n+nt}{version}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{0.0.0}
+\PYG{+w}{    }\PYG{n+nt}{repository}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{file://charts/zoo\PYGZhy{}frontend}
+\PYG{+w}{  }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{zoo\PYGZhy{}backend}
+\PYG{+w}{    }\PYG{n+nt}{version}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{0.0.0}
+\PYG{+w}{    }\PYG{n+nt}{repository}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{file://charts/zoo\PYGZhy{}backend}
+\PYG{+w}{  }\PYG{p+pIndicator}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nt}{name}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{mongodb}
+\PYG{+w}{    }\PYG{n+nt}{repository}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{https://charts.bitnami.com/bitnami}
+\PYG{+w}{    }\PYG{n+nt}{version}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{15.0.0}
+\PYG{+w}{    }\PYG{n+nt}{condition}\PYG{p}{:}\PYG{+w}{ }\PYG{l+lScalar+lScalarPlain}{mongo.internal.enabled}
+\end{MintedVerbatim}

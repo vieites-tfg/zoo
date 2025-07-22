@@ -1,0 +1,4 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+git\PYG{+w}{ }add\PYG{+w}{ }.
+git\PYG{+w}{ }commit\PYG{+w}{ }\PYGZhy{}m\PYG{+w}{ }\PYG{l+s+s1}{\PYGZsq{}cambio de nombre\PYGZsq{}}
+\end{MintedVerbatim}
