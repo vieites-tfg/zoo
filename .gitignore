@@ -13,6 +13,8 @@ local_packages/
 *.log
 *.out
 *.toc
+*.nav
+*.snm
 *.bbl
 *.blg
 *.lof
@@ -23,3 +25,5 @@ local_packages/
 *.fdb_latexmk
 *.synctex.gze
 *.synctex(busy)
+_minted
+*.bak*
