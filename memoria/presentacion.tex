@@ -30,36 +30,102 @@
 
 \section{Objetivos}
 \begin{frame}
-    \frametitle{¿Por qué?}
-    \begin{itemize}
-        \item Entornos de desarrollo con un gran volumen de tecnologías. \pause
-        \item Mucha complejidad. \pause
-        \item Coste de mantenimiento elevado. \pause
-        \item Baja portabilidad.
-    \end{itemize}
+    \frametitle{¿Cuál es el problema?}
+    \begin{columns}
+        \begin{column}{0.45\textwidth}
+            \begin{itemize}
+                \item<1-> Aplicaciones con un gran volumen de tecnologías.
+                      % - frontend, proxy, backend, BDs
+                \item<2-> Gran complejidad.
+                      % sintaxis
+                      % tipos de valores
+                      % número de yaml en gitlab
+                \item<3-> Coste de mantenimiento elevado.
+                      % scripts heterogeneos, copia-pega
+                      % poca capacidad de abstracción
+                      % versionado de herramientas
+                \item<4-> Baja portabilidad.
+                      % ejecución en remoto
+                      % sin pipeline local, sin docker
+                      % dependencia de la plataforma
+                      % push and pray
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.55\textwidth}
+            \begin{figure}
+                \includegraphics<1>[height=4.9cm]{figuras/Gitlab}
+                \only<1>{\caption{Arquitectura de GitLab\cite{gitlab_architecture}.}}
+                \includegraphics<2>[scale=0.4]{figuras/Gitlab_yamls}
+                \only<2>{\caption{Archivos YAML en GitLab\cite{gitlab_repo}.}}
+                \includegraphics<3>[scale=0.15]{figuras/costes-mantenimiento}
+                \only<3>{\caption{Imagen generada con IA.}}
+                \includegraphics<4>[scale=0.35]{figuras/portabilidad}
+            \end{figure}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
     \frametitle{¿Qué se propone?}
-    Dagger para gestionar CI/CD.
-    \begin{itemize}
-        \item ¿Qué es Dagger? \pause
-        \item ¿Cómo de complejo es? \pause
-        \item ¿Facilita el desarrollo? \pause
-        \item ¿Disminuye el coste de mantenimiento? \pause
-        \item ¿Mejora la portabilidad?
-    \end{itemize}
+    {\it Dagger} para gestionar CI/CD.
+    \begin{columns}
+        \hfill
+        \begin{column}{0.55\textwidth}
+            \begin{itemize}
+                \item<1-> ¿Qué es Dagger?
+                \item<2-> ¿Cómo de complejo es?
+                    % curva de aprendizaje
+                \item<3-> ¿Facilita el desarrollo?
+                    % comparado con tecnologías tradicionales
+                \item<4-> ¿Disminuye el coste de mantenimiento?
+                    % del que se habló antes
+                \item<5-> ¿Mejora la portabilidad?
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{figure}
+                \hspace*{-1.8cm}\includegraphics<1->[scale=1.2]{figuras/Dagger_logo}
+            \end{figure}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \section{Fundamentos teóricos}
+\subsection{Conceptos y herramientas}
 \begin{frame}
     \frametitle{Conceptos básicos}
     \begin{itemize}
         \item CI/CD (\textit{Continuous Integration/Continuous Delivery}). \pause
         \item GitOps \& ArgoCD. \pause
-        \item Kubernetes \& Helm. \pause
+        \item Kubernetes \& Helm.
     \end{itemize}
 \end{frame}
+\subsection{Dagger}
+
+\begin{frame}
+    \frametitle{Dagger}
+    \begin{itemize}
+        \item SDK de creación de \textit{pipelines} de CI/CD. \pause
+        \item Múltiples lenguajes. \pause
+        \item Portabilidad. \pause
+        \item Módulos.
+    \end{itemize}
+\end{frame}
+
+\section{Bibliografía}
+\begin{frame}
+    \frametitle{Bibliografía}
+    \begin{thebibliography}{99}
+        \scriptsize
+        \bibitem{gitlab_architecture} GitLab Inc. ``GitLab Architecture Overview | GitLab Docs.'' Gitlab.com, 2025, {\it https://docs.gitlab.com/development/architecture/\#simplified-component-overview}. Accedido el 26 de agosto del 2025.
+        \bibitem{gitlab_repo} GitLab Inc. ``GitLab.org / GitLab.'' GitLab, 8 Feb. 2020, {\it https://gitlab.com/gitlab-org/gitlab}.
+        \bibitem{gitlab_ci} GitLab Inc. ``Doc/Development/Cicd/\_index.md · Master · GitLab.org / GitLab · GitLab.'' GitLab, 2025, {\it https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/cicd/\_index.md}. Accedido el 26 de agosto del 2025.
+    \end{thebibliography}
+\end{frame}
+
+\end{document}
+% Dagger functions (encadenamiento)
+% Daggerverse
 
 % \section{Sección 1}
 % \subsection{Ejemplo de subsección}
@@ -204,4 +270,3 @@
 %         \caption{Una figura grande}
 %     \end{figure}
 % \end{frame}
-\end{document}
