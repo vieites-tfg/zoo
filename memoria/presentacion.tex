@@ -20,6 +20,7 @@
 \end{frame}
 
 \section{Objetivos}
+\subsection{El problema}
 \begin{frame}
     \frametitle{¿Cuál es el problema?}
     \begin{columns}
@@ -56,9 +57,10 @@
     \end{columns}
 \end{frame}
 
+\subsection{La solución}
+
 \begin{frame}
     \frametitle{¿Qué se propone?}
-
     \begin{center}
         {\it Dagger} para gestionar CI/CD.
     \end{center}
@@ -75,8 +77,6 @@
     % ¿Permite la independencia de plataforma?
 \end{frame}
 
-\section{Fundamentos teóricos}
-\subsection{Conceptos y herramientas}
 \begin{frame}
     \frametitle{CI/CD}
     \begin{figure}
@@ -84,33 +84,6 @@
         \caption{Ciclo de CI/CD de este TFG.}
     \end{figure}
 \end{frame}
-\begin{frame}
-    \frametitle{GitOps \& ArgoCD}
-    \begin{figure}
-        \includegraphics[scale=0.35]{figuras/argocd-simple}
-        \caption{Funcionamiento de ArgoCD con GitOps.}
-    \end{figure}
-\end{frame}
-\begin{frame}
-    \frametitle{Kubernetes \& Helm}
-    \begin{columns}
-        \begin{column}{0.45\textwidth}
-            \begin{figure}
-                \includegraphics[scale=0.15]{figuras/kubernetes-logo}
-            \end{figure}
-        \end{column}
-        \begin{column}{0.1\textwidth}
-            \center
-            \LARGE \&
-        \end{column}
-        \begin{column}{0.45\textwidth}
-            \begin{figure}
-                \includegraphics[scale=0.18]{figuras/helm-logo}
-            \end{figure}
-        \end{column}
-    \end{columns}
-\end{frame}
-\subsection{Dagger}
 
 \begin{frame}
     \frametitle{Dagger}
@@ -139,6 +112,31 @@
             \end{figure}
         \end{column}
     \end{columns}
+\end{frame}
+\section{Fundamentos teóricos}
+\subsection{Conceptos y herramientas}
+\begin{frame}
+    \frametitle{Kubernetes \& Helm}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{figure}
+                \includegraphics[scale=0.15]{figuras/kubernetes-logo}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{figure}
+                \includegraphics[scale=0.18]{figuras/helm-logo}
+            \end{figure}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{GitOps \& ArgoCD}
+    \begin{figure}
+        \includegraphics[scale=0.35]{figuras/argocd-simple}
+        \caption{Funcionamiento de ArgoCD con GitOps.}
+    \end{figure}
 \end{frame}
 
 % \section{Bibliografía}

@@ -1,0 +1,47 @@
+---- Diapo 1
+
+Hola a todos, soy Daniel Vieites, y os voy a presentar mi Trabajo de Fin de Grado, el cual trata de la creación de un ciclo completo de CI y CD utilizando Dagger y Kubernetes.
+
+---- Diapo 2 Tabla de contenido
+
+Hablaré primero de los objetivos del TFG, indicando el problema que se pretende resolver, aportando todo el contexto necesario. Entonces, pasaré a explicar una serie de conceptos y herramientas imprescindibles para entender mejor todo lo realizado en el TFG, y presentaré Dagger como solución al problema que se ha planteado.
+
+> Faltan apartados
+
+---- Diapo 3 ¿Cuál es el problema?
+
+Voy a comenzar respondiendo cuál es el problema que se ha encontrado. Y es que, hoy en día, las aplicaciones utilizan cada vez más tecnologías diferentes. Sobre todo aplicaciones bien conocidas, como es el caso de GitLab, de la cual podemos ver en este diagrama una representación reducida, proporcionada por ellos mismos, de lo que es su arquitectura. Aquí se pueden observar bastantes servicios diferentes, cada uno con sus funciones específicas, y todos comunicados entre sí.
+
+Como en toda aplicación medianamente grande, es necesario tener un flujo de trabajo a la hora de integrar código y de desplegar la aplicación. En este flujo se deberían hacer cosas como: realizar pruebas a la aplicación que indiquen que todo funciona correctamente, comprobar que el propio código tenga un formato y una sintaxis correcta, construir la aplicación para su posterior despliegue, y todo esto de manera automatizada, ya que se tratan de tareas repetitivas que no deberían cambiar demasiado una vez definidas.
+
+Este flujo de trabajo se realiza hoy en día utilizando, sobre todo, archivos YAML, como el que se ve en la imagen; y scripts específicos para cada una de las herramientas. Siguiendo con el ejemplo de GitLab, en el momento de preparar esta presentación, se podían encontrar más de 9000 archivos YAML en todo el repositorio de su aplicación, de los cuales cerca de 70 de estos archivos definían el flujo de CI, es decir, todo lo relacionado con la integración de código en la aplicación: pruebas, sintaxis y formateo del código y construcción de la aplicación.
+
+Mantener esta cantidad de archivos que automatizan el ciclo de vida de la aplicación supone un coste muy elevado de tiempo y, por lo tanto, de dinero.
+
+Además, ofrecen muy poca portabilidad. Todo el flujo de integración de código y despliegue de la aplicación de GitLab se realiza de manera remota. No existe opción de realizar este proceso de manera local, lo cual genera una dependencia con el servicio remoto, ya que es necesario que dicho servicio esté disponible para poder trabajar.
+
+---- Diapo 4 ¿Qué se propone?
+
+Por lo tanto, estos hechos son los que nos llevan a buscar una alternativa para la gestión de los ciclos de CI y CD. Y lo que se propone es utilizar Dagger.
+
+---- Diapo 5 CI/CD
+
+Antes de introducir lo que es Dagger, voy a dejar más claro qué son los ciclos de CI y de CD.
+
+Estas son las siglas en inglés de Continuous Integration y Continuous Deployment, Integración y Despliegue Contínuos. En este diagrama se pueden ver los pasos que se siguen en este TFG para realizar estos ciclos.
+
+Dentro de la integración continua se incluye: la escritura de código, la construcción de la aplicación, para comprobar que los cambios realizados en el código siguen permitiendo construir la aplicación; el linting, que se refiere a la comprobación de formateo y sintaxis del propio código; y los tests que permiten asegurar que la aplicación funciona como se espera.
+
+Una vez realizado el ciclo de CI, se pasa a la creación de una release de la aplicación, que es el primer paso del ciclo de CD. Se realiza una release cuando se le da un nombre al estado actual de la aplicación, que suele ser en forma de versiones, como la 1.0 o 2.0. Es entonces cuando se pasa a desplegar dicha release, quedando disponible para su uso. Así se completaría el ciclo de CI/CD, y se volvería a empezar de nuevo.
+
+---- Diapo 6 Dagger
+
+Una vez se tiene claro lo que son los ciclos de CI y CD, puedo pasar a presentar Dagger como la solución al problema que he comentado antes.
+
+Dagger es un SDK de creación de pipelines de CI/CD, es decir, se trata de un Kit de Desarrollo de Software que nos permite crear esta serie de acciones necesarias para realizar los ciclos de CI y CD, utilizando cualquiera de los lenguajes que se muestran aquí. Todos estos son lenguajes conocidos por la mayoría de programadores, y esta gran variedad de opciones hace que, independientemente del sector de la programación en la que trabaje el programador, sea muy probable que sepa utilizar uno de estos lenguajes, lo cual le va a permitir empezar a utilizar Dagger más fácilmente.
+
+El hecho de que se puedan utilizar estos lenguajes de programación, nos da la oportunidad de poder crear nuestros ciclos de CI/CD como si se trataran de aplicaciones independientes completamente estructuradas. Estas aplicaciones construidas con Dagger se conocen como módulos, y se pueden subir a un espacio común llamado Daggerverse. Además, estos módulos no tienen por qué ser los ciclos de CI y CD completos, pueden ser pequeñas aplicaciones con funcionalidades específicas que cualquier equipo de desarrollo pueda incluir directamente en sus pipelines.
+
+Además, todas las funciones que se crean en un módulo de Dagger corren sobre un runtime de OCI, como Docker. Es decir, se puede utilizar cualquier aplicación que permita crear contenedores definidos de la manera estandarizada que indica la fundación Open Container Initiative. Por lo tanto, con esta funcionalidad vamos a ser capaces de ejecutar nuestros ciclos de CI/CD en cualquier entorno de desarrollo que tenga instalada una herramienta como Docker. Y, como no podía ser de otra manera, se puede ejecutar todo de manera local, sin depender de herramientas remotas.
+
+Por último, Dagger hace un uso extensivo de la caché, almacenando cada una de las operaciones que realiza, y acudiendo a ellas siempre que los parámetros de entrada de las funciones no cambie. Esta funcionalidad hará que tareas que nunca cambien dentro de nuestros ciclos de CI/CD, como la instalación de dependencias, se ejecuten mucho más rápido tras la primera ejecución, ya que se almacenará el resultado en la caché, y se recurirá a este cada vez que se realice la misma operación.
