@@ -190,7 +190,6 @@ generators:
 		WithEnvVariable("XDG_CONFIG_HOME", "/root/.config").
 		WithNewFile("/app/kustomization.yaml", kustomizationFile).
 		WithNewFile("/app/secret_generator.yaml", secretGeneratorFile).
-		Terminal().
 		WithExec([]string{"sh", "-c", processingScript})
 
 	commitScript := fmt.Sprintf(`
