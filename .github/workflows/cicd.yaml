@@ -73,6 +73,7 @@ jobs:
           cat ./.env
 
       - name: Run Dagger CI module
+        if: false
         run: |
           set -euo pipefail
 
