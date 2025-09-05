@@ -27,31 +27,17 @@
         \begin{column}{0.45\textwidth}
             \begin{itemize}
                 \item<1-> Aplicaciones con un gran volumen de tecnologías.
-                      % - frontend, proxy, backend, BDs
                 \item<2-> Gran complejidad.
-                      % sintaxis
-                      % tipos de valores
-                      % número de yaml en gitlab
                 \item<3-> Coste de mantenimiento elevado.
-                      % scripts heterogéneos
-                      % entrelazar herramientas especializadas
-                      % poca capacidad de abstracción
-                \item<4-> Baja portabilidad.
-                      % ejecución en remoto
-                      % sin pipeline local, sin docker
-                      % dependencia de la plataforma
-                      % push and pray
             \end{itemize}
         \end{column}
         \begin{column}{0.55\textwidth}
             \begin{figure}
-                \includegraphics<1>[height=4.9cm]{figuras/Gitlab}
+                \includegraphics<1>[height=4.8cm]{figuras/Gitlab}
                 \only<1>{\caption{Arquitectura de GitLab.}}
-                \includegraphics<2>[scale=0.4]{figuras/Gitlab_yamls}
-                \only<2>{\caption{Archivos YAML en GitLab.}}
+                \includegraphics<2>[scale=0.33]{figuras/complejidad}
                 \includegraphics<3>[scale=0.15]{figuras/costes-mantenimiento}
                 \only<3>{\caption{Imagen generada con IA.}}
-                \includegraphics<4>[scale=0.35]{figuras/portabilidad}
             \end{figure}
         \end{column}
     \end{columns}
@@ -92,12 +78,12 @@
             \begin{itemize}
                 \item<1-> SDK de creación de \textit{pipelines} de CI/CD.
                 \item<2-> Múltiples lenguajes.
-                    % Sin necesidad de entrelazar scripts de manera
-                    % compleja. Uso del mismo lenguaje de programación.
-                    % Más abstracción.
+                      % Sin necesidad de entrelazar scripts de manera
+                      % compleja. Uso del mismo lenguaje de programación.
+                      % Más abstracción.
                 \item<3-> Módulos.
                 \item<4-> {\it Runtime} de OCI.
-                    % Permite ejecución local
+                      % Permite ejecución local
                 \item<5-> Uso de caché.
             \end{itemize}
         \end{column}
@@ -113,22 +99,46 @@
         \end{column}
     \end{columns}
 \end{frame}
-\section{Fundamentos teóricos}
-\subsection{Conceptos y herramientas}
+
+\section{Organización}
 \begin{frame}
-    \frametitle{Kubernetes \& Helm}
-    \begin{columns}
-        \begin{column}{0.5\textwidth}
-            \begin{figure}
-                \includegraphics[scale=0.15]{figuras/kubernetes-logo}
-            \end{figure}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-            \begin{figure}
-                \includegraphics[scale=0.18]{figuras/helm-logo}
-            \end{figure}
-        \end{column}
-    \end{columns}
+    \frametitle{Organización de GitHub}
+    \begin{figure}
+        \includegraphics[scale=0.28]{figuras/vieites-tfg}
+    \end{figure}
+\end{frame}
+
+\section{CI}
+\subsection{App}
+\begin{frame}
+    \frametitle{Zoo}
+    \begin{figure}
+        \includegraphics[scale=0.25]{figuras/app}
+        \caption{Elementos de la aplicación.}
+    \end{figure}
+\end{frame}
+
+\subsection{CI con Dagger}
+\begin{frame}
+    \frametitle{Tengo que explicar CI}
+\end{frame}
+
+\section{CD}
+\subsection{Estructura de despliegue}
+\begin{frame}
+    \frametitle{helm-repository}
+    \begin{figure}
+        \includegraphics[scale=0.4]{figuras/helm-repository}
+        \caption{Estructura de despliegue de la aplicación.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{state}
+    \begin{figure}
+        \includegraphics[scale=0.3]{figuras/state}
+        \caption{Estructura del repositorio de estado.}
+    \end{figure}
 \end{frame}
 
 \begin{frame}
@@ -137,6 +147,16 @@
         \includegraphics[scale=0.35]{figuras/argocd-simple}
         \caption{Funcionamiento de ArgoCD con GitOps.}
     \end{figure}
+\end{frame}
+
+\subsection{CD con Dagger}
+\begin{frame}
+    \frametitle{Tengo que explicar CD}
+\end{frame}
+
+\section{Conclusiones}
+\begin{frame}
+    \frametitle{Conclusiones}
 \end{frame}
 
 % \section{Bibliografía}
