@@ -71,9 +71,6 @@ jobs:
           ${{ secrets.SOPS_CONFIG_FILE }}
           EOF
 
-          cat ./sops/.sops.yaml
-          cat ./.env
-
       - name: Run Dagger CI module
         run: |
           set -euo pipefail
@@ -110,9 +107,6 @@ jobs:
       - name: Run Dagger CD module
         working-directory: zoo
         run: |
-          ls -la
-          ls -la sops
-
           dagger call -m "./dagger/cd" \
             --socket=/var/run/docker.sock \
             --kind-svc=tcp://localhost:3000 \
