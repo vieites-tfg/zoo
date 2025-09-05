@@ -110,6 +110,7 @@ jobs:
         working-directory: zoo
         run: |
           ls -la
+          ls -la sops
 
           dagger call -m "./dagger/cd" \
             --socket=/var/run/docker.sock \
