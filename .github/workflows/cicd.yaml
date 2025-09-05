@@ -25,6 +25,8 @@ jobs:
 
       - name: Install Dagger
         uses: dagger/dagger-for-github@8.0.0
+        with:
+          version: "v0.18.16"
 
       - name: Determine environment
         id: determine_env
