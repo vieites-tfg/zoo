@@ -7,6 +7,10 @@ SOPS_DIR="${CURRENT_DIR}/../sops"
 ARGO_DIR="${CURRENT_DIR}/../argo"
 CLUSTER_DIR="${CURRENT_DIR}/../cluster"
 ENVS=("dev" "pre" "pro")
+# if there are arguments, use them as environment
+if [ "$#" -gt 0 ]; then
+    ENVS=("$@")
+fi
 PASSWORDS=""
 
 INGRESS_MANIFEST="https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml"
@@ -38,7 +42,7 @@ for ENV in "${ENVS[@]}"; do
 
     echo "--- Applying SOPS AGE Key for ArgoCD ---"
     cat "${SOPS_DIR}/age.agekey" |
-        kubectl create secret generic sops-age -n argocd --context ${CONTEXT} \
+        kubectl create secret generic sops-age -n argocd --context "${CONTEXT}" \
         --from-file=keys.txt=/dev/stdin
 
     echo "--- Installing ArgoCD in cluster '${ENV}' ---"
@@ -68,9 +72,9 @@ for ENV in "${ENVS[@]}"; do
         -o jsonpath="{.data.password}" | base64 -d)
 
     current_pass="${ENV} password: ${pass}\n"
-    printf "${current_pass}"
+    printf "%s\n" "${current_pass}"
     PASSWORDS+="${current_pass}"
 done
 
 echo "--- All environments created successfully! ---"
-printf "${PASSWORDS}"
+printf "%s\n" "${PASSWORDS}"

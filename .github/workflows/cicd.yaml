@@ -25,6 +25,8 @@ jobs:
 
       - name: Install Dagger
         uses: dagger/dagger-for-github@8.0.0
+        with:
+          version: "v0.18.16"
 
       - name: Determine environment
         id: determine_env
@@ -53,9 +55,8 @@ jobs:
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
 
       - name: Recreate needed files
+        working-directory: zoo
         run: |
-          cd "${GITHUB_WORKSPACE}/zoo"
-
           # Create .env
           echo "MONGO_DATABASE=${{ secrets.MONGO_DATABASE }}" > ./.env
           echo "MONGO_ROOT=${{ secrets.MONGO_ROOT }}" >> ./.env
@@ -70,7 +71,11 @@ jobs:
           ${{ secrets.SOPS_CONFIG_FILE }}
           EOF
 
+          cat ./sops/.sops.yaml
+          cat ./.env
+
       - name: Run Dagger CI module
+        if: false
         run: |
           set -euo pipefail
 
@@ -104,8 +109,10 @@ jobs:
           update_state "zoo-frontend" "${tag}"
 
       - name: Run Dagger CD module
+        working-directory: zoo
         run: |
-          cd "${GITHUB_WORKSPACE}/zoo"
+          ls -la
+          ls -la sops
 
           dagger call -m "./dagger/cd" \
             --socket=/var/run/docker.sock \
