@@ -53,9 +53,8 @@ jobs:
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
 
       - name: Recreate needed files
+        working-directory: zoo
         run: |
-          cd "${GITHUB_WORKSPACE}/zoo"
-
           # Create .env
           echo "MONGO_DATABASE=${{ secrets.MONGO_DATABASE }}" > ./.env
           echo "MONGO_ROOT=${{ secrets.MONGO_ROOT }}" >> ./.env
@@ -69,6 +68,9 @@ jobs:
           cat <<EOF > ./sops/.sops.yaml
           ${{ secrets.SOPS_CONFIG_FILE }}
           EOF
+
+          cat ./sops/.sops.yaml
+          cat ./.env
 
       - name: Run Dagger CI module
         run: |
@@ -104,8 +106,9 @@ jobs:
           update_state "zoo-frontend" "${tag}"
 
       - name: Run Dagger CD module
+        working-directory: zoo
         run: |
-          cd "${GITHUB_WORKSPACE}/zoo"
+          ls -la
 
           dagger call -m "./dagger/cd" \
             --socket=/var/run/docker.sock \
