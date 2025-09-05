@@ -78,8 +78,6 @@ alias prl := pkg_remote_local
 pkg_remote_local package:
   ./scripts/push_package.sh all {{package}}
 
-cluster := "zoo-cluster"
-
 apply_ingress:
   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
   sleep 0.5
@@ -88,7 +86,7 @@ apply_ingress:
   --selector=app.kubernetes.io/component=controller \
   --timeout=90s
 
-create_cluster:
+create_cluster cluster:
   kind create cluster --name {{cluster}} --config=./cluster/kind_local.yaml
 
   kubectl create namespace dev
@@ -96,7 +94,7 @@ create_cluster:
   kubectl create namespace pro
 
 alias dc := delete_cluster
-delete_cluster:
+delete_cluster cluster:
   kind delete cluster -n {{cluster}}
 
 check_hosts +ns:
