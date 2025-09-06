@@ -8,7 +8,7 @@ import (
 type Ci struct {
 	// This is the '.env' file with the environment variables needed to launch the application.
 	// +required
-	SecEnv  *dagger.Secret
+	SecEnv *dagger.Secret
 
 	secrets secrets
 }
@@ -20,7 +20,11 @@ func New(secEnv *dagger.Secret) *Ci {
 }
 
 // Builds the base image from the Dockerfile.
-func (m *Ci) Base(ctx context.Context, src *dagger.Directory) (*dagger.Container, error) {
+func (m *Ci) Base(
+	ctx context.Context,
+	// +defaultPath="/"
+	src *dagger.Directory,
+) (*dagger.Container, error) {
 	ctr := dag.
 		Container().
 		From("node:20").
@@ -30,8 +34,8 @@ func (m *Ci) Base(ctx context.Context, src *dagger.Directory) (*dagger.Container
 		WithFile("yarn.lock", src.File("yarn.lock")).
 		WithDirectory("packages", src.Directory("packages")).
 		WithDirectory(".git", src.Directory(".git")).
-		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
 		WithMountedCache("/.yarn/cache", dag.CacheVolume("yarn-cache")).
+		WithEnvVariable("YARN_CACHE_FOLDER", "/.yarn/cache").
 		WithExec([]string{"yarn", "install"}).
 		WithExec([]string{"yarn", "global", "add", "lerna@8.2.1"}).
 		WithExec([]string{"yarn", "global", "add", "@vercel/ncc"})
