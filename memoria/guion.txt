@@ -1,83 +1,127 @@
 ---- Diapo 1
 
-Hola a todos, soy Daniel Vieites, y os voy a presentar mi Trabajo de Fin de Grado, el cual trata de la creación de un ciclo completo de CI y CD utilizando Dagger y Kubernetes. La idea de este TFG es responder si Dagger es una opción viable para la creación de pipelines de CI y CD para cualquier aplicación, así cómo las ventajas y las desventajas que tiene con respecto a métodos convencinales.
+- quién soy
+- de qué trata la presentación
+- es dagger viable para crear pipelines de ci/cd?
+- ventajas y desventajas de dagger frente a métodos convencionales
 
 ---- Diapo 2 Tabla de contenidos
 
-Hablaré primero de los objetivos del TFG, indicando el problema que se pretende resolver y la solución que se le ha dado al problema. Entonces, pasaré a explicar cómo se ha organizado todo el trabajo en GitHub, los diferentes repositorios y la relación entre ellos. Pasaré primero al apartado de CI (Integración Continua), que corresponde con la creación de la aplicación web y la posterior implementación del ciclo de CI con Dagger. Después seguiré con CD (Despliegue Contínuo), donde diré cómo se ha estructurado la aplicación para su despliegue y cómo se ha implementado el ciclo de CD con Dagger. Por último, hablaré de las conclusiones a las que se ha llegado
+- objetivos, problema y solución
+- organización, repositorios y relación entre ellos
+- CI, app e implementación con dagger
+- CD, estructura de despliegue implementación con dagger
+- conclusiones
 
 ---- Diapo 3 ¿Cuál es el problema?
 
-Voy a comenzar respondiendo cuál es el problema que se ha encontrado. Y es que, hoy en día, las aplicaciones utilizan cada vez más tecnologías diferentes. En este diagrama podemos ver una representación reducida de lo que es la arquitectura de GitLab. Como se puede observar, hay bastantes servicios diferentes, cada uno con sus funciones específicas, y todos comunicados entre sí.
+- aplicaciones con cada vez más tecnologías
+- representación reducida de la arquitectura de GitLab
+- muchos servicios diferentes comunicados entre sí
 
-Como en toda aplicación medianamente grande, es necesario tener un flujo de trabajo a la hora de integrar código y de desplegar la aplicación. En este flujo se hacen cosas como: realizar pruebas, para comprobar que todo funciona correctamente; asegurarnos que el propio código tenga un formato y una sintaxis correcta, construir y desplegar la aplicación. Todo esto de manera automatizada.
+- necesario un flujo de trabajo de integración y despliegue
+    - cosas que hacer en el flujo
+    - flujo automatizado
 
-Este flujo automatizado de integración y depliegue de código se realiza hoy en día creando scripts independientes, específicos para cada una de las tecnologías que debemos testear, y todos estos scripts están, a su vez, unidos por más scripts, normalmente escritos en bash. Así se obtiene un caos funcional, pero que no deja de ser un caos. A estos scripts hay que añadirle también la ingente cantidad de archivos YAML, tan populares para la configuración de absolutamente cualquier cosa, pero que a la vez son muy volátiles, es muy fácil equivocarse configurándolos.
+- cómo se realiza hoy en día este flujo automatizado
+    - scripts específicos + scripts de unión
+    - YAML: popular pero volátil
+- caos funcional
+- tiempo de ejecución muy elevado si no se configura correctamente la caché
 
-Todo esto hace que estos ciclos de pruebas y depliegue de cualquier aplicación sean muy difíciles de mantener. Esto supone un coste muy elevado de tiempo y, por lo tanto, de dinero.
+- difícil de mantener
+- conte de tiempo y dinero
 
 ---- Diapo 4 ¿Qué se propone?
 
-Por lo tanto, lo que se propone como alternativa, es utilizar Dagger. Esta herramienta se presenta como una revolución de la creación de pipelines de CI y CD. Se trata de un nuevo paradigma, que podríamos considerar tan importante como la aparición de Docker para la virtualización de aplicaciones.
+- Dagger
+    - revolución para la creación de pipelines CI/CD
+    - tan importante como la aparición de Docker para el despliegue de aplicaciones.
 
 ---- Diapo 5 CI/CD
 
-Antes de introducir lo que es Dagger, voy a dejar más claro qué son los ciclos de CI y de CD.
-
-Estas son las siglas en inglés de Continuous Integration y Continuous Deployment, Integración y Despliegue Contínuos. En este diagrama se pueden ver los pasos que se siguen en este TFG para realizar estos ciclos.
-
-Dentro de la integración continua se incluye: la escritura de código, la construcción de la aplicación, para comprobar que los cambios realizados en el código siguen permitiendo construir la aplicación; el linting, que se refiere a la comprobación de formateo y sintaxis del propio código; y los tests que permiten asegurar que la aplicación funciona como se espera.
-
-Una vez realizado el ciclo de CI, se pasa a la creación de una release de la aplicación, que es el primer paso del ciclo de CD. Se realiza una release cuando se le da un nombre al estado actual de la aplicación, que suele ser en forma de versiones, como la 1.0 o 2.0. Es entonces cuando se pasa a desplegar dicha release, quedando disponible para su uso. Así se completaría el ciclo de CI/CD, y se volvería a empezar de nuevo.
+- qué es CI y CD
+    - pasos de cada uno y qué se hace
 
 ---- Diapo 6 Dagger
 
-Una vez se tiene claro lo que son los ciclos de CI y CD, puedo pasar a presentar Dagger como la solución al problema que he comentado antes.
-
-Dagger es un SDK de creación de pipelines de CI/CD, es decir, se trata de un Kit de Desarrollo de Software que nos permite crear esta serie de acciones necesarias para realizar los ciclos de CI y CD, utilizando cualquiera de los lenguajes que se muestran aquí. Todos estos son lenguajes conocidos por la mayoría de programadores, y esta gran variedad de opciones hace que, independientemente del sector de la programación en la que trabaje el programador, sea muy probable que sepa utilizar uno de estos lenguajes, lo cual le va a permitir empezar a utilizar Dagger más fácilmente.
-
-El hecho de que se puedan utilizar estos lenguajes de programación, nos da la oportunidad de poder crear nuestros ciclos de CI/CD como si se trataran de aplicaciones independientes completamente estructuradas. Estas aplicaciones construidas con Dagger se conocen como módulos, y se pueden subir a un espacio común llamado Daggerverse. Además, estos módulos no tienen por qué ser los ciclos de CI y CD completos, pueden ser pequeñas aplicaciones con funcionalidades específicas que cualquier equipo de desarrollo pueda incluir directamente en sus pipelines.
-
-Además, todas las funciones que se crean en un módulo de Dagger corren sobre un runtime de OCI, como Docker. Es decir, se puede utilizar cualquier aplicación que permita crear contenedores definidos de la manera estandarizada que indica la fundación Open Container Initiative. Por lo tanto, con esta funcionalidad vamos a ser capaces de ejecutar nuestros ciclos de CI/CD en cualquier entorno de desarrollo que tenga instalada una herramienta como Docker. Y también va a permitir ejecutar todo de manera local, sin depender de herramientas remotas.
-
-Además, Dagger hace un uso extensivo de la caché, almacenando cada una de las operaciones que realiza, y acudiendo a ellas siempre que los parámetros de entrada de las funciones no cambie. Esta funcionalidad hace que tareas que nunca cambian dentro de nuestros ciclos de CI/CD, como la instalación de dependencias, se ejecuten mucho más rápido tras la primera ejecución, ya que se almacenará el resultado en la caché, y se recurrirá a ese resultado cada vez que se realice la misma operación.
+- qué es Dagger
+    - SDK de creación de pipelines de CI y CD
+    - programático
+    - múltiples lenguajes, conocidos por la mayoría de programadores
+    - ciclos de CI/CD como aplicaciones estructuradas
+    - aplicaciones -> módulos -> Daggerverse
+    - módulos con funcionalidades específicas
+    - funciones corren sobre runtime de OCI: Docker
+    - ejecución en cualquier entorno de desarrollo con una herramienta como Docker
+    - ejecución de manera local
+    - uso extensivo y automatizado de la caché
 
 ---- Diapo 7 Organización de GitHub
 
-Ahora pasaré a explicar cómo se ha desarrollado la implementación de todo lo necesario para comprobar si Dagger es realmente la solución al problema que se ha planteado.
-
-Lo primero que se ha hecho fue crear una organización de Github, a la que se le ha llamado vieites-tfg. Aquí se han creado los siguientes repositorios: zoo, helm-repository y state.
-
-El repositorio de zoo está estructurado como un monorepo, esto significa que todos los paquetes que conforman la aplicación, en este caso el frontend y el backend, se encuentran en el mismo repositorio. Esto se ha decidio así porque la aplicación es relativamente pequeña, y se hace más sencillo gestionar los paquetes si están todos en un mismo lugar. Además, se utiliza una herramienta de gestión de monorepos, llamada Lerna, que permite realizar operaciones sobre los distintos paquetes de la aplicación, tanto a la vez, como por separado. En este repositorio también se encuentra toda la implementación de los ciclos de CI y CD con Dagger. Esta es otra ventaja de tener el repositorio estructurado como un monorepo, ya que se puede utilizar Lerna desde los propios ciclos de CI y CD de Dagger para realizar las acciones que queramos sobre los paquetes de la aplicación.
-
-Para realizar el despliegue de la aplicación se utiliza Kubernetes y Helm. Kubernetes nos permite definir en una serie de archivos la estructura de la aplicación a la hora de desplegar. Helm nos permite crear plantillas para generar estos archivos de Kubernetes de manera dinámica. Esto nos va a permitir más adelante definir diferentes entornos para la aplicación, que serán: el de desarrollo, el de pre-producción y el de producción.
-
-Las plantillas de helm se almacenan en el repositorio helm-repository, mientras que los valores correspondientes a cada uno de los entornos se encuentran en el repositorio state. Además, en state se creó una rama específica en la que se almacenan los recursos de Kubernetes finales para cada uno de los entornos definidos. Más adelante explicaré por qué se almacenan en un lugar a parte los recursos finales.
-
-Ahora voy a explicar más en profundidad lo que se realiza en cada uno de los repositorios, pero voy a dejar todo lo relacionado con Dagger para el final, con el fin de tener todo el contexto posible antes de hablar de la creación de los ciclos de CI y CD.
+- qué se hace en cada repositorio
+- zoo
+    - monorepo
+        - los paquetes de la aplicación en un mismo lugar
+        - más fácil de gestionar
+        - Lerna
+        - Dagger
+- Kubernetes
+    - archivos YAML para definir la estructura
+- Helm
+    - plantillas para creación dinámica de los archivos: Charts
+    - se le pasan diferentes valores
+    - definición de entornos
+- helm-repository
+    - Charts de Helm
+- state
+    - valores para cada entorno que se pasan a las Charts
+    - rama deploy para recursos finales por entorno
 
 ---- Diapo 8 App zoo
 
-Empezando por el repositorio de zoo, tenemos la aplicación web de gestión del zoo. Como se ha comentado antes, está formado por dos paquetes: el frontend, construido con Vue y Typescript; y el backend, en el que se ha creado una API REST con Typestcript que se comunica con una base de datos MongoDB, en la que se almacenan los datos de los animales.
+- hablar de la imagen
+- primeros pasos ciclo de CI
+    - todo local
+    - Dockerfiles
+    - scripts
+    - comandos
+    - justfile
+    - no comparable con una aplicación grande, pero se entiende la idea
 
->>>> AÑADIR IMAGEN DE LA PÁGINA WEB
+---- Diapo 9 CI con Dagger
 
----- Diapo 9 helm-repository
+- funciones únicas
+- traducción de Dockerfiles (API de Docker)
+- estructuración
+- concatenación de funciones
 
-En el repositorio helm-repository se encuentran las plantillas de Helm que definen los recursos de Kubernetes necesarios para desplegar la aplicación. Las plantillas de Helm se agrupan en Charts, por lo tanto, podemos ver que tenemos una Chart zoo principal, y dentro de esta, otras tres Charts. zoo-frontend y zoo-backend son las Charts que definen, respectivamente, la estructura del frontend y del backend de nuestra aplicación. Por otro lado tenemos una Chart mongodb que obtenemos de un repositorio muy conocido llamado Bitnami.
+---- Diapo 10 helm-repository
 
-Entre los recursos que se van a utilizar para desplegar nuestra aplicación se encuentran: elementos de configuración como los configMap, secretos en el backend para acceder a la base de datos, Ingress para permitir el acceso desde el exterior junto con los servicios, los cuales permiten también la comunicación entre los pods que crean los distintos deployments.
+- Chart umbrella
+- subcharts
+    - frontend
+    - backend
+    - mongo
+- mongo de bitnami
+- plantillas de recursos
+    - cm: configuración de variables
+    - svc: exponer pods mediante red
+    - deploy: gestionar pods
+    - ing: permitir acceso externo HTTP/HTTPS
+    - secret: almacenar datos sensibles cifrados
+- se necesita pasar valores a las plantillas
 
-Como decía, esto son plantillas de Helm que definen recursos de Kubernetes. Pero para generar los recursos en sí necesitamos pasarles a estas plantillas los valores necesarios.
+---- Diapo 11 state
 
----- Diapo 10 state
+- creación de diferentes entornos pasando diferentes valores
+- rama main
+    - archivos de valores
+    - helmfile, para conectar con la Chart
+- rama deploy
+    - recursos finales por entorno
+    - metodología GitOps para despliegue con ArgoCD
 
-Esos valores se definen en el repositorio state. Debido a la capacidad de poder pasar diferentes valores a las mismas plantillas, se pueden crear entornos diferentes para la aplicación. Esos entornos son los que se ven aquí: dev, pre y pro.
-
-Como se puede ver, en el repositorio de state existen dos ramas. La principal, main, está estructurada de esta manera, con archivos de valores globales en la raíz del repositorio, directorios con archivos de valores específicos para cada uno de los entornos, y un archivo helmfile, el cual permite indicar la Chart de helm que estamos utilizando, aportando el repositorio en el que se encuentra, el nombre de la Chart y la versión; y los valores que se le van a pasar a la Chart, según se quiera crear un entorno u otro.
-
-Los recursos resultantes de aplicar los valores de un entorno determinado a nuestra Chart, se guardan en la rama deploy. Por lo tanto, esta rama tiene la información del estado actual de cada uno de los entornos. De esta manera, se están realizando prácticas que concuerdan con la metodología GitOps.
-
----- Diapo 10 GitOps & ArgoCD
+---- Diapo 12 GitOps & ArgoCD
 
 Esto se realiza así porque se utiliza la herramienta ArgoCD, la cual funciona siguiendo esta metodología, en la cual se utilizan repositorios de Git para almacenar el estado que el equipo desea que tenga la aplicación. ArgoCD es una herramienta que permite desplegar aplicacines definidas mediante recursos de Kubernetes. Y tiene la capacidad de detectar cambios en el repositorio y rama que se le indique. Cuando detecta algún cambio, se actualiza, obteniene los cambios que se han realizado, y actualiza su estado para que concuerde con el estado que realmente se desea, que es el que está en el repositorio.
