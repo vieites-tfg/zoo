@@ -104,9 +104,6 @@ cd ~/zoo
 
 2. Clave privada
 
-> [!warning]
-> Reservar únicamente para la entrega final de la memoria.
-
 ```bash
 mkdir -p ./sops # crear el directorio en el caso de que no exista
 echo "AGE-SECRET-KEY-1CTS4S4QNNZ9N9YXXM288LSE9VKPJ220E57ZHC4558WMZ8LG2QWKQFFER8C" > ./sops/age.agekey
