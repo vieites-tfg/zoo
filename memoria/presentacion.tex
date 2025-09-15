@@ -9,7 +9,7 @@
     Universidad de Santiago de Compostela}
 \author{Autor: Daniel Vieites Torres}
 \institute{Tutor: Juan Carlos Pichel Campos \\ Co-tutor: Francisco Maseda Muiño}
-\date{15 de septiembre de 2025}
+\date{16 de septiembre de 2025}
 
 \begin{frame}
     \titlepage
@@ -25,6 +25,10 @@
         \caption{Ciclo de CI/CD de este TFG.}
     \end{figure}
 \end{frame}
+
+%%%%%%%%%%%%%%%
+% El problema %
+%%%%%%%%%%%%%%%
 
 \subsection{El problema}
 \begin{frame}
@@ -44,6 +48,10 @@
         \end{column}
     \end{columns}
 \end{frame}
+
+%%%%%%%%%%%%%%%
+% La solución %
+%%%%%%%%%%%%%%%
 
 \subsection{La solución}
 
@@ -65,8 +73,9 @@
                 \item<1-> SDK de creación de \textit{pipelines} de CI/CD.
                 \item<2-> Múltiples lenguajes.
                 \item<3-> Módulos.
-                \item<4-> {\it Runtime} de OCI.
+                \item<4-> \textit{pipelines} como DAGs.
                 \item<5-> Uso de caché.
+                \item<6-> {\it Runtime} de OCI.
             \end{itemize}
         \end{column}
         \begin{column}{0.55\textwidth}
@@ -74,15 +83,17 @@
                 \includegraphics<1>[scale=0.2]{figuras/dagger}
                 \includegraphics<2>[scale=0.25]{figuras/languages}
                 \includegraphics<3>[scale=0.4]{figuras/daggerverse}
-                \includegraphics<4>[scale=0.4]{figuras/docker}
+                \includegraphics<4>[scale=0.3]{figuras/dag}
                 \includegraphics<5>[scale=0.1]{figuras/cache}
-                \only<5>{\caption{Imagen generada con IA.}}
+                \only<5>{\caption{Generada con IA.}}
+                \includegraphics<6>[scale=0.4]{figuras/docker}
             \end{figure}
         \end{column}
     \end{columns}
 \end{frame}
 
 \section{Organización}
+\subsection{Conjunto de repositorios}
 \begin{frame}
     \frametitle{Organización de GitHub}
     \begin{figure}
@@ -90,7 +101,10 @@
     \end{figure}
 \end{frame}
 
-\section{CI}
+%%%%%%%%%%%%
+% repos CI %
+%%%%%%%%%%%%
+
 \subsection{App}
 \begin{frame}
     \frametitle{Zoo}
@@ -100,17 +114,19 @@
     \end{figure}
 \end{frame}
 
-\subsection{CI con Dagger}
+%%%%%%%%%%%%
+% repos CD %
+%%%%%%%%%%%%
+
+\subsection{Metodología de despliegue}
 \begin{frame}
-    \frametitle{CI con Dagger}
+    \frametitle{GitOps \& ArgoCD}
     \begin{figure}
-        \includegraphics[width=10.8cm]{figuras/ci_dagger_go}
-        \caption{Estructura del módulo de CI con Go.}
+        \includegraphics[scale=0.35]{figuras/argocd-simple}
+        \caption{Funcionamiento de ArgoCD con GitOps.}
     \end{figure}
 \end{frame}
 
-\section{CD}
-\subsection{Estructura de despliegue}
 \begin{frame}
     \frametitle{helm-repository}
     \begin{figure}
@@ -127,14 +143,26 @@
     \end{figure}
 \end{frame}
 
+%%%%%%
+% CI %
+%%%%%%
+
+\section{CI}
+\subsection{CI con Dagger}
 \begin{frame}
-    \frametitle{GitOps \& ArgoCD}
+    \frametitle{CI con Dagger}
     \begin{figure}
-        \includegraphics[scale=0.35]{figuras/argocd-simple}
-        \caption{Funcionamiento de ArgoCD con GitOps.}
+        \includegraphics[width=10.8cm]{figuras/ci_dagger_go}
+        \caption{Estructura del módulo de CI con Go.}
     \end{figure}
 \end{frame}
 
+%%%%%%
+% CD %
+%%%%%%
+
+\section{CD}
+\subsection{Metodología de despliegue}
 \begin{frame}
     \frametitle{Diferentes entornos}
     \begin{figure}
@@ -161,6 +189,10 @@
     \end{figure}
 \end{frame}
 
+%%%%%%%%%%%%%%%%
+% Conclusiones %
+%%%%%%%%%%%%%%%%
+
 \section{Conclusiones}
 \begin{frame}
     \frametitle{Rendimiento}
@@ -172,12 +204,12 @@
 \begin{frame}
     \frametitle{Conclusiones finales}
     \begin{itemize}
-        \item Curva de aprendizaje moderada.
-        \item Facilidad de gestión de la lógica de programación.
-        \item Mantenimiento a largo plazo.
-        \item Gran portabilidad.
-        \item Gestión de caché.
-        \item Existencia de módulos públicos.
+        \item Curva de aprendizaje moderada. % API Docker
+        \item Facilidad de gestión. % sin scripts
+        \item Mantenimiento a largo plazo. % por lo anterior
+        \item Gran portabilidad. % Docker
+        \item Gestión de caché. % mejora tiempos
+        \item Existencia de módulos públicos. % reutilizar, ahorra tiempo
     \end{itemize}
 \end{frame}
 
